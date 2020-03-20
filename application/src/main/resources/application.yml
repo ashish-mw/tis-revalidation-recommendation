@@ -1,0 +1,57 @@
+spring:
+  profiles:
+    active: ${SPRING_PROFILE:local}
+  application:
+    name: TIS-HEE-REVALIDATION
+  jackson:
+    serialization.write_dates_as_timestamps: false
+    serialization.indent_output: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+  data:
+    mongodb:
+      host: ${MONGODB_HOST:localhost}
+      port: ${MONGODB_PORT:27017}
+      database: ${MONGODB_DATABASE:revalidation}
+#      username: ${MONGODB_USERNAME:guest}
+#      password: ${MONGODB_PASSWORD:guest}
+#      authentication-database: ${AUTH_DB:eventstore}
+
+server:
+  servlet:
+    context-path: /revalidation
+  port: ${SERVICE_PORT:8080}
+
+logging:
+  level:
+    uk.nhs.hee.tis.gmc.client: ${LOGGING_LEVEL:DEBUG}
+  file:
+    name: ${LOG_DIR:${HOME}}/revalidation.log
+
+management:
+  endpoints:
+    health:
+      enabled: true
+    web:
+      exposure:
+        include: '*'
+  server:
+    servlet:
+      context-path: /management
+
+app:
+  error:
+    exchange: "ex.error"
+    limit.retries: true
+
+  reval:
+    event.store.db: ${EVENT_STORE:eventstore}
+    event.store.collection: ${EVENT_STORE_COLLECTION:events_log}
+
+  rabbit:
+    exchange: ${EXCHANGE:gmc-connect-exchange}
+    queue: ${QUEUE:gmc-doctors-queue}
+    routingKey: ${ROUTING_KEY:uk.nhs.hee}

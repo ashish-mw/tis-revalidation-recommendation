@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import static java.time.LocalDate.now;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -61,8 +62,8 @@ public class RevalidationIT {
         gmcReference = faker.number().digits(8);
         firstName = faker.name().firstName();
         lastName = faker.name().lastName();
-        submissionDate = LocalDate.now();
-        dateAdded = LocalDate.now().minusDays(5);
+        submissionDate = now();
+        dateAdded = now().minusDays(5);
         underNotice = faker.options().option(UnderNotice.class);
         sanction = faker.lorem().characters(2);
 
@@ -91,5 +92,4 @@ public class RevalidationIT {
         assertThat(byId.get().getUnderNotice(), is(underNotice));
         assertThat(byId.get().getSanction(), is(sanction));
     }
-
 }

@@ -3,7 +3,7 @@
 echo "Starting up docker environment"
 
 cd ../scripts/
-docker-compose up -d
+docker-compose up --build --force-recreate --renew-anon-volumes -d
 
 sleep 40
 

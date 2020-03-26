@@ -16,8 +16,8 @@ spring:
       host: ${MONGODB_HOST:localhost}
       port: ${MONGODB_PORT:27017}
       database: ${MONGODB_DATABASE:revalidation}
-      username: ${MONGODB_USERNAME:guest}
-      password: ${MONGODB_PASSWORD:guest}
+      username: ${MONGODB_USERNAME:root}
+      password: ${MONGODB_PASSWORD:password}
       authentication-database: ${AUTH_DB:admin}
 
 server:

@@ -18,6 +18,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
+import static org.springframework.data.domain.Sort.Direction.DESC;
+import static org.springframework.data.domain.Sort.by;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -48,7 +50,7 @@ public class DoctorsForDBServiceTest {
     @Test
     public void shouldReturnListOfDoctors() {
 
-        when(repository.findAll()).thenReturn(of(doc1, doc2, doc3, doc4, doc5));
+        when(repository.findAll(by(DESC, "submissionDate"))).thenReturn(of(doc1, doc2, doc3, doc4, doc5));
         var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails();
         var doctorsForDB = allDoctors.getDoctorsForDB();
         assertThat(doctorsForDB, hasSize(5));

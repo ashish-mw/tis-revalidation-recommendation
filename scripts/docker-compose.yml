@@ -19,8 +19,6 @@ services:
     image: mongo:latest
     ports:
       - '27017:27017'
-    volumes:
-      - /tmp/data/mongo:/data/db
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root

@@ -1,6 +1,7 @@
 package uk.nhs.hee.tis.revalidation.entity;
 
 
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Document(collection = "doctorsForDB")
+@ApiModel(description = "Trainee doctors's core profile data")
 public class DoctorsForDB {
 
     @Id

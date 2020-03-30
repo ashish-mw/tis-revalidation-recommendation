@@ -26,7 +26,7 @@ jobs:
         uses: actions/upload-artifact@v2-preview
         with:
           name: app-jar
-          path: ./application/target/*-uber.jar
+          path: ./application/target/gmc-client-uber.jar
 
   dockerize:
     name: Dockerize
@@ -41,7 +41,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: app-jar
-          path: build/libs
+          path: application/target
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1

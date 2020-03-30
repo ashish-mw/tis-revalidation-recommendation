@@ -57,7 +57,7 @@ jobs:
       - name: Set lowercase repository name
         id: lowercase-repository-name
         env:
-          UPPERCASE_REPO_NAME: ${{ github.event.repository.name }}"
+          UPPERCASE_REPO_NAME: ${{ github.event.repository.name }}
         run: |
           echo "::set-output name=repo_name::echo $UPPERCASE_REPO_NAME | awk '{print tolower(0)}'"
 

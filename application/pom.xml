@@ -86,7 +86,7 @@
     </dependencies>
 
     <build>
-        <finalName>gmc-client</finalName>
+        <finalName>revalidation</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

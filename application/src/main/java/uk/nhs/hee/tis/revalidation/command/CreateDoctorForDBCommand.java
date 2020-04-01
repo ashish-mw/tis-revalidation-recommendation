@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class DoctorForDBReceivedCommand {
+public class CreateDoctorForDBCommand {
 
     @TargetAggregateIdentifier
     private UUID id;

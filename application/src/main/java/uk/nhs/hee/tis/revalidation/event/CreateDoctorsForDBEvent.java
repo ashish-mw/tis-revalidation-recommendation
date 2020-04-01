@@ -7,13 +7,15 @@ import lombok.NoArgsConstructor;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DoctorsForDBReceivedEvent {
+public class CreateDoctorsForDBEvent {
 
+    private UUID id;
     private String gmcReferenceNumber;
     private String doctorFirstName;
     private String doctorLastName;

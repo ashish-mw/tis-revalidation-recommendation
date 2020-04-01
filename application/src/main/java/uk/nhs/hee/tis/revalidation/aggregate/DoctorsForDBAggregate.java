@@ -9,13 +9,15 @@ import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
+import org.axonframework.modelling.command.Repository;
 import org.axonframework.spring.stereotype.Aggregate;
-import uk.nhs.hee.tis.revalidation.command.DoctorForDBReceivedCommand;
+import uk.nhs.hee.tis.revalidation.command.CreateDoctorForDBCommand;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
-import uk.nhs.hee.tis.revalidation.event.DoctorsForDBReceivedEvent;
+import uk.nhs.hee.tis.revalidation.event.CreateDoctorsForDBEvent;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Slf4j
 @Data
@@ -26,6 +28,7 @@ import java.time.LocalDate;
 public class DoctorsForDBAggregate implements Serializable {
 
     @AggregateIdentifier
+    private UUID id;
     private String gmcReferenceNumber;
     private String doctorFirstName;
     private String doctorLastName;
@@ -35,9 +38,10 @@ public class DoctorsForDBAggregate implements Serializable {
     private String sanction;
 
     @CommandHandler
-    public DoctorsForDBAggregate(final DoctorForDBReceivedCommand command) {
-        log.info("Command Handler *****");
-        final var event = DoctorsForDBReceivedEvent.builder()
+    public DoctorsForDBAggregate(final CreateDoctorForDBCommand command) {
+        log.info("Command Handler: {}", CreateDoctorForDBCommand.class.getName());
+        final var event = CreateDoctorsForDBEvent.builder()
+                .id(command.getId())
                 .gmcReferenceNumber(command.getGmcReferenceNumber())
                 .doctorFirstName(command.getDoctorFirstName())
                 .doctorLastName(command.getDoctorLastName())
@@ -47,12 +51,15 @@ public class DoctorsForDBAggregate implements Serializable {
                 .sanction(command.getSanction())
                 .build();
 
+
+
         AggregateLifecycle.apply(event);
     }
 
     @EventSourcingHandler
-    public void on(final DoctorsForDBReceivedEvent event) {
-        log.info("Event Source Handler *****");
+    public void on(final CreateDoctorsForDBEvent event) {
+        log.info("Event Source Handler: {}", CreateDoctorsForDBEvent.class.getName());
+        this.id = event.getId();
         this.gmcReferenceNumber = event.getGmcReferenceNumber();
         this.doctorFirstName = event.getDoctorFirstName();
         this.doctorLastName = event.getDoctorLastName();

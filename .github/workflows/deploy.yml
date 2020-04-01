@@ -26,7 +26,7 @@ jobs:
         uses: actions/upload-artifact@v2-preview
         with:
           name: app-jar
-          path: ./application/target/gmc-client-uber.jar
+          path: ./application/target/revalidation-uber.jar
 
   dockerize:
     name: Dockerize

@@ -4,7 +4,7 @@ import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
-import uk.nhs.hee.tis.revalidation.event.DoctorsForDBReceivedEvent;
+import uk.nhs.hee.tis.revalidation.event.CreateDoctorsForDBEvent;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 @Component
@@ -14,7 +14,7 @@ public class DoctorsForDBProjection {
     private DoctorsForDBRepository repository;
 
     @EventHandler
-    public void on(final DoctorsForDBReceivedEvent event) {
+    public void on(final CreateDoctorsForDBEvent event) {
         final var doctorsForDB = DoctorsForDB.builder()
                 .gmcReferenceNumber(event.getGmcReferenceNumber())
                 .doctorFirstName(event.getDoctorFirstName())

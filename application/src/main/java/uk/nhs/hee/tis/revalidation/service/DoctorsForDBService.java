@@ -3,13 +3,15 @@ package uk.nhs.hee.tis.revalidation.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.nhs.hee.tis.revalidation.dto.DoctorsForDBDTO;
-import uk.nhs.hee.tis.revalidation.dto.GmcDoctorDTO;
+import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeDoctorDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDTO;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.domain.Sort.by;
 
@@ -17,30 +19,29 @@ import static org.springframework.data.domain.Sort.by;
 @Service
 public class DoctorsForDBService {
 
-    private static final String SUBMISSION_DATE = "submissionDate";
-
     @Autowired
-    private DoctorsForDBRepository doctorsForDBRepository;
+    private DoctorsForDBRepository doctorsRepository;
 
-    public GmcDoctorDTO getAllTraineeDoctorDetails() {
-        final var doctorsForDB = getAndConvertDoctorsForDB();
-        return GmcDoctorDTO.builder()
-                .doctorsForDB(doctorsForDB)
+    public TraineeDoctorDTO getAllTraineeDoctorDetails(final RevalidationRequestDTO requestDTO) {
+        final var doctorsForDB = getAndConvertDoctorsForDB(requestDTO);
+        return TraineeDoctorDTO.builder()
+                .traineeInfo(doctorsForDB)
                 .count(doctorsForDB.size())
                 .build();
     }
 
-    private List<DoctorsForDBDTO> getAndConvertDoctorsForDB() {
-        final var allDoctors = doctorsForDBRepository.findAll(by(DESC, SUBMISSION_DATE));
-        return allDoctors.stream().map(d -> DoctorsForDBDTO.builder()
+    private List<TraineeInfoDTO> getAndConvertDoctorsForDB(final RevalidationRequestDTO requestDTO) {
+        final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
+        final var allDoctors = doctorsRepository.findAll(by(direction, requestDTO.getSortColumn()));
+        return allDoctors.stream().map(d -> TraineeInfoDTO.builder()
                 .gmcReferenceNumber(d.getGmcReferenceNumber())
                 .doctorFirstName(d.getDoctorFirstName())
                 .doctorLastName(d.getDoctorLastName())
                 .submissionDate(d.getSubmissionDate())
                 .dateAdded(d.getDateAdded())
-                .underNotice(d.getUnderNotice().value())
+                .underNotice(d.getUnderNotice())
                 .sanction(d.getSanction())
                 .build())
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 }

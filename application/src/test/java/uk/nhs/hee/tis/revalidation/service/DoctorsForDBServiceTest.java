@@ -7,11 +7,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static java.util.List.of;
 import static org.hamcrest.Matchers.hasSize;
@@ -51,8 +53,9 @@ public class DoctorsForDBServiceTest {
     public void shouldReturnListOfDoctors() {
 
         when(repository.findAll(by(DESC, "submissionDate"))).thenReturn(of(doc1, doc2, doc3, doc4, doc5));
-        var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails();
-        var doctorsForDB = allDoctors.getDoctorsForDB();
+        final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").build();
+        final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
+        final var doctorsForDB = allDoctors.getTraineeInfo();
         assertThat(doctorsForDB, hasSize(5));
 
         assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef1));
@@ -60,7 +63,7 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lname1));
         assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate1));
         assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate1));
-        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1.value()));
+        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
@@ -68,7 +71,7 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(1).getDoctorLastName(), is(lname2));
         assertThat(doctorsForDB.get(1).getSubmissionDate(), is(subDate2));
         assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate2));
-        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2.value()));
+        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
 
         assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef3));
@@ -76,7 +79,7 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(2).getDoctorLastName(), is(lname3));
         assertThat(doctorsForDB.get(2).getSubmissionDate(), is(subDate3));
         assertThat(doctorsForDB.get(2).getDateAdded(), is(addedDate3));
-        assertThat(doctorsForDB.get(2).getUnderNotice(), is(un3.value()));
+        assertThat(doctorsForDB.get(2).getUnderNotice(), is(un3));
         assertThat(doctorsForDB.get(2).getSanction(), is(sanction3));
 
         assertThat(doctorsForDB.get(3).getGmcReferenceNumber(), is(gmcRef4));
@@ -84,7 +87,7 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(3).getDoctorLastName(), is(lname4));
         assertThat(doctorsForDB.get(3).getSubmissionDate(), is(subDate4));
         assertThat(doctorsForDB.get(3).getDateAdded(), is(addedDate4));
-        assertThat(doctorsForDB.get(3).getUnderNotice(), is(un4.value()));
+        assertThat(doctorsForDB.get(3).getUnderNotice(), is(un4));
         assertThat(doctorsForDB.get(3).getSanction(), is(sanction4));
 
         assertThat(doctorsForDB.get(4).getGmcReferenceNumber(), is(gmcRef5));
@@ -92,8 +95,18 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(4).getDoctorLastName(), is(lname5));
         assertThat(doctorsForDB.get(4).getSubmissionDate(), is(subDate5));
         assertThat(doctorsForDB.get(4).getDateAdded(), is(addedDate5));
-        assertThat(doctorsForDB.get(4).getUnderNotice(), is(un5.value()));
+        assertThat(doctorsForDB.get(4).getUnderNotice(), is(un5));
         assertThat(doctorsForDB.get(4).getSanction(), is(sanction5));
+    }
+
+    @Test
+    public void shouldReturnEmptyListOfDoctorsWhenNoRecordFound() {
+        when(repository.findAll(by(DESC, "submissionDate"))).thenReturn(List.of());
+        final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").build();
+        final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
+        final var doctorsForDB = allDoctors.getTraineeInfo();
+        assertThat(doctorsForDB, hasSize(0));
+        assertThat(allDoctors.getCount(), is(0));
     }
 
     private void setupData() {

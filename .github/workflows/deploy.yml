@@ -96,5 +96,5 @@ jobs:
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ github.event.repository.name }}
-          cluster: tis-hee-revalidation
+          cluster: revalidation
           wait-for-service-stability: true

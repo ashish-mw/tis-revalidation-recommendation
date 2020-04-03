@@ -73,7 +73,7 @@ public class DoctorsForDBServiceIT {
 
         final var requestDTO = RevalidationRequestDTO.builder().sortColumn("submissionDate").sortOrder("desc").build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
-        assertThat(doctorDTO.getCount(), is(5));
+        assertThat(doctorDTO.getCountTotal(), is(5L));
 
         final var doctorsForDB = doctorDTO.getTraineeInfo();
 
@@ -137,7 +137,7 @@ public class DoctorsForDBServiceIT {
 
         final var requestDTO = RevalidationRequestDTO.builder().sortColumn("doctorFirstName").sortOrder("asc").build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
-        assertThat(doctorDTO.getCount(), is(3));
+        assertThat(doctorDTO.getCountTotal(), is(3L));
 
         final var doctorsForDB = doctorDTO.getTraineeInfo();
 
@@ -185,7 +185,7 @@ public class DoctorsForDBServiceIT {
 
         final var requestDTO = RevalidationRequestDTO.builder().sortColumn("doctorLastName").sortOrder("desc").build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
-        assertThat(doctorDTO.getCount(), is(3));
+        assertThat(doctorDTO.getCountTotal(), is(3L));
 
         final var doctorsForDB = doctorDTO.getTraineeInfo();
 
@@ -215,6 +215,29 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(2).getUnderNotice(), is(un2));
         assertThat(doctorsForDB.get(2).getSanction(), is(sanction2));
         assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status2));
+    }
+
+    @DisplayName("Trainee doctors information should be sorted by submission date in desc order")
+    @Test
+    public void shouldReturnDataWithTotalAndUnderNoticeCounts() {
+        un1 = UnderNotice.YES;
+        un2 = UnderNotice.NO;
+        un3 = UnderNotice.YES;
+        un4 = UnderNotice.ON_HOLD;
+        un5 = UnderNotice.NO;
+
+        doc1.setUnderNotice(un1);
+        doc2.setUnderNotice(un2);
+        doc3.setUnderNotice(un3);
+        doc4.setUnderNotice(un4);
+        doc5.setUnderNotice(un5);
+
+        repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
+
+        final var requestDTO = RevalidationRequestDTO.builder().sortColumn("submissionDate").sortOrder("desc").build();
+        final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
+        assertThat(doctorDTO.getCountTotal(), is(5L));
+        assertThat(doctorDTO.getCountUnderNotice(), is(3L));
     }
 
     private void setupData() {

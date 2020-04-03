@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.domain.Sort.by;
+import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.NO;
 
 @Transactional
 @Service
@@ -26,7 +27,8 @@ public class DoctorsForDBService {
         final var doctorsForDB = getAndConvertDoctorsForDB(requestDTO);
         return TraineeDoctorDTO.builder()
                 .traineeInfo(doctorsForDB)
-                .count(doctorsForDB.size())
+                .countTotal(doctorsForDB.size())
+                .countUnderNotice(underNoticeCount())
                 .build();
     }
 
@@ -44,5 +46,9 @@ public class DoctorsForDBService {
                 .doctorStatus(d.getDoctorStatus())
                 .build())
                 .collect(toList());
+    }
+
+    private long underNoticeCount() {
+        return doctorsRepository.countByUnderNoticeIsNot(NO.name());
     }
 }

@@ -15,6 +15,7 @@ import java.util.List;
 @ApiModel(description = "List of trainee doctors with total count")
 public class TraineeDoctorDTO {
 
-    private int count;
+    private long countTotal;
+    private long countUnderNotice;
     private List<TraineeInfoDTO> traineeInfo;
 }

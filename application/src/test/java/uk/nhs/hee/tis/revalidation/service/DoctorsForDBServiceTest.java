@@ -54,9 +54,12 @@ public class DoctorsForDBServiceTest {
     public void shouldReturnListOfDoctors() {
 
         when(repository.findAll(by(DESC, "submissionDate"))).thenReturn(of(doc1, doc2, doc3, doc4, doc5));
+        when(repository.countByUnderNoticeIsNot(UnderNotice.NO.name())).thenReturn(2l);
         final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();
+        assertThat(allDoctors.getCountTotal(), is(5L));
+        assertThat(allDoctors.getCountUnderNotice(), is(2L));
         assertThat(doctorsForDB, hasSize(5));
 
         assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef1));
@@ -108,11 +111,13 @@ public class DoctorsForDBServiceTest {
     @Test
     public void shouldReturnEmptyListOfDoctorsWhenNoRecordFound() {
         when(repository.findAll(by(DESC, "submissionDate"))).thenReturn(List.of());
+        when(repository.countByUnderNoticeIsNot(UnderNotice.NO.name())).thenReturn(0l);
         final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();
+        assertThat(allDoctors.getCountTotal(), is(0L));
+        assertThat(allDoctors.getCountUnderNotice(), is(0L));
         assertThat(doctorsForDB, hasSize(0));
-        assertThat(allDoctors.getCount(), is(0));
     }
 
     private void setupData() {

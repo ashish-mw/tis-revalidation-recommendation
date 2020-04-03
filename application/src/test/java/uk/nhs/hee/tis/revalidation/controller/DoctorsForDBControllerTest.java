@@ -43,25 +43,33 @@ public class DoctorsForDBControllerTest {
     @MockBean
     private DoctorsForDBService doctorsForDBService;
 
-    private String gmcReference;
-    private String firstName;
-    private String lastName;
-    private LocalDate submissionDate;
-    private LocalDate dateAdded;
-    private UnderNotice underNotice;
-    private String sanction;
-    private String doctorStatus;
+    private String gmcRef1, gmcRef2;
+    private String firstName1, firstName2;
+    private String lastName1, lastName2;
+    private LocalDate submissionDate1, submissionDate2;
+    private LocalDate dateAdded1, dateAdded2;
+    private UnderNotice underNotice1, underNotice2;
+    private String sanction1, sanction2;
+    private String doctorStatus1, doctorStatus2;
 
     @Before
     public void setup() {
-        gmcReference = faker.number().digits(8);
-        firstName = faker.name().firstName();
-        lastName = faker.name().lastName();
-        submissionDate = now();
-        dateAdded = now().minusDays(5);
-        underNotice = faker.options().option(UnderNotice.class);
-        sanction = faker.lorem().characters(2);
-        doctorStatus = faker.lorem().characters(0);
+        gmcRef1 = faker.number().digits(8);
+        gmcRef2 = faker.number().digits(8);
+        firstName1 = faker.name().firstName();
+        firstName2 = faker.name().firstName();
+        lastName1 = faker.name().lastName();
+        lastName2 = faker.name().lastName();
+        submissionDate1 = now();
+        submissionDate2 = now();
+        dateAdded1 = now().minusDays(5);
+        dateAdded2 = now().minusDays(5);
+        underNotice1 = UnderNotice.YES;
+        underNotice2 = UnderNotice.ON_HOLD;
+        sanction1 = faker.lorem().characters(2);
+        sanction2 = faker.lorem().characters(2);
+        doctorStatus1 = faker.lorem().characters(0);
+        doctorStatus2 = faker.lorem().characters(0);
     }
 
     @Test
@@ -104,22 +112,34 @@ public class DoctorsForDBControllerTest {
         final var doctorsForDB = buildDoctorsForDBList();
         return TraineeDoctorDTO.builder()
                 .traineeInfo(doctorsForDB)
-                .count(doctorsForDB.size())
+                .countTotal(doctorsForDB.size())
+                .countUnderNotice(1l)
                 .build();
     }
 
     private List<TraineeInfoDTO> buildDoctorsForDBList() {
         final var doctor1 = TraineeInfoDTO.builder()
-                .gmcReferenceNumber(gmcReference)
-                .doctorFirstName(firstName)
-                .doctorLastName(lastName)
-                .submissionDate(submissionDate)
-                .dateAdded(dateAdded)
-                .underNotice(underNotice)
-                .sanction(sanction)
-                .doctorStatus(doctorStatus)
+                .gmcReferenceNumber(gmcRef1)
+                .doctorFirstName(firstName1)
+                .doctorLastName(lastName1)
+                .submissionDate(submissionDate1)
+                .dateAdded(dateAdded1)
+                .underNotice(underNotice1)
+                .sanction(sanction1)
+                .doctorStatus(doctorStatus1)
                 .build();
-        return of(doctor1);
+
+        final var doctor2 = TraineeInfoDTO.builder()
+                .gmcReferenceNumber(gmcRef2)
+                .doctorFirstName(firstName2)
+                .doctorLastName(lastName2)
+                .submissionDate(submissionDate2)
+                .dateAdded(dateAdded2)
+                .underNotice(underNotice2)
+                .sanction(sanction2)
+                .doctorStatus(doctorStatus2)
+                .build();
+        return of(doctor1, doctor2);
     }
 
 }

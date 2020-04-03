@@ -27,4 +27,5 @@ public class DoctorsForDB {
     private LocalDate dateAdded;
     private UnderNotice underNotice;
     private String sanction;
+    private String doctorStatus;
 }

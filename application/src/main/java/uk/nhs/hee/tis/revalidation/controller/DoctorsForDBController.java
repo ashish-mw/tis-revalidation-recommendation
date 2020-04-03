@@ -58,12 +58,12 @@ public class DoctorsForDBController {
     //TODO: find a better way like separate validator
     private void validate(final RevalidationRequestDTO requestDTO) {
         if(!sortFields.contains(requestDTO.getSortColumn())) {
-            log.warn("Invalid sort column name provided, revert to default column");
+            log.warn("Invalid sort column name provided: {}, revert to default column: {}", requestDTO.getSortColumn(), SUBMISSION_DATE);
             requestDTO.setSortColumn(SUBMISSION_DATE);
         }
 
         if (!sortOrder.contains(requestDTO.getSortOrder())) {
-            log.warn("Invalid sort order provided, revert to default order");
+            log.warn("Invalid sort order provided: {}, revert to default order: {}", requestDTO.getSortOrder(), DESC);
             requestDTO.setSortOrder(DESC);
         }
 

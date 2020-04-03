@@ -41,6 +41,7 @@ public class DoctorsForDBService {
                 .dateAdded(d.getDateAdded())
                 .underNotice(d.getUnderNotice())
                 .sanction(d.getSanction())
+                .doctorStatus(d.getDoctorStatus())
                 .build())
                 .collect(toList());
     }

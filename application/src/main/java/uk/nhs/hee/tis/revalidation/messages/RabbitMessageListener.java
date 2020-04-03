@@ -26,6 +26,7 @@ public class RabbitMessageListener {
                 .dateAdded(gmcDoctor.getDateAdded())
                 .sanction(gmcDoctor.getSanction())
                 .underNotice(gmcDoctor.getUnderNotice())
+                .doctorStatus(gmcDoctor.getDoctorStatus())
                 .build();
 
         commandGateway.send(command);

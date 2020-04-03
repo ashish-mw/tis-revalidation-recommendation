@@ -9,6 +9,8 @@ import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 
 import java.time.LocalDate;
 
+import static java.time.LocalDate.now;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,4 +25,18 @@ public class TraineeInfoDTO {
     private LocalDate dateAdded;
     private UnderNotice underNotice;
     private String sanction;
+
+    //TODO: defaulting the values for F.E, Will be replace with proper values when Tis data available.
+    @Builder.Default
+    private String doctorStatus = "";
+    @Builder.Default
+    private String programmeName = "";
+    @Builder.Default
+    private String programmeMembershipType = "";
+    @Builder.Default
+    private LocalDate cctDate = now();
+    @Builder.Default
+    private String admin = "";
+    @Builder.Default
+    private LocalDate lastUpdatedDate = now();
 }

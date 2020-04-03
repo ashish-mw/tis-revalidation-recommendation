@@ -20,4 +20,5 @@ public class CreateDoctorForDBCommand {
     private LocalDate dateAdded;
     private String underNotice;
     private String sanction;
+    private String doctorStatus;
 }

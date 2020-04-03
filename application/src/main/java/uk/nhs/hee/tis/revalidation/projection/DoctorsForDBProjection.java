@@ -23,6 +23,7 @@ public class DoctorsForDBProjection {
                 .dateAdded(event.getDateAdded())
                 .underNotice(event.getUnderNotice())
                 .sanction(event.getSanction())
+                .doctorStatus(event.getDoctorStatus())
                 .build();
 
         repository.save(doctorsForDB);

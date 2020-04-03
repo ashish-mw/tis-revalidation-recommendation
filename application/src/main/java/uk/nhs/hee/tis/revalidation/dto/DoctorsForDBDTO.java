@@ -1,5 +1,6 @@
 package uk.nhs.hee.tis.revalidation.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DoctorsForDBDTO {
 
     private String gmcReferenceNumber;
@@ -20,4 +22,5 @@ public class DoctorsForDBDTO {
     private LocalDate dateAdded;
     private String underNotice;
     private String sanction;
+    private String doctorStatus;
 }

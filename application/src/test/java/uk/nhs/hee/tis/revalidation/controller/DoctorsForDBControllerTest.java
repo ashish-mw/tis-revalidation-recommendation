@@ -10,8 +10,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.nhs.hee.tis.revalidation.dto.TraineeDoctorDTO;
 import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeDoctorDTO;
 import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDTO;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
@@ -50,6 +50,7 @@ public class DoctorsForDBControllerTest {
     private LocalDate dateAdded;
     private UnderNotice underNotice;
     private String sanction;
+    private String doctorStatus;
 
     @Before
     public void setup() {
@@ -60,6 +61,7 @@ public class DoctorsForDBControllerTest {
         dateAdded = now().minusDays(5);
         underNotice = faker.options().option(UnderNotice.class);
         sanction = faker.lorem().characters(2);
+        doctorStatus = faker.lorem().characters(0);
     }
 
     @Test
@@ -115,6 +117,7 @@ public class DoctorsForDBControllerTest {
                 .dateAdded(dateAdded)
                 .underNotice(underNotice)
                 .sanction(sanction)
+                .doctorStatus(doctorStatus)
                 .build();
         return of(doctor1);
     }

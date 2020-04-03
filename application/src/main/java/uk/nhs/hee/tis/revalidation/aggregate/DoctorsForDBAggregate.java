@@ -36,6 +36,7 @@ public class DoctorsForDBAggregate implements Serializable {
     private LocalDate dateAdded;
     private UnderNotice underNotice;
     private String sanction;
+    private String doctorStatus;
 
     @CommandHandler
     public DoctorsForDBAggregate(final CreateDoctorForDBCommand command) {
@@ -49,6 +50,7 @@ public class DoctorsForDBAggregate implements Serializable {
                 .dateAdded(command.getDateAdded())
                 .underNotice(UnderNotice.fromString(command.getUnderNotice()))
                 .sanction(command.getSanction())
+                .doctorStatus(command.getDoctorStatus())
                 .build();
 
 
@@ -67,6 +69,7 @@ public class DoctorsForDBAggregate implements Serializable {
         this.dateAdded = event.getDateAdded();
         this.underNotice = event.getUnderNotice();
         this.sanction = event.getSanction();
+        this.doctorStatus = event.getDoctorStatus();
     }
 
 }

@@ -47,6 +47,7 @@ public class DoctorsForDBServiceIT {
     private LocalDate addedDate1, addedDate2, addedDate3, addedDate4, addedDate5;
     private UnderNotice un1, un2, un3, un4, un5;
     private String sanction1, sanction2, sanction3, sanction4, sanction5;
+    private String status1, status2, status3, status4, status5;
 
     @Before
     public void setup() {
@@ -83,6 +84,7 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate4));
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un4));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction4));
+        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status4));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName2));
@@ -91,6 +93,7 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate2));
         assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
+        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
 
         assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef5));
         assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fName5));
@@ -99,6 +102,7 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(2).getDateAdded(), is(addedDate5));
         assertThat(doctorsForDB.get(2).getUnderNotice(), is(un5));
         assertThat(doctorsForDB.get(2).getSanction(), is(sanction5));
+        assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status5));
 
         assertThat(doctorsForDB.get(3).getGmcReferenceNumber(), is(gmcRef1));
         assertThat(doctorsForDB.get(3).getDoctorFirstName(), is(fName1));
@@ -107,6 +111,7 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(3).getDateAdded(), is(addedDate1));
         assertThat(doctorsForDB.get(3).getUnderNotice(), is(un1));
         assertThat(doctorsForDB.get(3).getSanction(), is(sanction1));
+        assertThat(doctorsForDB.get(3).getDoctorStatus(), is(status1));
 
         assertThat(doctorsForDB.get(4).getGmcReferenceNumber(), is(gmcRef3));
         assertThat(doctorsForDB.get(4).getDoctorFirstName(), is(fName3));
@@ -115,9 +120,10 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(4).getDateAdded(), is(addedDate3));
         assertThat(doctorsForDB.get(4).getUnderNotice(), is(un3));
         assertThat(doctorsForDB.get(4).getSanction(), is(sanction3));
+        assertThat(doctorsForDB.get(4).getDoctorStatus(), is(status3));
     }
 
-    @DisplayName("Trainee doctors information should be sorted by First name in asc order")
+    @DisplayName("Trainee doctors information should be sorted by first name in asc order")
     @Test
     public void shouldReturnDataSortByFirstNameInAscOrder() {
         fName1 = "Zolo";
@@ -142,6 +148,7 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate2));
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un2));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction2));
+        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status2));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef3));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName3));
@@ -150,6 +157,7 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate3));
         assertThat(doctorsForDB.get(1).getUnderNotice(), is(un3));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction3));
+        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status3));
 
         assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef1));
         assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fName1));
@@ -158,22 +166,24 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(2).getDateAdded(), is(addedDate1));
         assertThat(doctorsForDB.get(2).getUnderNotice(), is(un1));
         assertThat(doctorsForDB.get(2).getSanction(), is(sanction1));
+        assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status1));
 
     }
 
-    @DisplayName("Trainee doctors information should be sorted by Gmc Number in desc order")
+    @DisplayName("Trainee doctors information should be sorted by last name in desc order")
     @Test
-    public void shouldReturnDataSortByGmcNumberInDescOrder() {
-        gmcRef1 = "23456789";
-        gmcRef2 = "12345678";
-        gmcRef3 = "43456789";
+    public void shouldReturnDataSortByLastNameInDescOrder() {
+        lName1 = "John";
+        lName2 = "Adam";
+        lName3 = "Webber";
 
-        doc1.setGmcReferenceNumber(gmcRef1);
-        doc2.setGmcReferenceNumber(gmcRef2);
-        doc3.setGmcReferenceNumber(gmcRef3);
+        doc1.setDoctorLastName(lName1);
+        doc2.setDoctorLastName(lName2);
+        doc3.setDoctorLastName(lName3);
+
         repository.saveAll(List.of(doc1, doc2, doc3));
 
-        final var requestDTO = RevalidationRequestDTO.builder().sortColumn("gmcReferenceNumber").sortOrder("desc").build();
+        final var requestDTO = RevalidationRequestDTO.builder().sortColumn("doctorLastName").sortOrder("desc").build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCount(), is(3));
 
@@ -186,6 +196,7 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate3));
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un3));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction3));
+        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status3));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef1));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName1));
@@ -194,6 +205,7 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate1));
         assertThat(doctorsForDB.get(1).getUnderNotice(), is(un1));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction1));
+        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status1));
 
         assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef2));
         assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fName2));
@@ -202,6 +214,7 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(2).getDateAdded(), is(addedDate2));
         assertThat(doctorsForDB.get(2).getUnderNotice(), is(un2));
         assertThat(doctorsForDB.get(2).getSanction(), is(sanction2));
+        assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status2));
     }
 
     private void setupData() {
@@ -247,10 +260,16 @@ public class DoctorsForDBServiceIT {
         sanction4 = faker.lorem().characters(2);
         sanction5 = faker.lorem().characters(2);
 
-        doc1 = new DoctorsForDB(gmcRef1, fName1, lName1, subDate1, addedDate1, un1, sanction1);
-        doc2 = new DoctorsForDB(gmcRef2, fName2, lName2, subDate2, addedDate2, un2, sanction2);
-        doc3 = new DoctorsForDB(gmcRef3, fName3, lName3, subDate3, addedDate3, un3, sanction3);
-        doc4 = new DoctorsForDB(gmcRef4, fName4, lName4, subDate4, addedDate4, un4, sanction4);
-        doc5 = new DoctorsForDB(gmcRef5, fName5, lName5, subDate5, addedDate5, un5, sanction5);
+        status1 = faker.lorem().characters(10);
+        status2 = faker.lorem().characters(10);
+        status3 = faker.lorem().characters(10);
+        status4 = faker.lorem().characters(10);
+        status5 = faker.lorem().characters(10);
+
+        doc1 = new DoctorsForDB(gmcRef1, fName1, lName1, subDate1, addedDate1, un1, sanction1, status1);
+        doc2 = new DoctorsForDB(gmcRef2, fName2, lName2, subDate2, addedDate2, un2, sanction2, status2);
+        doc3 = new DoctorsForDB(gmcRef3, fName3, lName3, subDate3, addedDate3, un3, sanction3, status3);
+        doc4 = new DoctorsForDB(gmcRef4, fName4, lName4, subDate4, addedDate4, un4, sanction4, status4);
+        doc5 = new DoctorsForDB(gmcRef5, fName5, lName5, subDate5, addedDate5, un5, sanction5, status5);
     }
 }

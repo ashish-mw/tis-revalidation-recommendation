@@ -12,7 +12,7 @@ import uk.nhs.hee.tis.revalidation.controller.DoctorsForDBController;
 import uk.nhs.hee.tis.revalidation.dto.DoctorsForDBDTO;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
-import static java.time.LocalDate.*;
+import static java.time.LocalDate.of;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -37,12 +37,13 @@ public class JsonSerializationTest {
                 .gmcReferenceNumber("gmtRef")
                 .sanction("sanction")
                 .underNotice("under notice")
+                .doctorStatus("not started")
                 .dateAdded(of(2020, 4, 2))
                 .submissionDate(of(2020,3,31)).build();
 
         final var json = mapper.writeValueAsString(doctor);
 
-        assertThat(json,is("{\"gmcReferenceNumber\":\"gmtRef\",\"doctorFirstName\":\"first\",\"doctorLastName\":\"last\",\"submissionDate\":\"2020-03-31\",\"dateAdded\":\"2020-04-02\",\"underNotice\":\"under notice\",\"sanction\":\"sanction\"}"));
+        assertThat(json,is("{\"gmcReferenceNumber\":\"gmtRef\",\"doctorFirstName\":\"first\",\"doctorLastName\":\"last\",\"submissionDate\":\"2020-03-31\",\"dateAdded\":\"2020-04-02\",\"underNotice\":\"under notice\",\"sanction\":\"sanction\",\"doctorStatus\":\"not started\"}"));
     }
 
 }

@@ -23,4 +23,5 @@ public class CreateDoctorsForDBEvent {
     private LocalDate dateAdded;
     private UnderNotice underNotice;
     private String sanction;
+    private String doctorStatus;
 }

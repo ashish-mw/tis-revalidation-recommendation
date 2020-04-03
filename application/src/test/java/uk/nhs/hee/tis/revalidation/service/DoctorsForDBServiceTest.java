@@ -43,6 +43,7 @@ public class DoctorsForDBServiceTest {
     private LocalDate addedDate1, addedDate2, addedDate3, addedDate4, addedDate5;
     private UnderNotice un1, un2, un3, un4, un5;
     private String sanction1, sanction2, sanction3, sanction4,sanction5;
+    private String status1, status2, status3, status4,status5;
 
     @Before
     public void setup() {
@@ -65,6 +66,7 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate1));
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
+        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fname2));
@@ -73,6 +75,7 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate2));
         assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
+        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
 
         assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef3));
         assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fname3));
@@ -81,6 +84,7 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(2).getDateAdded(), is(addedDate3));
         assertThat(doctorsForDB.get(2).getUnderNotice(), is(un3));
         assertThat(doctorsForDB.get(2).getSanction(), is(sanction3));
+        assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status3));
 
         assertThat(doctorsForDB.get(3).getGmcReferenceNumber(), is(gmcRef4));
         assertThat(doctorsForDB.get(3).getDoctorFirstName(), is(fname4));
@@ -89,6 +93,7 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(3).getDateAdded(), is(addedDate4));
         assertThat(doctorsForDB.get(3).getUnderNotice(), is(un4));
         assertThat(doctorsForDB.get(3).getSanction(), is(sanction4));
+        assertThat(doctorsForDB.get(3).getDoctorStatus(), is(status4));
 
         assertThat(doctorsForDB.get(4).getGmcReferenceNumber(), is(gmcRef5));
         assertThat(doctorsForDB.get(4).getDoctorFirstName(), is(fname5));
@@ -97,6 +102,7 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(4).getDateAdded(), is(addedDate5));
         assertThat(doctorsForDB.get(4).getUnderNotice(), is(un5));
         assertThat(doctorsForDB.get(4).getSanction(), is(sanction5));
+        assertThat(doctorsForDB.get(4).getDoctorStatus(), is(status5));
     }
 
     @Test
@@ -152,10 +158,16 @@ public class DoctorsForDBServiceTest {
         sanction4 = faker.lorem().characters(2);
         sanction5 = faker.lorem().characters(2);
 
-        doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1);
-        doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2);
-        doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3);
-        doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4);
-        doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5);
+        status1 = faker.lorem().characters(10);
+        status2 = faker.lorem().characters(10);
+        status3 = faker.lorem().characters(10);
+        status4 = faker.lorem().characters(10);
+        status5 = faker.lorem().characters(10);
+
+        doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1);
+        doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2);
+        doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3, status3);
+        doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4, status4);
+        doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5);
     }
 }

@@ -51,6 +51,10 @@ app:
     event.store.db: ${EVENT_STORE:eventstore}
     event.store.collection: ${EVENT_STORE_COLLECTION:events_log}
 
+  validation:
+    sort.fields: ${SORT_FIELD:submissionDate,doctorFirstName,doctorLastName}
+    sort.order: ${SORT_ORDER:asc,desc}
+
   rabbit:
     exchange: ${EXCHANGE:gmc-connect-exchange}
     queue: ${QUEUE:gmc-doctors-queue}

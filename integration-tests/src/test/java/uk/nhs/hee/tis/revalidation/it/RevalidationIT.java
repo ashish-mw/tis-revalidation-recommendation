@@ -14,15 +14,13 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.nhs.hee.tis.revalidation.RevalidationApplication;
 import uk.nhs.hee.tis.revalidation.dto.DoctorsForDBDTO;
-import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 import java.time.LocalDate;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static java.time.LocalDate.now;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -79,17 +77,17 @@ public class RevalidationIT {
 
         rabbitTemplate.convertAndSend(exchange, routingKey, gmcDoctorDTO);
 
-        TimeUnit.SECONDS.sleep(5);
+        SECONDS.sleep(5);
 
-        final Optional<DoctorsForDB> byId = repository.findById(gmcReference);
+        final var doctorsForDB = repository.findById(gmcReference);
 
-        assertThat(byId.isPresent(), is(true));
-        assertThat(byId.get().getGmcReferenceNumber(), is(gmcReference));
-        assertThat(byId.get().getDoctorFirstName(), is(firstName));
-        assertThat(byId.get().getDoctorLastName(), is(lastName));
-        assertThat(byId.get().getSubmissionDate(), is(submissionDate));
-        assertThat(byId.get().getDateAdded(), is(dateAdded));
-        assertThat(byId.get().getUnderNotice(), is(underNotice));
-        assertThat(byId.get().getSanction(), is(sanction));
+        assertThat(doctorsForDB.isPresent(), is(true));
+        assertThat(doctorsForDB.get().getGmcReferenceNumber(), is(gmcReference));
+        assertThat(doctorsForDB.get().getDoctorFirstName(), is(firstName));
+        assertThat(doctorsForDB.get().getDoctorLastName(), is(lastName));
+        assertThat(doctorsForDB.get().getSubmissionDate(), is(submissionDate));
+        assertThat(doctorsForDB.get().getDateAdded(), is(dateAdded));
+        assertThat(doctorsForDB.get().getUnderNotice(), is(underNotice));
+        assertThat(doctorsForDB.get().getSanction(), is(sanction));
     }
 }

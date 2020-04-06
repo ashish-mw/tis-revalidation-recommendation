@@ -98,3 +98,8 @@ jobs:
           service: tis-hee-revalidation
           cluster: revalidation
           wait-for-service-stability: false
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2.0.0
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}

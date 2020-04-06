@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.hee.tis.revalidation.dto.TraineeDoctorDTO;
 import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeDoctorDTO;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
 import java.util.List;
@@ -29,6 +29,8 @@ public class DoctorsForDBController {
     protected static final String SUBMISSION_DATE = "submissionDate";
     protected static final String DESC = "desc";
     protected static final String ASC = "asc";
+    protected static final String UNDER_NOTICE = "underNotice";
+    protected static final String UNDER_NOTICE_VALUE = "false";
 
     @Value("${app.validation.sort.fields}")
     private List<String> sortFields;
@@ -43,10 +45,12 @@ public class DoctorsForDBController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Trainee gmc all doctors data", response = TraineeDoctorDTO.class)})
     @GetMapping
     public ResponseEntity<TraineeDoctorDTO> getTraineeDoctorsInformation(@RequestParam(name = SORT_COLUMN, defaultValue = SUBMISSION_DATE) final String sortColumn,
-                                                                         @RequestParam(name = SORT_ORDER, defaultValue = DESC) final String sortOrder) {
+                                                                         @RequestParam(name = SORT_ORDER, defaultValue = DESC) final String sortOrder,
+                                                                         @RequestParam(name = UNDER_NOTICE, defaultValue = UNDER_NOTICE_VALUE) final boolean underNotice) {
         final var revalidationRequestDTO = RevalidationRequestDTO.builder()
                 .sortColumn(sortColumn)
                 .sortOrder(sortOrder)
+                .underNotice(underNotice)
                 .build();
 
         validate(revalidationRequestDTO);

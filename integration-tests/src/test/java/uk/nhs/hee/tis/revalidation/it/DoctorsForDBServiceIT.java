@@ -219,7 +219,7 @@ public class DoctorsForDBServiceIT {
 
     @DisplayName("Trainee doctors information should be sorted by submission date in desc order")
     @Test
-    public void shouldReturnDataWithTotalAndUnderNoticeCounts() {
+    public void shouldReturnDataWithTotalCountAndUnderNoticeCount() {
         un1 = UnderNotice.YES;
         un2 = UnderNotice.NO;
         un3 = UnderNotice.YES;
@@ -238,6 +238,80 @@ public class DoctorsForDBServiceIT {
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCountTotal(), is(5L));
         assertThat(doctorDTO.getCountUnderNotice(), is(3L));
+    }
+
+    @DisplayName("Get Under Notice Trainee doctors information also sorted by submission date in desc order")
+    @Test
+    public void shouldReturnUnderNoticeDoctorsSortBySubmissionDate() {
+
+        subDate1 = LocalDate.now().minusDays(5);
+        subDate2 = LocalDate.now().minusDays(2);
+        subDate3 = LocalDate.now().minusDays(8);
+        subDate4 = LocalDate.now().minusDays(1);
+        subDate5 = LocalDate.now().minusDays(3);
+
+        un1 = UnderNotice.YES;
+        un2 = UnderNotice.YES;
+        un3 = UnderNotice.NO;
+        un4 = UnderNotice.ON_HOLD;
+        un5 = UnderNotice.YES;
+
+        doc1.setSubmissionDate(subDate1);
+        doc2.setSubmissionDate(subDate2);
+        doc3.setSubmissionDate(subDate3);
+        doc4.setSubmissionDate(subDate4);
+        doc5.setSubmissionDate(subDate5);
+
+        doc1.setUnderNotice(un1);
+        doc2.setUnderNotice(un2);
+        doc3.setUnderNotice(un3);
+        doc4.setUnderNotice(un4);
+        doc5.setUnderNotice(un5);
+
+        repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
+
+        final var requestDTO = RevalidationRequestDTO.builder().sortColumn("submissionDate").sortOrder("desc").underNotice(true).build();
+        final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
+        assertThat(doctorDTO.getCountTotal(), is(5L));
+        assertThat(doctorDTO.getCountUnderNotice(), is(4L));
+
+        final var doctorsForDB = doctorDTO.getTraineeInfo();
+
+        assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef4));
+        assertThat(doctorsForDB.get(0).getDoctorFirstName(), is(fName4));
+        assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lName4));
+        assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate4));
+        assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate4));
+        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un4));
+        assertThat(doctorsForDB.get(0).getSanction(), is(sanction4));
+        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status4));
+
+        assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
+        assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName2));
+        assertThat(doctorsForDB.get(1).getDoctorLastName(), is(lName2));
+        assertThat(doctorsForDB.get(1).getSubmissionDate(), is(subDate2));
+        assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate2));
+        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
+        assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
+        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
+
+        assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef5));
+        assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fName5));
+        assertThat(doctorsForDB.get(2).getDoctorLastName(), is(lName5));
+        assertThat(doctorsForDB.get(2).getSubmissionDate(), is(subDate5));
+        assertThat(doctorsForDB.get(2).getDateAdded(), is(addedDate5));
+        assertThat(doctorsForDB.get(2).getUnderNotice(), is(un5));
+        assertThat(doctorsForDB.get(2).getSanction(), is(sanction5));
+        assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status5));
+
+        assertThat(doctorsForDB.get(3).getGmcReferenceNumber(), is(gmcRef1));
+        assertThat(doctorsForDB.get(3).getDoctorFirstName(), is(fName1));
+        assertThat(doctorsForDB.get(3).getDoctorLastName(), is(lName1));
+        assertThat(doctorsForDB.get(3).getSubmissionDate(), is(subDate1));
+        assertThat(doctorsForDB.get(3).getDateAdded(), is(addedDate1));
+        assertThat(doctorsForDB.get(3).getUnderNotice(), is(un1));
+        assertThat(doctorsForDB.get(3).getSanction(), is(sanction1));
+        assertThat(doctorsForDB.get(3).getDoctorStatus(), is(status1));
     }
 
     private void setupData() {

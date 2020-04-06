@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
 import uk.nhs.hee.tis.revalidation.dto.TraineeDoctorDTO;
 import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDTO;
+import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 import java.util.List;
@@ -14,7 +15,8 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.domain.Sort.by;
-import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.NO;
+import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.ON_HOLD;
+import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.YES;
 
 @Transactional
 @Service
@@ -27,14 +29,13 @@ public class DoctorsForDBService {
         final var doctorsForDB = getAndConvertDoctorsForDB(requestDTO);
         return TraineeDoctorDTO.builder()
                 .traineeInfo(doctorsForDB)
-                .countTotal(doctorsForDB.size())
-                .countUnderNotice(underNoticeCount())
+                .countTotal(getCountAll())
+                .countUnderNotice(getCountUnderNotice())
                 .build();
     }
 
     private List<TraineeInfoDTO> getAndConvertDoctorsForDB(final RevalidationRequestDTO requestDTO) {
-        final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
-        final var allDoctors = doctorsRepository.findAll(by(direction, requestDTO.getSortColumn()));
+        final var allDoctors = getSortedAndFilteredDoctors(requestDTO);
         return allDoctors.stream().map(d -> TraineeInfoDTO.builder()
                 .gmcReferenceNumber(d.getGmcReferenceNumber())
                 .doctorFirstName(d.getDoctorFirstName())
@@ -48,7 +49,22 @@ public class DoctorsForDBService {
                 .collect(toList());
     }
 
-    private long underNoticeCount() {
-        return doctorsRepository.countByUnderNoticeIsNot(NO.name());
+    private List<DoctorsForDB> getSortedAndFilteredDoctors(final RevalidationRequestDTO requestDTO) {
+        final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
+        if (requestDTO.isUnderNotice()) {
+            return doctorsRepository.findAllByUnderNoticeIn(by(direction, requestDTO.getSortColumn()), YES.name(), ON_HOLD.name());
+        }
+
+        return doctorsRepository.findAll(by(direction, requestDTO.getSortColumn()));
+    }
+
+    //TODO: explore to implement cache
+    private long getCountAll() {
+        return doctorsRepository.count();
+    }
+
+    //TODO: explore to implement cache
+    private long getCountUnderNotice() {
+        return doctorsRepository.countByUnderNoticeIn(YES.name(), ON_HOLD.name());
     }
 }

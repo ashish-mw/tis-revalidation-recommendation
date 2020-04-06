@@ -15,6 +15,7 @@ import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import java.time.LocalDate;
 import java.util.List;
 
+import static java.time.LocalDate.now;
 import static java.util.List.of;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -22,6 +23,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.domain.Sort.by;
+import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.ON_HOLD;
+import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.YES;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -51,10 +54,11 @@ public class DoctorsForDBServiceTest {
     }
 
     @Test
-    public void shouldReturnListOfDoctors() {
+    public void shouldReturnListOfAllDoctors() {
 
         when(repository.findAll(by(DESC, "submissionDate"))).thenReturn(of(doc1, doc2, doc3, doc4, doc5));
-        when(repository.countByUnderNoticeIsNot(UnderNotice.NO.name())).thenReturn(2l);
+        when(repository.countByUnderNoticeIn(YES.name(), ON_HOLD.name())).thenReturn(2l);
+        when(repository.count()).thenReturn(5l);
         final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();
@@ -109,9 +113,41 @@ public class DoctorsForDBServiceTest {
     }
 
     @Test
+    public void shouldReturnListOfUnderNoticeDoctors() {
+
+        when(repository.findAllByUnderNoticeIn(by(DESC, "submissionDate"), YES.name(), ON_HOLD.name())).thenReturn(of(doc1, doc2));
+        when(repository.countByUnderNoticeIn(YES.name(), ON_HOLD.name())).thenReturn(2l);
+        when(repository.count()).thenReturn(5l);
+        final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").underNotice(true).build();
+        final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
+        final var doctorsForDB = allDoctors.getTraineeInfo();
+        assertThat(allDoctors.getCountTotal(), is(5L));
+        assertThat(allDoctors.getCountUnderNotice(), is(2L));
+        assertThat(doctorsForDB, hasSize(2));
+
+        assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef1));
+        assertThat(doctorsForDB.get(0).getDoctorFirstName(), is(fname1));
+        assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lname1));
+        assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate1));
+        assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate1));
+        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1));
+        assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
+        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1));
+
+        assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
+        assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fname2));
+        assertThat(doctorsForDB.get(1).getDoctorLastName(), is(lname2));
+        assertThat(doctorsForDB.get(1).getSubmissionDate(), is(subDate2));
+        assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate2));
+        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
+        assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
+        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
+    }
+
+    @Test
     public void shouldReturnEmptyListOfDoctorsWhenNoRecordFound() {
         when(repository.findAll(by(DESC, "submissionDate"))).thenReturn(List.of());
-        when(repository.countByUnderNoticeIsNot(UnderNotice.NO.name())).thenReturn(0l);
+        when(repository.countByUnderNoticeIn(YES.name(), ON_HOLD.name())).thenReturn(0l);
         final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();
@@ -139,17 +175,17 @@ public class DoctorsForDBServiceTest {
         lname4 = faker.name().lastName();
         lname5 = faker.name().lastName();
 
-        subDate1 = LocalDate.now();
-        subDate2 = LocalDate.now();
-        subDate3 = LocalDate.now();
-        subDate4 = LocalDate.now();
-        subDate5 = LocalDate.now();
+        subDate1 = now();
+        subDate2 = now();
+        subDate3 = now();
+        subDate4 = now();
+        subDate5 = now();
 
-        addedDate1 = LocalDate.now().minusDays(5);
-        addedDate2 = LocalDate.now().minusDays(5);
-        addedDate3 = LocalDate.now().minusDays(5);
-        addedDate4 = LocalDate.now().minusDays(5);
-        addedDate5 = LocalDate.now().minusDays(5);
+        addedDate1 = now().minusDays(5);
+        addedDate2 = now().minusDays(5);
+        addedDate3 = now().minusDays(5);
+        addedDate4 = now().minusDays(5);
+        addedDate5 = now().minusDays(5);
 
         un1 = faker.options().option(UnderNotice.class);
         un2 = faker.options().option(UnderNotice.class);

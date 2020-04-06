@@ -79,7 +79,8 @@ public class DoctorsForDBControllerTest {
         when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO)).thenReturn(gmcDoctorDTO);
         this.mockMvc.perform(get("/api/v1/doctors")
                 .param(SORT_ORDER, ASC)
-                .param(SORT_COLUMN, SUBMISSION_DATE))
+                .param(SORT_COLUMN, SUBMISSION_DATE)
+                .param(UNDER_NOTICE, UNDER_NOTICE_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(gmcDoctorDTO)));
     }
@@ -104,6 +105,19 @@ public class DoctorsForDBControllerTest {
         this.mockMvc.perform(get(DOCTORS_API_URL)
                 .param(SORT_ORDER, "aa")
                 .param(SORT_COLUMN, "date"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(mapper.writeValueAsString(gmcDoctorDTO)));
+    }
+
+    @Test
+    public void shouldReturnUnderNoticeTraineeDoctorsInformation() throws Exception {
+        final var gmcDoctorDTO = prepareGmcDoctor();
+        final var requestDTO = RevalidationRequestDTO.builder().sortOrder(ASC).sortColumn(SUBMISSION_DATE).underNotice(true).build();
+        when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO)).thenReturn(gmcDoctorDTO);
+        this.mockMvc.perform(get("/api/v1/doctors")
+                .param(SORT_ORDER, ASC)
+                .param(SORT_COLUMN, SUBMISSION_DATE)
+                .param(UNDER_NOTICE, String.valueOf(true)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(gmcDoctorDTO)));
     }

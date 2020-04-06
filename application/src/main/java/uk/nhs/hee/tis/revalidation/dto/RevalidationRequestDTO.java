@@ -8,4 +8,5 @@ import lombok.Data;
 public class RevalidationRequestDTO {
     private String sortColumn;
     private String sortOrder;
+    private boolean underNotice;
 }

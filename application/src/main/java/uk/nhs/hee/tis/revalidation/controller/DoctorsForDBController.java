@@ -31,6 +31,8 @@ public class DoctorsForDBController {
     protected static final String ASC = "asc";
     protected static final String UNDER_NOTICE = "underNotice";
     protected static final String UNDER_NOTICE_VALUE = "false";
+    protected static final String PAGE_NUMBER = "pageNumber";
+    protected static final String PAGE_NUMBER_VALUE = "0";
 
     @Value("${app.validation.sort.fields}")
     private List<String> sortFields;
@@ -46,11 +48,13 @@ public class DoctorsForDBController {
     @GetMapping
     public ResponseEntity<TraineeDoctorDTO> getTraineeDoctorsInformation(@RequestParam(name = SORT_COLUMN, defaultValue = SUBMISSION_DATE) final String sortColumn,
                                                                          @RequestParam(name = SORT_ORDER, defaultValue = DESC) final String sortOrder,
-                                                                         @RequestParam(name = UNDER_NOTICE, defaultValue = UNDER_NOTICE_VALUE) final boolean underNotice) {
+                                                                         @RequestParam(name = UNDER_NOTICE, defaultValue = UNDER_NOTICE_VALUE) final boolean underNotice,
+                                                                         @RequestParam(name = PAGE_NUMBER, defaultValue = PAGE_NUMBER_VALUE) final int pageNumber) {
         final var revalidationRequestDTO = RevalidationRequestDTO.builder()
                 .sortColumn(sortColumn)
                 .sortOrder(sortOrder)
                 .underNotice(underNotice)
+                .pageNumber(pageNumber)
                 .build();
 
         validate(revalidationRequestDTO);

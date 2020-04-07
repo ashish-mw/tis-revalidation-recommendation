@@ -1,6 +1,9 @@
 package uk.nhs.hee.tis.revalidation.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
@@ -9,9 +12,8 @@ import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDTO;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
-import java.util.List;
-
 import static java.util.stream.Collectors.toList;
+import static org.springframework.data.domain.PageRequest.of;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.domain.Sort.by;
@@ -22,40 +24,47 @@ import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.YES;
 @Service
 public class DoctorsForDBService {
 
+
+    @Value("${app.reval.pagination.pageSize}")
+    private int pageSize;
+
     @Autowired
     private DoctorsForDBRepository doctorsRepository;
 
     public TraineeDoctorDTO getAllTraineeDoctorDetails(final RevalidationRequestDTO requestDTO) {
-        final var doctorsForDB = getAndConvertDoctorsForDB(requestDTO);
+        final var paginatedDoctors = getSortedAndFilteredDoctorsByPageNumber(requestDTO);
+        final var traineeDoctors = paginatedDoctors.get().map(d -> convert(d)).collect(toList());
+
         return TraineeDoctorDTO.builder()
-                .traineeInfo(doctorsForDB)
+                .traineeInfo(traineeDoctors)
                 .countTotal(getCountAll())
                 .countUnderNotice(getCountUnderNotice())
+                .totalPages(paginatedDoctors.getTotalPages())
                 .build();
     }
 
-    private List<TraineeInfoDTO> getAndConvertDoctorsForDB(final RevalidationRequestDTO requestDTO) {
-        final var allDoctors = getSortedAndFilteredDoctors(requestDTO);
-        return allDoctors.stream().map(d -> TraineeInfoDTO.builder()
-                .gmcReferenceNumber(d.getGmcReferenceNumber())
-                .doctorFirstName(d.getDoctorFirstName())
-                .doctorLastName(d.getDoctorLastName())
-                .submissionDate(d.getSubmissionDate())
-                .dateAdded(d.getDateAdded())
-                .underNotice(d.getUnderNotice())
-                .sanction(d.getSanction())
-                .doctorStatus(d.getDoctorStatus())
-                .build())
-                .collect(toList());
+    private TraineeInfoDTO convert(final DoctorsForDB doctorsForDB) {
+        return TraineeInfoDTO.builder()
+                .gmcReferenceNumber(doctorsForDB.getGmcReferenceNumber())
+                .doctorFirstName(doctorsForDB.getDoctorFirstName())
+                .doctorLastName(doctorsForDB.getDoctorLastName())
+                .submissionDate(doctorsForDB.getSubmissionDate())
+                .dateAdded(doctorsForDB.getDateAdded())
+                .underNotice(doctorsForDB.getUnderNotice())
+                .sanction(doctorsForDB.getSanction())
+                .doctorStatus(doctorsForDB.getDoctorStatus())
+                .build();
     }
 
-    private List<DoctorsForDB> getSortedAndFilteredDoctors(final RevalidationRequestDTO requestDTO) {
+
+    private Page<DoctorsForDB> getSortedAndFilteredDoctorsByPageNumber(final RevalidationRequestDTO requestDTO) {
         final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
+        final Pageable pageableAndSortable = of(requestDTO.getPageNumber(), pageSize, by(direction, requestDTO.getSortColumn()));
         if (requestDTO.isUnderNotice()) {
-            return doctorsRepository.findAllByUnderNoticeIn(by(direction, requestDTO.getSortColumn()), YES.name(), ON_HOLD.name());
+            return doctorsRepository.findAllByUnderNoticeIn(pageableAndSortable, YES.name(), ON_HOLD.name());
         }
 
-        return doctorsRepository.findAll(by(direction, requestDTO.getSortColumn()));
+        return doctorsRepository.findAll(pageableAndSortable);
     }
 
     //TODO: explore to implement cache

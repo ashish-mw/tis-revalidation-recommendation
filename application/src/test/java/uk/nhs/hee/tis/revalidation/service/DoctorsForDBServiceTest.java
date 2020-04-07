@@ -7,16 +7,19 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.stream.Stream;
 
 import static java.time.LocalDate.now;
-import static java.util.List.of;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -38,6 +41,9 @@ public class DoctorsForDBServiceTest {
     @Mock
     private DoctorsForDBRepository repository;
 
+    @Mock
+    private Page page;
+
     private DoctorsForDB doc1, doc2, doc3, doc4, doc5;
     private String gmcRef1, gmcRef2, gmcRef3, gmcRef4, gmcRef5;
     private String fname1, fname2, fname3, fname4, fname5;
@@ -50,20 +56,25 @@ public class DoctorsForDBServiceTest {
 
     @Before
     public void setup() {
+        ReflectionTestUtils.setField(doctorsForDBService, "pageSize", 20);
         setupData();
     }
 
     @Test
     public void shouldReturnListOfAllDoctors() {
 
-        when(repository.findAll(by(DESC, "submissionDate"))).thenReturn(of(doc1, doc2, doc3, doc4, doc5));
+        final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
+        when(repository.findAll(pageableAndSortable)).thenReturn(page);
+        when(page.get()).thenReturn(Stream.of(doc1, doc2, doc3, doc4, doc5));
+        when(page.getTotalPages()).thenReturn(1);
         when(repository.countByUnderNoticeIn(YES.name(), ON_HOLD.name())).thenReturn(2l);
         when(repository.count()).thenReturn(5l);
-        final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").build();
+        final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").pageNumber(1).build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();
         assertThat(allDoctors.getCountTotal(), is(5L));
         assertThat(allDoctors.getCountUnderNotice(), is(2L));
+        assertThat(allDoctors.getTotalPages(), is(1L));
         assertThat(doctorsForDB, hasSize(5));
 
         assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef1));
@@ -115,14 +126,18 @@ public class DoctorsForDBServiceTest {
     @Test
     public void shouldReturnListOfUnderNoticeDoctors() {
 
-        when(repository.findAllByUnderNoticeIn(by(DESC, "submissionDate"), YES.name(), ON_HOLD.name())).thenReturn(of(doc1, doc2));
+        final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
+        when(repository.findAllByUnderNoticeIn(pageableAndSortable, YES.name(), ON_HOLD.name())).thenReturn(page);
+        when(page.get()).thenReturn(Stream.of(doc1, doc2));
+        when(page.getTotalPages()).thenReturn(1);
         when(repository.countByUnderNoticeIn(YES.name(), ON_HOLD.name())).thenReturn(2l);
         when(repository.count()).thenReturn(5l);
-        final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").underNotice(true).build();
+        final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").underNotice(true).pageNumber(1).build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();
         assertThat(allDoctors.getCountTotal(), is(5L));
         assertThat(allDoctors.getCountUnderNotice(), is(2L));
+        assertThat(allDoctors.getTotalPages(), is(1L));
         assertThat(doctorsForDB, hasSize(2));
 
         assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef1));
@@ -146,13 +161,16 @@ public class DoctorsForDBServiceTest {
 
     @Test
     public void shouldReturnEmptyListOfDoctorsWhenNoRecordFound() {
-        when(repository.findAll(by(DESC, "submissionDate"))).thenReturn(List.of());
+        final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
+        when(repository.findAll(pageableAndSortable)).thenReturn(page);
+        when(page.get()).thenReturn(Stream.of());
         when(repository.countByUnderNoticeIn(YES.name(), ON_HOLD.name())).thenReturn(0l);
-        final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").build();
+        final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").pageNumber(1).build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();
         assertThat(allDoctors.getCountTotal(), is(0L));
         assertThat(allDoctors.getCountUnderNotice(), is(0L));
+        assertThat(allDoctors.getTotalPages(), is(0L));
         assertThat(doctorsForDB, hasSize(0));
     }
 

@@ -80,7 +80,8 @@ public class DoctorsForDBControllerTest {
         this.mockMvc.perform(get("/api/v1/doctors")
                 .param(SORT_ORDER, ASC)
                 .param(SORT_COLUMN, SUBMISSION_DATE)
-                .param(UNDER_NOTICE, UNDER_NOTICE_VALUE))
+                .param(UNDER_NOTICE, UNDER_NOTICE_VALUE)
+                .param(PAGE_NUMBER, PAGE_NUMBER_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(gmcDoctorDTO)));
     }

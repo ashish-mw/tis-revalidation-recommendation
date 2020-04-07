@@ -50,6 +50,7 @@ app:
   reval:
     event.store.db: ${EVENT_STORE:eventstore}
     event.store.collection: ${EVENT_STORE_COLLECTION:events_log}
+    pagination.pageSize: ${PAGINATION_PAGE_SIZE:20}
 
   rabbit:
     exchange: ${EXCHANGE:gmc-connect-exchange}

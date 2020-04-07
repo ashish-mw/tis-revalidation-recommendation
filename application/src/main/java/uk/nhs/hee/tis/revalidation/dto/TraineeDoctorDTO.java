@@ -17,5 +17,6 @@ public class TraineeDoctorDTO {
 
     private long countTotal;
     private long countUnderNotice;
+    private long totalPages;
     private List<TraineeInfoDTO> traineeInfo;
 }

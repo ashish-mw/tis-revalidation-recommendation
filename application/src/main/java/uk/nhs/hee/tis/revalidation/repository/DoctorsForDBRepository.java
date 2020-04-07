@@ -1,12 +1,11 @@
 package uk.nhs.hee.tis.revalidation.repository;
 
 
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
-
-import java.util.List;
 
 @Repository
 public interface DoctorsForDBRepository extends MongoRepository<DoctorsForDB, String> {
@@ -15,5 +14,5 @@ public interface DoctorsForDBRepository extends MongoRepository<DoctorsForDB, St
     long countByUnderNoticeIn(final String... underNotice);
 
     //Get trainee doctors who are underNotice
-    List<DoctorsForDB> findAllByUnderNoticeIn(final Sort sort, final String... underNotice);
+    Page<DoctorsForDB> findAllByUnderNoticeIn(final Pageable pageable, final String... underNotice);
 }

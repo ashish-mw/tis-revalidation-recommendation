@@ -61,7 +61,7 @@ public class DoctorsForDBService {
         final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
         final Pageable pageableAndSortable = of(requestDTO.getPageNumber(), pageSize, by(direction, requestDTO.getSortColumn()));
         if (requestDTO.isUnderNotice()) {
-            return doctorsRepository.findAllByUnderNoticeIn(pageableAndSortable, YES.name(), ON_HOLD.name());
+            return doctorsRepository.findAllByUnderNoticeIn(pageableAndSortable, YES, ON_HOLD);
         }
 
         return doctorsRepository.findAll(pageableAndSortable);
@@ -74,6 +74,6 @@ public class DoctorsForDBService {
 
     //TODO: explore to implement cache
     private long getCountUnderNotice() {
-        return doctorsRepository.countByUnderNoticeIn(YES.name(), ON_HOLD.name());
+        return doctorsRepository.countByUnderNoticeIn(YES, ON_HOLD);
     }
 }

@@ -67,7 +67,7 @@ public class DoctorsForDBServiceTest {
         when(repository.findAll(pageableAndSortable)).thenReturn(page);
         when(page.get()).thenReturn(Stream.of(doc1, doc2, doc3, doc4, doc5));
         when(page.getTotalPages()).thenReturn(1);
-        when(repository.countByUnderNoticeIn(YES.name(), ON_HOLD.name())).thenReturn(2l);
+        when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
         when(repository.count()).thenReturn(5l);
         final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").pageNumber(1).build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
@@ -127,10 +127,10 @@ public class DoctorsForDBServiceTest {
     public void shouldReturnListOfUnderNoticeDoctors() {
 
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
-        when(repository.findAllByUnderNoticeIn(pageableAndSortable, YES.name(), ON_HOLD.name())).thenReturn(page);
+        when(repository.findAllByUnderNoticeIn(pageableAndSortable, YES, ON_HOLD)).thenReturn(page);
         when(page.get()).thenReturn(Stream.of(doc1, doc2));
         when(page.getTotalPages()).thenReturn(1);
-        when(repository.countByUnderNoticeIn(YES.name(), ON_HOLD.name())).thenReturn(2l);
+        when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
         when(repository.count()).thenReturn(5l);
         final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").underNotice(true).pageNumber(1).build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
@@ -164,7 +164,7 @@ public class DoctorsForDBServiceTest {
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
         when(repository.findAll(pageableAndSortable)).thenReturn(page);
         when(page.get()).thenReturn(Stream.of());
-        when(repository.countByUnderNoticeIn(YES.name(), ON_HOLD.name())).thenReturn(0l);
+        when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(0l);
         final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").pageNumber(1).build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();

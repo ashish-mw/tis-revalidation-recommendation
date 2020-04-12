@@ -96,7 +96,7 @@ jobs:
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: reval-be
-          cluster: revalidation
+          cluster: revalidation-preprod
           wait-for-service-stability: false
 
       - name: Slack Notification success

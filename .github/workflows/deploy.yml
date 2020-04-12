@@ -95,7 +95,7 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: tis-hee-revalidation
+          service: reval-be
           cluster: revalidation
           wait-for-service-stability: false
 

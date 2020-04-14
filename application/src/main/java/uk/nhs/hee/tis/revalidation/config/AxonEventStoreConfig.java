@@ -26,19 +26,19 @@ public class AxonEventStoreConfig {
     @Value("${app.reval.event.store.collection}")
     private String eventStoreTable;
 
-    @Value("${spring.data.mongodb.host}")
+    @Value("${app.mongodb.host}")
     private String host;
 
-    @Value("${spring.data.mongodb.port}")
+    @Value("${app.mongodb.port}")
     private int port;
 
-    @Value("${spring.data.mongodb.username}")
+    @Value("${app.mongodb.username}")
     private String userName;
 
-    @Value("${spring.data.mongodb.password}")
+    @Value("${app.mongodb.password}")
     private String password;
 
-    @Value("${spring.data.mongodb.authentication-database}")
+    @Value("${app.mongodb.authentication-database}")
     private String authenticationDatabase;
 
     @Bean

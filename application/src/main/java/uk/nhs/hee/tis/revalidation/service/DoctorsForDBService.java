@@ -40,6 +40,7 @@ public class DoctorsForDBService {
                 .countTotal(getCountAll())
                 .countUnderNotice(getCountUnderNotice())
                 .totalPages(paginatedDoctors.getTotalPages())
+                .totalResults(paginatedDoctors.getTotalElements())
                 .build();
     }
 
@@ -61,10 +62,10 @@ public class DoctorsForDBService {
         final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
         final Pageable pageableAndSortable = of(requestDTO.getPageNumber(), pageSize, by(direction, requestDTO.getSortColumn()));
         if (requestDTO.isUnderNotice()) {
-            return doctorsRepository.findAllByUnderNoticeIn(pageableAndSortable, YES, ON_HOLD);
+            return doctorsRepository.findAllByUnderNoticeIn(pageableAndSortable, requestDTO.getSearchQuery(), YES, ON_HOLD);
         }
 
-        return doctorsRepository.findAll(pageableAndSortable);
+        return doctorsRepository.findAll(pageableAndSortable, requestDTO.getSearchQuery());
     }
 
     //TODO: explore to implement cache

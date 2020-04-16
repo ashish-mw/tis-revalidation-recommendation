@@ -1,6 +1,5 @@
 package uk.nhs.hee.tis.revalidation.it;
 
-import com.github.javafaker.Faker;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,12 +13,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.nhs.hee.tis.revalidation.RevalidationApplication;
 import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
-import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static java.time.LocalDate.now;
@@ -32,25 +29,13 @@ import static org.junit.Assert.assertThat;
 @SpringBootTest(classes = RevalidationApplication.class)
 @TestPropertySource("classpath:application-test.yml")
 @ActiveProfiles("test")
-public class DoctorsForDBServiceIT {
-
-    private final Faker faker = new Faker();
+public class DoctorsForDBServiceIT extends BaseIT {
 
     @Autowired
     private DoctorsForDBService service;
 
     @Autowired
     private DoctorsForDBRepository repository;
-
-    private DoctorsForDB doc1, doc2, doc3, doc4, doc5;
-    private String gmcRef1, gmcRef2, gmcRef3, gmcRef4, gmcRef5;
-    private String fName1, fName2, fName3, fName4, fName5;
-    private String lName1, lName2, lName3, lName4, lName5;
-    private LocalDate subDate1, subDate2, subDate3, subDate4, subDate5;
-    private LocalDate addedDate1, addedDate2, addedDate3, addedDate4, addedDate5;
-    private UnderNotice un1, un2, un3, un4, un5;
-    private String sanction1, sanction2, sanction3, sanction4, sanction5;
-    private String status1, status2, status3, status4, status5;
 
     @Before
     public void setup() {
@@ -75,7 +60,11 @@ public class DoctorsForDBServiceIT {
         doc5.setSubmissionDate(subDate5);
         repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
 
-        final var requestDTO = RevalidationRequestDTO.builder().sortColumn("submissionDate").sortOrder("desc").build();
+        final var requestDTO = RevalidationRequestDTO.builder()
+                .sortColumn("submissionDate")
+                .sortOrder("desc")
+                .searchQuery("")
+                .build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCountTotal(), is(5L));
 
@@ -139,7 +128,11 @@ public class DoctorsForDBServiceIT {
         doc3.setDoctorFirstName(fName3);
         repository.saveAll(List.of(doc1, doc2, doc3));
 
-        final var requestDTO = RevalidationRequestDTO.builder().sortColumn("doctorFirstName").sortOrder("asc").build();
+        final var requestDTO = RevalidationRequestDTO.builder()
+                .sortColumn("doctorFirstName")
+                .sortOrder("asc")
+                .searchQuery("")
+                .build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCountTotal(), is(3L));
 
@@ -187,7 +180,11 @@ public class DoctorsForDBServiceIT {
 
         repository.saveAll(List.of(doc1, doc2, doc3));
 
-        final var requestDTO = RevalidationRequestDTO.builder().sortColumn("doctorLastName").sortOrder("desc").build();
+        final var requestDTO = RevalidationRequestDTO.builder()
+                .sortColumn("doctorLastName")
+                .sortOrder("desc")
+                .searchQuery("")
+                .build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCountTotal(), is(3L));
 
@@ -238,7 +235,11 @@ public class DoctorsForDBServiceIT {
 
         repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
 
-        final var requestDTO = RevalidationRequestDTO.builder().sortColumn("submissionDate").sortOrder("desc").build();
+        final var requestDTO = RevalidationRequestDTO.builder()
+                .sortColumn("submissionDate")
+                .sortOrder("desc")
+                .searchQuery("")
+                .build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCountTotal(), is(5L));
         assertThat(doctorDTO.getCountUnderNotice(), is(3L));
@@ -274,7 +275,12 @@ public class DoctorsForDBServiceIT {
 
         repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
 
-        final var requestDTO = RevalidationRequestDTO.builder().sortColumn("submissionDate").sortOrder("desc").underNotice(true).build();
+        final var requestDTO = RevalidationRequestDTO.builder()
+                .sortColumn("submissionDate")
+                .sortOrder("desc")
+                .underNotice(true)
+                .searchQuery("")
+                .build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCountTotal(), is(5L));
         assertThat(doctorDTO.getCountUnderNotice(), is(4L));
@@ -335,8 +341,10 @@ public class DoctorsForDBServiceIT {
         repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
 
         var requestDTO = RevalidationRequestDTO.builder()
-                .sortColumn("submissionDate").sortOrder("desc")
+                .sortColumn("submissionDate")
+                .sortOrder("desc")
                 .pageNumber(0)
+                .searchQuery("")
                 .build();
         ReflectionTestUtils.setField(service, "pageSize", 2);
         //fetch record for first page
@@ -366,8 +374,10 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
 
         requestDTO = RevalidationRequestDTO.builder()
-                .sortColumn("submissionDate").sortOrder("desc")
+                .sortColumn("submissionDate")
+                .sortOrder("desc")
                 .pageNumber(1)
+                .searchQuery("")
                 .build();
         //fetch record for second page
         doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
@@ -395,8 +405,10 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status1));
 
         requestDTO = RevalidationRequestDTO.builder()
-                .sortColumn("submissionDate").sortOrder("desc")
+                .sortColumn("submissionDate")
+                .sortOrder("desc")
                 .pageNumber(2)
+                .searchQuery("")
                 .build();
 
         //fetch record for third page
@@ -433,8 +445,10 @@ public class DoctorsForDBServiceIT {
         repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
 
         var requestDTO = RevalidationRequestDTO.builder()
-                .sortColumn("submissionDate").sortOrder("desc")
+                .sortColumn("submissionDate")
+                .sortOrder("desc")
                 .pageNumber(6)
+                .searchQuery("")
                 .build();
         ReflectionTestUtils.setField(service, "pageSize", 2);
         var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
@@ -443,59 +457,4 @@ public class DoctorsForDBServiceIT {
         assertThat(doctorDTO.getTotalPages(), is(3L));
     }
 
-    private void setupData() {
-        gmcRef1 = faker.number().digits(8);
-        gmcRef2 = faker.number().digits(8);
-        gmcRef3 = faker.number().digits(8);
-        gmcRef4 = faker.number().digits(8);
-        gmcRef5 = faker.number().digits(8);
-
-        fName1 = faker.name().firstName();
-        fName2 = faker.name().firstName();
-        fName3 = faker.name().firstName();
-        fName4 = faker.name().firstName();
-        fName5 = faker.name().firstName();
-
-        lName1 = faker.name().lastName();
-        lName2 = faker.name().lastName();
-        lName3 = faker.name().lastName();
-        lName4 = faker.name().lastName();
-        lName5 = faker.name().lastName();
-
-        subDate1 = now();
-        subDate2 = now();
-        subDate3 = now();
-        subDate4 = now();
-        subDate5 = now();
-
-        addedDate1 = now().minusDays(5);
-        addedDate2 = now().minusDays(5);
-        addedDate3 = now().minusDays(5);
-        addedDate4 = now().minusDays(5);
-        addedDate5 = now().minusDays(5);
-
-        un1 = faker.options().option(UnderNotice.class);
-        un2 = faker.options().option(UnderNotice.class);
-        un3 = faker.options().option(UnderNotice.class);
-        un4 = faker.options().option(UnderNotice.class);
-        un5 = faker.options().option(UnderNotice.class);
-
-        sanction1 = faker.lorem().characters(2);
-        sanction2 = faker.lorem().characters(2);
-        sanction3 = faker.lorem().characters(2);
-        sanction4 = faker.lorem().characters(2);
-        sanction5 = faker.lorem().characters(2);
-
-        status1 = faker.lorem().characters(10);
-        status2 = faker.lorem().characters(10);
-        status3 = faker.lorem().characters(10);
-        status4 = faker.lorem().characters(10);
-        status5 = faker.lorem().characters(10);
-
-        doc1 = new DoctorsForDB(gmcRef1, fName1, lName1, subDate1, addedDate1, un1, sanction1, status1);
-        doc2 = new DoctorsForDB(gmcRef2, fName2, lName2, subDate2, addedDate2, un2, sanction2, status2);
-        doc3 = new DoctorsForDB(gmcRef3, fName3, lName3, subDate3, addedDate3, un3, sanction3, status3);
-        doc4 = new DoctorsForDB(gmcRef4, fName4, lName4, subDate4, addedDate4, un4, sanction4, status4);
-        doc5 = new DoctorsForDB(gmcRef5, fName5, lName5, subDate5, addedDate5, un5, sanction5, status5);
-    }
 }

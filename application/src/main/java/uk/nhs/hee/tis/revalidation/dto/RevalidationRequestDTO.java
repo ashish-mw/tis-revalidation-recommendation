@@ -10,4 +10,5 @@ public class RevalidationRequestDTO {
     private String sortOrder;
     private boolean underNotice;
     private int pageNumber;
+    private String searchQuery;
 }

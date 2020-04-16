@@ -28,6 +28,7 @@ server:
 logging:
   level:
     uk.nhs.hee.tis.gmc.client: ${LOGGING_LEVEL:DEBUG}
+    org.springframework.data.mongodb.core.MongoTemplate: ${LOGGING_LEVEL:DEBUG}
   file:
     name: ${LOG_DIR:${HOME}}/revalidation.log
 

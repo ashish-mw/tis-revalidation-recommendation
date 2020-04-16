@@ -64,12 +64,17 @@ public class DoctorsForDBServiceTest {
     public void shouldReturnListOfAllDoctors() {
 
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
-        when(repository.findAll(pageableAndSortable)).thenReturn(page);
+        when(repository.findAll(pageableAndSortable, "")).thenReturn(page);
         when(page.get()).thenReturn(Stream.of(doc1, doc2, doc3, doc4, doc5));
         when(page.getTotalPages()).thenReturn(1);
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
         when(repository.count()).thenReturn(5l);
-        final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").pageNumber(1).build();
+        final var requestDTO = RevalidationRequestDTO.builder()
+                .sortOrder("desc")
+                .sortColumn("submissionDate")
+                .pageNumber(1)
+                .searchQuery("")
+                .build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();
         assertThat(allDoctors.getCountTotal(), is(5L));
@@ -127,12 +132,18 @@ public class DoctorsForDBServiceTest {
     public void shouldReturnListOfUnderNoticeDoctors() {
 
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
-        when(repository.findAllByUnderNoticeIn(pageableAndSortable, YES, ON_HOLD)).thenReturn(page);
+        when(repository.findAllByUnderNoticeIn(pageableAndSortable, "",YES, ON_HOLD)).thenReturn(page);
         when(page.get()).thenReturn(Stream.of(doc1, doc2));
         when(page.getTotalPages()).thenReturn(1);
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
         when(repository.count()).thenReturn(5l);
-        final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").underNotice(true).pageNumber(1).build();
+        final var requestDTO = RevalidationRequestDTO.builder()
+                .sortOrder("desc")
+                .sortColumn("submissionDate")
+                .underNotice(true)
+                .pageNumber(1)
+                .searchQuery("")
+                .build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();
         assertThat(allDoctors.getCountTotal(), is(5L));
@@ -162,16 +173,64 @@ public class DoctorsForDBServiceTest {
     @Test
     public void shouldReturnEmptyListOfDoctorsWhenNoRecordFound() {
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
-        when(repository.findAll(pageableAndSortable)).thenReturn(page);
+        when(repository.findAll(pageableAndSortable,"")).thenReturn(page);
         when(page.get()).thenReturn(Stream.of());
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(0l);
-        final var requestDTO = RevalidationRequestDTO.builder().sortOrder("desc").sortColumn("submissionDate").pageNumber(1).build();
+        final var requestDTO = RevalidationRequestDTO.builder()
+                .sortOrder("desc")
+                .sortColumn("submissionDate")
+                .pageNumber(1)
+                .searchQuery("")
+                .build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();
         assertThat(allDoctors.getCountTotal(), is(0L));
         assertThat(allDoctors.getCountUnderNotice(), is(0L));
         assertThat(allDoctors.getTotalPages(), is(0L));
         assertThat(doctorsForDB, hasSize(0));
+    }
+
+    @Test
+    public void shouldReturnListOfAllDoctorsWhoMatchSearchQuery() {
+
+        final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
+        when(repository.findAll(pageableAndSortable, "query")).thenReturn(page);
+        when(page.get()).thenReturn(Stream.of(doc1, doc4));
+        when(page.getTotalPages()).thenReturn(1);
+        when(page.getTotalElements()).thenReturn(2l);
+        when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
+        when(repository.count()).thenReturn(5l);
+        final var requestDTO = RevalidationRequestDTO.builder()
+                .sortOrder("desc")
+                .sortColumn("submissionDate")
+                .pageNumber(1)
+                .searchQuery("query")
+                .build();
+        final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
+        final var doctorsForDB = allDoctors.getTraineeInfo();
+        assertThat(allDoctors.getCountTotal(), is(5L));
+        assertThat(allDoctors.getCountUnderNotice(), is(2L));
+        assertThat(allDoctors.getTotalPages(), is(1L));
+        assertThat(allDoctors.getTotalResults(), is(2L));
+        assertThat(doctorsForDB, hasSize(2));
+
+        assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef1));
+        assertThat(doctorsForDB.get(0).getDoctorFirstName(), is(fname1));
+        assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lname1));
+        assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate1));
+        assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate1));
+        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1));
+        assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
+        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1));
+
+        assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef4));
+        assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fname4));
+        assertThat(doctorsForDB.get(1).getDoctorLastName(), is(lname4));
+        assertThat(doctorsForDB.get(1).getSubmissionDate(), is(subDate4));
+        assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate4));
+        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un4));
+        assertThat(doctorsForDB.get(1).getSanction(), is(sanction4));
+        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status4));
     }
 
     private void setupData() {

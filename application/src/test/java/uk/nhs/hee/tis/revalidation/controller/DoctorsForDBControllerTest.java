@@ -75,13 +75,14 @@ public class DoctorsForDBControllerTest {
     @Test
     public void shouldReturnTraineeDoctorsInformation() throws Exception {
         final var gmcDoctorDTO = prepareGmcDoctor();
-        final var requestDTO = RevalidationRequestDTO.builder().sortOrder(ASC).sortColumn(SUBMISSION_DATE).build();
+        final var requestDTO = RevalidationRequestDTO.builder().sortOrder(ASC).sortColumn(SUBMISSION_DATE).searchQuery(EMPTY_STRING).build();
         when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO)).thenReturn(gmcDoctorDTO);
         this.mockMvc.perform(get("/api/v1/doctors")
                 .param(SORT_ORDER, ASC)
                 .param(SORT_COLUMN, SUBMISSION_DATE)
                 .param(UNDER_NOTICE, UNDER_NOTICE_VALUE)
-                .param(PAGE_NUMBER, PAGE_NUMBER_VALUE))
+                .param(PAGE_NUMBER, PAGE_NUMBER_VALUE)
+                .param(SEARCH_QUERY, EMPTY_STRING))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(gmcDoctorDTO)));
     }
@@ -89,7 +90,8 @@ public class DoctorsForDBControllerTest {
     @Test
     public void shouldReturnDataWhenSortOrderAndSortColumnAreEmpty() throws Exception {
         final var gmcDoctorDTO = prepareGmcDoctor();
-        final var requestDTO = RevalidationRequestDTO.builder().sortOrder(DESC).sortColumn(SUBMISSION_DATE).build();
+        final var requestDTO = RevalidationRequestDTO.builder().sortOrder(DESC).sortColumn(SUBMISSION_DATE)
+                .searchQuery(EMPTY_STRING).build();
         when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO)).thenReturn(gmcDoctorDTO);
         this.mockMvc.perform(get("/api/v1/doctors")
                 .param(SORT_ORDER, "")
@@ -101,7 +103,8 @@ public class DoctorsForDBControllerTest {
     @Test
     public void shouldReturnDataWhenSortOrderAndSortColumnAreInvalid() throws Exception {
         final var gmcDoctorDTO = prepareGmcDoctor();
-        final var requestDTO = RevalidationRequestDTO.builder().sortOrder(DESC).sortColumn(SUBMISSION_DATE).build();
+        final var requestDTO = RevalidationRequestDTO.builder().sortOrder(DESC).sortColumn(SUBMISSION_DATE)
+                .searchQuery(EMPTY_STRING).build();
         when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO)).thenReturn(gmcDoctorDTO);
         this.mockMvc.perform(get(DOCTORS_API_URL)
                 .param(SORT_ORDER, "aa")
@@ -113,7 +116,8 @@ public class DoctorsForDBControllerTest {
     @Test
     public void shouldReturnUnderNoticeTraineeDoctorsInformation() throws Exception {
         final var gmcDoctorDTO = prepareGmcDoctor();
-        final var requestDTO = RevalidationRequestDTO.builder().sortOrder(ASC).sortColumn(SUBMISSION_DATE).underNotice(true).build();
+        final var requestDTO = RevalidationRequestDTO.builder()
+                .sortOrder(ASC).sortColumn(SUBMISSION_DATE).underNotice(true).searchQuery(EMPTY_STRING).build();
         when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO)).thenReturn(gmcDoctorDTO);
         this.mockMvc.perform(get("/api/v1/doctors")
                 .param(SORT_ORDER, ASC)

@@ -3,10 +3,10 @@ package uk.nhs.hee.tis.revalidation.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDTO;
 import uk.nhs.hee.tis.revalidation.dto.TraineeDoctorDTO;
 import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDTO;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
@@ -31,9 +31,16 @@ public class DoctorsForDBService {
     @Autowired
     private DoctorsForDBRepository doctorsRepository;
 
+    @Autowired
+    private TraineeCoreService traineeCoreService;
+
     public TraineeDoctorDTO getAllTraineeDoctorDetails(final RevalidationRequestDTO requestDTO) {
         final var paginatedDoctors = getSortedAndFilteredDoctorsByPageNumber(requestDTO);
-        final var traineeDoctors = paginatedDoctors.get().map(d -> convert(d)).collect(toList());
+        final var doctorsList = paginatedDoctors.get().collect(toList());
+        final var gmcIds = doctorsList.stream().map(doc -> doc.getGmcReferenceNumber()).collect(toList());
+        final var traineeCoreInfo = traineeCoreService.getTraineeInformationFromCore(gmcIds);
+        final var traineeDoctors = doctorsList.stream().map(d ->
+                convert(d, traineeCoreInfo.get(d.getGmcReferenceNumber()))).collect(toList());
 
         return TraineeDoctorDTO.builder()
                 .traineeInfo(traineeDoctors)
@@ -44,8 +51,8 @@ public class DoctorsForDBService {
                 .build();
     }
 
-    private TraineeInfoDTO convert(final DoctorsForDB doctorsForDB) {
-        return TraineeInfoDTO.builder()
+    private TraineeInfoDTO convert(final DoctorsForDB doctorsForDB, final TraineeCoreDTO traineeCoreDTO) {
+        final var traineeInfoDTOBuilder = TraineeInfoDTO.builder()
                 .gmcReferenceNumber(doctorsForDB.getGmcReferenceNumber())
                 .doctorFirstName(doctorsForDB.getDoctorFirstName())
                 .doctorLastName(doctorsForDB.getDoctorLastName())
@@ -53,14 +60,24 @@ public class DoctorsForDBService {
                 .dateAdded(doctorsForDB.getDateAdded())
                 .underNotice(doctorsForDB.getUnderNotice())
                 .sanction(doctorsForDB.getSanction())
-                .doctorStatus(doctorsForDB.getDoctorStatus())
-                .build();
+                .doctorStatus(doctorsForDB.getDoctorStatus());
+
+        if (traineeCoreDTO != null) {
+            traineeInfoDTOBuilder
+                    .cctDate(traineeCoreDTO.getCctDate())
+                    .programmeName(traineeCoreDTO.getProgrammeName())
+                    .programmeMembershipType(traineeCoreDTO.getProgrammeMembershipType())
+                    .currentGrade(traineeCoreDTO.getCurrentGrade());
+        }
+
+        return traineeInfoDTOBuilder.build();
+
     }
 
 
     private Page<DoctorsForDB> getSortedAndFilteredDoctorsByPageNumber(final RevalidationRequestDTO requestDTO) {
         final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
-        final Pageable pageableAndSortable = of(requestDTO.getPageNumber(), pageSize, by(direction, requestDTO.getSortColumn()));
+        final var pageableAndSortable = of(requestDTO.getPageNumber(), pageSize, by(direction, requestDTO.getSortColumn()));
         if (requestDTO.isUnderNotice()) {
             return doctorsRepository.findAllByUnderNoticeIn(pageableAndSortable, requestDTO.getSearchQuery(), YES, ON_HOLD);
         }

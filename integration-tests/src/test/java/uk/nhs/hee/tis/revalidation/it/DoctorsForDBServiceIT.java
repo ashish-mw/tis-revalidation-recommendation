@@ -20,6 +20,7 @@ import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 import java.util.List;
 
 import static java.time.LocalDate.now;
+import static java.util.Map.of;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -46,7 +47,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
 
     @DisplayName("Trainee doctors information should be sorted by submission date in desc order")
     @Test
-    public void shouldReturnDataSortBySubmissionDateInDescOrder() {
+    public void shouldReturnDataSortBySubmissionDateInDescOrder() throws Exception {
         subDate1 = now().minusDays(5);
         subDate2 = now().minusDays(2);
         subDate3 = now().minusDays(8);
@@ -59,6 +60,9 @@ public class DoctorsForDBServiceIT extends BaseIT {
         doc4.setSubmissionDate(subDate4);
         doc5.setSubmissionDate(subDate5);
         repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
+
+        final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3, gmcRef4, coreDTO4, gmcRef5, coreDTO5);
+        stubCoreRequest(coreData);
 
         final var requestDTO = RevalidationRequestDTO.builder()
                 .sortColumn("submissionDate")
@@ -78,6 +82,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un4));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction4));
         assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status4));
+        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate4));
+        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName4));
+        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType4));
+        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade4));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName2));
@@ -87,6 +95,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
         assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
+        assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate2));
+        assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType2));
+        assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName2));
+        assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade2));
 
         assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef5));
         assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fName5));
@@ -96,8 +108,12 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(2).getUnderNotice(), is(un5));
         assertThat(doctorsForDB.get(2).getSanction(), is(sanction5));
         assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status5));
+        assertThat(doctorsForDB.get(2).getCctDate(), is(cctDate5));
+        assertThat(doctorsForDB.get(2).getProgrammeName(), is(progName5));
+        assertThat(doctorsForDB.get(2).getProgrammeMembershipType(), is(memType5));
+        assertThat(doctorsForDB.get(2).getCurrentGrade(), is(grade5));
 
-        assertThat(doctorsForDB.get(3).getGmcReferenceNumber(), is(gmcRef1));
+        assertThat(doctorsForDB.get(3).getGmcReferenceNumber(), is(this.gmcRef1));
         assertThat(doctorsForDB.get(3).getDoctorFirstName(), is(fName1));
         assertThat(doctorsForDB.get(3).getDoctorLastName(), is(lName1));
         assertThat(doctorsForDB.get(3).getSubmissionDate(), is(subDate1));
@@ -105,6 +121,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(3).getUnderNotice(), is(un1));
         assertThat(doctorsForDB.get(3).getSanction(), is(sanction1));
         assertThat(doctorsForDB.get(3).getDoctorStatus(), is(status1));
+        assertThat(doctorsForDB.get(3).getCctDate(), is(cctDate1));
+        assertThat(doctorsForDB.get(3).getProgrammeName(), is(progName1));
+        assertThat(doctorsForDB.get(3).getProgrammeMembershipType(), is(memType1));
+        assertThat(doctorsForDB.get(3).getCurrentGrade(), is(grade1));
 
         assertThat(doctorsForDB.get(4).getGmcReferenceNumber(), is(gmcRef3));
         assertThat(doctorsForDB.get(4).getDoctorFirstName(), is(fName3));
@@ -114,11 +134,16 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(4).getUnderNotice(), is(un3));
         assertThat(doctorsForDB.get(4).getSanction(), is(sanction3));
         assertThat(doctorsForDB.get(4).getDoctorStatus(), is(status3));
+        assertThat(doctorsForDB.get(4).getCctDate(), is(cctDate3));
+        assertThat(doctorsForDB.get(4).getProgrammeName(), is(progName3));
+        assertThat(doctorsForDB.get(4).getProgrammeMembershipType(), is(memType3));
+        assertThat(doctorsForDB.get(4).getCurrentGrade(), is(grade3));
+
     }
 
     @DisplayName("Trainee doctors information should be sorted by first name in asc order")
     @Test
-    public void shouldReturnDataSortByFirstNameInAscOrder() {
+    public void shouldReturnDataSortByFirstNameInAscOrder() throws Exception {
         fName1 = "Zolo";
         fName2 = "Andy";
         fName3 = "Mark";
@@ -127,6 +152,9 @@ public class DoctorsForDBServiceIT extends BaseIT {
         doc2.setDoctorFirstName(fName2);
         doc3.setDoctorFirstName(fName3);
         repository.saveAll(List.of(doc1, doc2, doc3));
+
+        final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3);
+        stubCoreRequest(coreData);
 
         final var requestDTO = RevalidationRequestDTO.builder()
                 .sortColumn("doctorFirstName")
@@ -146,6 +174,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un2));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction2));
         assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status2));
+        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate2));
+        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName2));
+        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType2));
+        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade2));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef3));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName3));
@@ -155,6 +187,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(1).getUnderNotice(), is(un3));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction3));
         assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status3));
+        assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate3));
+        assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName3));
+        assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType3));
+        assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade3));
 
         assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef1));
         assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fName1));
@@ -164,12 +200,16 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(2).getUnderNotice(), is(un1));
         assertThat(doctorsForDB.get(2).getSanction(), is(sanction1));
         assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status1));
+        assertThat(doctorsForDB.get(2).getCctDate(), is(cctDate1));
+        assertThat(doctorsForDB.get(2).getProgrammeName(), is(progName1));
+        assertThat(doctorsForDB.get(2).getProgrammeMembershipType(), is(memType1));
+        assertThat(doctorsForDB.get(2).getCurrentGrade(), is(grade1));
 
     }
 
     @DisplayName("Trainee doctors information should be sorted by last name in desc order")
     @Test
-    public void shouldReturnDataSortByLastNameInDescOrder() {
+    public void shouldReturnDataSortByLastNameInDescOrder() throws Exception {
         lName1 = "John";
         lName2 = "Adam";
         lName3 = "Webber";
@@ -179,6 +219,9 @@ public class DoctorsForDBServiceIT extends BaseIT {
         doc3.setDoctorLastName(lName3);
 
         repository.saveAll(List.of(doc1, doc2, doc3));
+
+        final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3);
+        stubCoreRequest(coreData);
 
         final var requestDTO = RevalidationRequestDTO.builder()
                 .sortColumn("doctorLastName")
@@ -198,6 +241,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un3));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction3));
         assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status3));
+        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate3));
+        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName3));
+        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType3));
+        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade3));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef1));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName1));
@@ -207,6 +254,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(1).getUnderNotice(), is(un1));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction1));
         assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status1));
+        assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate1));
+        assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName1));
+        assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType1));
+        assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade1));
 
         assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef2));
         assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fName2));
@@ -216,11 +267,15 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(2).getUnderNotice(), is(un2));
         assertThat(doctorsForDB.get(2).getSanction(), is(sanction2));
         assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status2));
+        assertThat(doctorsForDB.get(2).getCctDate(), is(cctDate2));
+        assertThat(doctorsForDB.get(2).getProgrammeName(), is(progName2));
+        assertThat(doctorsForDB.get(2).getProgrammeMembershipType(), is(memType2));
+        assertThat(doctorsForDB.get(2).getCurrentGrade(), is(grade2));
     }
 
     @DisplayName("Trainee doctors information should be sorted by submission date in desc order")
     @Test
-    public void shouldReturnDataWithTotalCountAndUnderNoticeCount() {
+    public void shouldReturnDataWithTotalCountAndUnderNoticeCount() throws Exception {
         un1 = UnderNotice.YES;
         un2 = UnderNotice.NO;
         un3 = UnderNotice.YES;
@@ -235,6 +290,9 @@ public class DoctorsForDBServiceIT extends BaseIT {
 
         repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
 
+        final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3, gmcRef4, coreDTO4, gmcRef5, coreDTO5);
+        stubCoreRequest(coreData);
+
         final var requestDTO = RevalidationRequestDTO.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
@@ -247,7 +305,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
 
     @DisplayName("Get Under Notice Trainee doctors information also sorted by submission date in desc order")
     @Test
-    public void shouldReturnUnderNoticeDoctorsSortBySubmissionDate() {
+    public void shouldReturnUnderNoticeDoctorsSortBySubmissionDate() throws Exception {
 
         subDate1 = now().minusDays(5);
         subDate2 = now().minusDays(2);
@@ -275,6 +333,9 @@ public class DoctorsForDBServiceIT extends BaseIT {
 
         repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
 
+        final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3, gmcRef4, coreDTO4, gmcRef5, coreDTO5);
+        stubCoreRequest(coreData);
+
         final var requestDTO = RevalidationRequestDTO.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
@@ -295,6 +356,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un4));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction4));
         assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status4));
+        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate4));
+        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName4));
+        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType4));
+        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade4));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName2));
@@ -304,6 +369,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
         assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
+        assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate2));
+        assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName2));
+        assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType2));
+        assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade2));
 
         assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef5));
         assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fName5));
@@ -313,6 +382,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(2).getUnderNotice(), is(un5));
         assertThat(doctorsForDB.get(2).getSanction(), is(sanction5));
         assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status5));
+        assertThat(doctorsForDB.get(2).getCctDate(), is(cctDate5));
+        assertThat(doctorsForDB.get(2).getProgrammeName(), is(progName5));
+        assertThat(doctorsForDB.get(2).getProgrammeMembershipType(), is(memType5));
+        assertThat(doctorsForDB.get(2).getCurrentGrade(), is(grade5));
 
         assertThat(doctorsForDB.get(3).getGmcReferenceNumber(), is(gmcRef1));
         assertThat(doctorsForDB.get(3).getDoctorFirstName(), is(fName1));
@@ -322,11 +395,15 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(3).getUnderNotice(), is(un1));
         assertThat(doctorsForDB.get(3).getSanction(), is(sanction1));
         assertThat(doctorsForDB.get(3).getDoctorStatus(), is(status1));
+        assertThat(doctorsForDB.get(3).getCctDate(), is(cctDate1));
+        assertThat(doctorsForDB.get(3).getProgrammeName(), is(progName1));
+        assertThat(doctorsForDB.get(3).getProgrammeMembershipType(), is(memType1));
+        assertThat(doctorsForDB.get(3).getCurrentGrade(), is(grade1));
     }
 
     @DisplayName("Trainee doctors information should be paginated and sorted by submission date in desc order")
     @Test
-    public void shouldReturnTraineeInfoInPaginatedForm() {
+    public void shouldReturnTraineeInfoInPaginatedForm() throws Exception {
         subDate1 = now().minusDays(5);
         subDate2 = now().minusDays(2);
         subDate3 = now().minusDays(8);
@@ -339,6 +416,9 @@ public class DoctorsForDBServiceIT extends BaseIT {
         doc4.setSubmissionDate(subDate4);
         doc5.setSubmissionDate(subDate5);
         repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
+
+        final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3, gmcRef4, coreDTO4, gmcRef5, coreDTO5);
+        stubCoreRequest(coreData);
 
         var requestDTO = RevalidationRequestDTO.builder()
                 .sortColumn("submissionDate")
@@ -363,6 +443,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un4));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction4));
         assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status4));
+        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate4));
+        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName4));
+        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType4));
+        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade4));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName2));
@@ -372,6 +456,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
         assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
+        assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate2));
+        assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName2));
+        assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType2));
+        assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade2));
 
         requestDTO = RevalidationRequestDTO.builder()
                 .sortColumn("submissionDate")
@@ -394,6 +482,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un5));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction5));
         assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status5));
+        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate5));
+        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName5));
+        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType5));
+        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade5));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef1));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName1));
@@ -403,6 +495,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(1).getUnderNotice(), is(un1));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction1));
         assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status1));
+        assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate1));
+        assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName1));
+        assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType1));
+        assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade1));
 
         requestDTO = RevalidationRequestDTO.builder()
                 .sortColumn("submissionDate")
@@ -426,6 +522,10 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un3));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction3));
         assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status3));
+        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate3));
+        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName3));
+        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType3));
+        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade3));
     }
 
     @DisplayName("Trainee doctors information should be not return any data if page number is not correct")

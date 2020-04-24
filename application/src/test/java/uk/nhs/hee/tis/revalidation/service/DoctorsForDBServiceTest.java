@@ -12,14 +12,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDTO;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.time.LocalDate.now;
+import static java.util.List.of;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -42,6 +45,12 @@ public class DoctorsForDBServiceTest {
     private DoctorsForDBRepository repository;
 
     @Mock
+    private TraineeCoreService traineeCoreService;
+
+    @Mock
+    private TraineeCoreDTO coreDTO1, coreDTO2, coreDTO3, coreDTO4, coreDTO5;
+
+    @Mock
     private Page page;
 
     private DoctorsForDB doc1, doc2, doc3, doc4, doc5;
@@ -53,6 +62,10 @@ public class DoctorsForDBServiceTest {
     private UnderNotice un1, un2, un3, un4, un5;
     private String sanction1, sanction2, sanction3, sanction4,sanction5;
     private String status1, status2, status3, status4,status5;
+    private LocalDate cctDate1, cctDate2, cctDate3, cctDate4, cctDate5;
+    private String progName1, progName2, progName3, progName4, progName5;
+    private String memType1, memType2, memType3, memType4, memType5;
+    private String grade1, grade2, grade3, grade4, grade5;
 
     @Before
     public void setup() {
@@ -65,6 +78,33 @@ public class DoctorsForDBServiceTest {
 
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
         when(repository.findAll(pageableAndSortable, "")).thenReturn(page);
+        when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1,gmcRef2, gmcRef3, gmcRef4, gmcRef5)))
+                .thenReturn(Map.of(gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3, gmcRef4, coreDTO4, gmcRef5, coreDTO5));
+        when(coreDTO1.getCctDate()).thenReturn(cctDate1);
+        when(coreDTO1.getProgrammeName()).thenReturn(progName1);
+        when(coreDTO1.getProgrammeMembershipType()).thenReturn(memType1);
+        when(coreDTO1.getCurrentGrade()).thenReturn(grade1);
+
+        when(coreDTO2.getCctDate()).thenReturn(cctDate2);
+        when(coreDTO2.getProgrammeName()).thenReturn(progName2);
+        when(coreDTO2.getProgrammeMembershipType()).thenReturn(memType2);
+        when(coreDTO2.getCurrentGrade()).thenReturn(grade2);
+
+        when(coreDTO3.getCctDate()).thenReturn(cctDate3);
+        when(coreDTO3.getProgrammeName()).thenReturn(progName3);
+        when(coreDTO3.getProgrammeMembershipType()).thenReturn(memType3);
+        when(coreDTO3.getCurrentGrade()).thenReturn(grade3);
+
+        when(coreDTO4.getCctDate()).thenReturn(cctDate4);
+        when(coreDTO4.getProgrammeName()).thenReturn(progName4);
+        when(coreDTO4.getProgrammeMembershipType()).thenReturn(memType4);
+        when(coreDTO4.getCurrentGrade()).thenReturn(grade4);
+
+        when(coreDTO5.getCctDate()).thenReturn(cctDate5);
+        when(coreDTO5.getProgrammeName()).thenReturn(progName5);
+        when(coreDTO5.getProgrammeMembershipType()).thenReturn(memType5);
+        when(coreDTO5.getCurrentGrade()).thenReturn(grade5);
+
         when(page.get()).thenReturn(Stream.of(doc1, doc2, doc3, doc4, doc5));
         when(page.getTotalPages()).thenReturn(1);
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
@@ -75,7 +115,9 @@ public class DoctorsForDBServiceTest {
                 .pageNumber(1)
                 .searchQuery("")
                 .build();
+
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
+
         final var doctorsForDB = allDoctors.getTraineeInfo();
         assertThat(allDoctors.getCountTotal(), is(5L));
         assertThat(allDoctors.getCountUnderNotice(), is(2L));
@@ -90,6 +132,10 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
         assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1));
+        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate1));
+        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName1));
+        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType1));
+        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade1));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fname2));
@@ -99,6 +145,10 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
         assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
+        assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate2));
+        assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName2));
+        assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType2));
+        assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade2));
 
         assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef3));
         assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fname3));
@@ -108,6 +158,10 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(2).getUnderNotice(), is(un3));
         assertThat(doctorsForDB.get(2).getSanction(), is(sanction3));
         assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status3));
+        assertThat(doctorsForDB.get(2).getCctDate(), is(cctDate3));
+        assertThat(doctorsForDB.get(2).getProgrammeName(), is(progName3));
+        assertThat(doctorsForDB.get(2).getProgrammeMembershipType(), is(memType3));
+        assertThat(doctorsForDB.get(2).getCurrentGrade(), is(grade3));
 
         assertThat(doctorsForDB.get(3).getGmcReferenceNumber(), is(gmcRef4));
         assertThat(doctorsForDB.get(3).getDoctorFirstName(), is(fname4));
@@ -117,6 +171,10 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(3).getUnderNotice(), is(un4));
         assertThat(doctorsForDB.get(3).getSanction(), is(sanction4));
         assertThat(doctorsForDB.get(3).getDoctorStatus(), is(status4));
+        assertThat(doctorsForDB.get(3).getCctDate(), is(cctDate4));
+        assertThat(doctorsForDB.get(3).getProgrammeName(), is(progName4));
+        assertThat(doctorsForDB.get(3).getProgrammeMembershipType(), is(memType4));
+        assertThat(doctorsForDB.get(3).getCurrentGrade(), is(grade4));
 
         assertThat(doctorsForDB.get(4).getGmcReferenceNumber(), is(gmcRef5));
         assertThat(doctorsForDB.get(4).getDoctorFirstName(), is(fname5));
@@ -126,6 +184,10 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(4).getUnderNotice(), is(un5));
         assertThat(doctorsForDB.get(4).getSanction(), is(sanction5));
         assertThat(doctorsForDB.get(4).getDoctorStatus(), is(status5));
+        assertThat(doctorsForDB.get(4).getCctDate(), is(cctDate5));
+        assertThat(doctorsForDB.get(4).getProgrammeName(), is(progName5));
+        assertThat(doctorsForDB.get(4).getProgrammeMembershipType(), is(memType5));
+        assertThat(doctorsForDB.get(4).getCurrentGrade(), is(grade5));
     }
 
     @Test
@@ -133,6 +195,18 @@ public class DoctorsForDBServiceTest {
 
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
         when(repository.findAllByUnderNoticeIn(pageableAndSortable, "",YES, ON_HOLD)).thenReturn(page);
+        when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1,gmcRef2)))
+                .thenReturn(Map.of(gmcRef1, coreDTO1, gmcRef2, coreDTO2));
+        when(coreDTO1.getCctDate()).thenReturn(cctDate1);
+        when(coreDTO1.getProgrammeName()).thenReturn(progName1);
+        when(coreDTO1.getProgrammeMembershipType()).thenReturn(memType1);
+        when(coreDTO1.getCurrentGrade()).thenReturn(grade1);
+
+        when(coreDTO2.getCctDate()).thenReturn(cctDate2);
+        when(coreDTO2.getProgrammeName()).thenReturn(progName2);
+        when(coreDTO2.getProgrammeMembershipType()).thenReturn(memType2);
+        when(coreDTO2.getCurrentGrade()).thenReturn(grade2);
+
         when(page.get()).thenReturn(Stream.of(doc1, doc2));
         when(page.getTotalPages()).thenReturn(1);
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
@@ -159,6 +233,10 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
         assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1));
+        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate1));
+        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName1));
+        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType1));
+        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade1));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fname2));
@@ -168,6 +246,10 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
         assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
+        assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate2));
+        assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName2));
+        assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType2));
+        assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade2));
     }
 
     @Test
@@ -195,6 +277,18 @@ public class DoctorsForDBServiceTest {
 
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
         when(repository.findAll(pageableAndSortable, "query")).thenReturn(page);
+        when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1,gmcRef4)))
+                .thenReturn(Map.of(gmcRef1, coreDTO1, gmcRef4, coreDTO4));
+        when(coreDTO1.getCctDate()).thenReturn(cctDate1);
+        when(coreDTO1.getProgrammeName()).thenReturn(progName1);
+        when(coreDTO1.getProgrammeMembershipType()).thenReturn(memType1);
+        when(coreDTO1.getCurrentGrade()).thenReturn(grade1);
+
+        when(coreDTO4.getCctDate()).thenReturn(cctDate4);
+        when(coreDTO4.getProgrammeName()).thenReturn(progName4);
+        when(coreDTO4.getProgrammeMembershipType()).thenReturn(memType4);
+        when(coreDTO4.getCurrentGrade()).thenReturn(grade4);
+
         when(page.get()).thenReturn(Stream.of(doc1, doc4));
         when(page.getTotalPages()).thenReturn(1);
         when(page.getTotalElements()).thenReturn(2l);
@@ -222,6 +316,10 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
         assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1));
+        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate1));
+        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName1));
+        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType1));
+        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade1));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef4));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fname4));
@@ -231,6 +329,10 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(1).getUnderNotice(), is(un4));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction4));
         assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status4));
+        assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate4));
+        assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName4));
+        assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType4));
+        assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade4));
     }
 
     private void setupData() {
@@ -281,6 +383,30 @@ public class DoctorsForDBServiceTest {
         status3 = faker.lorem().characters(10);
         status4 = faker.lorem().characters(10);
         status5 = faker.lorem().characters(10);
+
+        cctDate1 = now();
+        cctDate2 = now();
+        cctDate3 = now();
+        cctDate4 = now();
+        cctDate5 = now();
+
+        progName1 = faker.lorem().sentence(3);
+        progName2 = faker.lorem().sentence(3);
+        progName3 = faker.lorem().sentence(3);
+        progName4 = faker.lorem().sentence(3);
+        progName5 = faker.lorem().sentence(3);
+
+        memType1 = faker.lorem().characters(8);
+        memType2 = faker.lorem().characters(8);
+        memType3 = faker.lorem().characters(8);
+        memType4 = faker.lorem().characters(8);
+        memType5 = faker.lorem().characters(8);
+
+        grade1 = faker.lorem().characters(5);
+        grade2 = faker.lorem().characters(5);
+        grade3 = faker.lorem().characters(5);
+        grade4 = faker.lorem().characters(5);
+        grade5 = faker.lorem().characters(5);
 
         doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1);
         doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2);

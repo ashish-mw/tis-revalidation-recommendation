@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
-import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDTO;
-import uk.nhs.hee.tis.revalidation.dto.TraineeDoctorDTO;
-import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDTO;
+import uk.nhs.hee.tis.revalidation.dto.*;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
@@ -74,7 +71,6 @@ public class DoctorsForDBService {
 
     }
 
-
     private Page<DoctorsForDB> getSortedAndFilteredDoctorsByPageNumber(final RevalidationRequestDTO requestDTO) {
         final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
         final var pageableAndSortable = of(requestDTO.getPageNumber(), pageSize, by(direction, requestDTO.getSortColumn()));
@@ -93,5 +89,10 @@ public class DoctorsForDBService {
     //TODO: explore to implement cache
     private long getCountUnderNotice() {
         return doctorsRepository.countByUnderNoticeIn(YES, ON_HOLD);
+    }
+
+    public void updateTrainee(final DoctorsForDBDTO gmcDoctor) {
+        final DoctorsForDB doctorsForDB = DoctorsForDB.convert(gmcDoctor);
+        doctorsRepository.save(doctorsForDB);
     }
 }

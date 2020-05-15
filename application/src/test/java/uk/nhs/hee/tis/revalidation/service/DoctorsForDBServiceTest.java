@@ -379,11 +379,11 @@ public class DoctorsForDBServiceTest {
         sanction4 = faker.lorem().characters(2);
         sanction5 = faker.lorem().characters(2);
 
-        status1 = faker.options().option(RevalidationStatus.class);
-        status2 = faker.options().option(RevalidationStatus.class);
-        status3 = faker.options().option(RevalidationStatus.class);
-        status4 = faker.options().option(RevalidationStatus.class);
-        status5 = faker.options().option(RevalidationStatus.class);
+        status1 = RevalidationStatus.NOT_STARTED;
+        status2 = RevalidationStatus.NOT_STARTED;
+        status3 = RevalidationStatus.NOT_STARTED;
+        status4 = RevalidationStatus.NOT_STARTED;
+        status5 = RevalidationStatus.NOT_STARTED;
 
         cctDate1 = now();
         cctDate2 = now();

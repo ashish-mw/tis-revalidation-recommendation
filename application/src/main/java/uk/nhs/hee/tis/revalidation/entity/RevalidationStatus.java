@@ -18,9 +18,9 @@ public enum RevalidationStatus {
         return this.status;
     }
 
-    public static RevalidationStatus fromValue(final String status) {
+    public static RevalidationStatus fromString(final String status) {
         for (RevalidationStatus revalidationStatus : RevalidationStatus.values()) {
-            if (revalidationStatus.value().equalsIgnoreCase(status)) {
+            if (revalidationStatus.status.equals(status)) {
                 return revalidationStatus;
             }
         }

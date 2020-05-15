@@ -42,6 +42,7 @@ public class DoctorsForDB {
                 .dateAdded(doctorsForDBDTO.getDateAdded())
                 .underNotice(UnderNotice.fromString(doctorsForDBDTO.getUnderNotice()))
                 .sanction(doctorsForDBDTO.getSanction())
+                .doctorStatus(RevalidationStatus.NOT_STARTED)
                 .lastUpdatedDate(now())
                 .build();
     }

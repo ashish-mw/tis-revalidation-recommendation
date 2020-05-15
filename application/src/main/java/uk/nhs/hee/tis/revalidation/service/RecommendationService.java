@@ -30,9 +30,9 @@ public class RecommendationService {
                     .doctorLastName(doctorsForDB.getDoctorLastName())
                     .submissionDate(doctorsForDB.getSubmissionDate())
                     .dateAdded(doctorsForDB.getDateAdded())
-                    .underNotice(doctorsForDB.getUnderNotice())
+                    .underNotice(doctorsForDB.getUnderNotice().value())
                     .sanction(doctorsForDB.getSanction())
-                    .doctorStatus(doctorsForDB.getDoctorStatus());
+                    .doctorStatus(doctorsForDB.getDoctorStatus().value());
 
             if (traineeCoreInfo.get(gmcId) != null) {
                 final var traineeCoreDTO = traineeCoreInfo.get(gmcId);

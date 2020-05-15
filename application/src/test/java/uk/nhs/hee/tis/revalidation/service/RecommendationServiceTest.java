@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDTO;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
+import uk.nhs.hee.tis.revalidation.entity.RevalidationStatus;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
@@ -45,7 +46,7 @@ public class RecommendationServiceTest {
     private LocalDate dateAdded;
     private UnderNotice underNotice;
     private String sanction;
-    private String status;
+    private RevalidationStatus status;
     private LocalDate cctDate;
     private String programmeName;
     private String programmeMembershipType;
@@ -55,7 +56,7 @@ public class RecommendationServiceTest {
     public void setup() {
         firstName = faker.name().firstName();
         lastName = faker.name().lastName();
-        status = faker.lorem().characters(5);
+        status = RevalidationStatus.NOT_STARTED;
         submissionDate = LocalDate.now();
         dateAdded = LocalDate.now();
         underNotice = UnderNotice.NO;
@@ -81,9 +82,9 @@ public class RecommendationServiceTest {
         assertThat(traineeInfo.getDoctorLastName(), is(lastName));
         assertThat(traineeInfo.getSubmissionDate(), is(submissionDate));
         assertThat(traineeInfo.getDateAdded(), is(dateAdded));
-        assertThat(traineeInfo.getUnderNotice(), is(underNotice));
+        assertThat(traineeInfo.getUnderNotice(), is(underNotice.value()));
         assertThat(traineeInfo.getSanction(), is(sanction));
-        assertThat(traineeInfo.getDoctorStatus(), is(status));
+        assertThat(traineeInfo.getDoctorStatus(), is(status.value()));
         assertThat(traineeInfo.getCctDate(), is(cctDate));
         assertThat(traineeInfo.getProgrammeName(), is(programmeName));
         assertThat(traineeInfo.getProgrammeMembershipType(), is(programmeMembershipType));
@@ -101,9 +102,9 @@ public class RecommendationServiceTest {
         assertThat(traineeInfo.getDoctorLastName(), is(lastName));
         assertThat(traineeInfo.getSubmissionDate(), is(submissionDate));
         assertThat(traineeInfo.getDateAdded(), is(dateAdded));
-        assertThat(traineeInfo.getUnderNotice(), is(underNotice));
+        assertThat(traineeInfo.getUnderNotice(), is(underNotice.value()));
         assertThat(traineeInfo.getSanction(), is(sanction));
-        assertThat(traineeInfo.getDoctorStatus(), is(status));
+        assertThat(traineeInfo.getDoctorStatus(), is(status.value()));
         assertThat(traineeInfo.getCctDate(), is(nullValue()));
         assertThat(traineeInfo.getProgrammeName(), is(nullValue()));
         assertThat(traineeInfo.getProgrammeMembershipType(), is(nullValue()));

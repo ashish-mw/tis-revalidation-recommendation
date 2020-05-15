@@ -8,6 +8,7 @@ import org.junit.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDTO;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
+import uk.nhs.hee.tis.revalidation.entity.RevalidationStatus;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 
 import java.time.LocalDate;
@@ -35,7 +36,7 @@ public class BaseIT {
     protected LocalDate addedDate1, addedDate2, addedDate3, addedDate4, addedDate5;
     protected UnderNotice un1, un2, un3, un4, un5;
     protected String sanction1, sanction2, sanction3, sanction4, sanction5;
-    protected String status1, status2, status3, status4, status5;
+    protected RevalidationStatus status1, status2, status3, status4, status5;
     protected LocalDate cctDate1, cctDate2, cctDate3, cctDate4, cctDate5;
     protected String progName1, progName2, progName3, progName4, progName5;
     protected String memType1, memType2, memType3, memType4, memType5;
@@ -84,11 +85,11 @@ public class BaseIT {
         sanction4 = faker.lorem().characters(2);
         sanction5 = faker.lorem().characters(2);
 
-        status1 = faker.lorem().characters(10);
-        status2 = faker.lorem().characters(10);
-        status3 = faker.lorem().characters(10);
-        status4 = faker.lorem().characters(10);
-        status5 = faker.lorem().characters(10);
+        status1 = faker.options().option(RevalidationStatus.class);
+        status2 = faker.options().option(RevalidationStatus.class);
+        status3 = faker.options().option(RevalidationStatus.class);
+        status4 = faker.options().option(RevalidationStatus.class);
+        status5 = faker.options().option(RevalidationStatus.class);
 
         cctDate1 = now();
         cctDate2 = now();
@@ -114,11 +115,11 @@ public class BaseIT {
         grade4 = faker.lorem().characters(5);
         grade5 = faker.lorem().characters(5);
 
-        doc1 = new DoctorsForDB(gmcRef1, fName1, lName1, subDate1, addedDate1, un1, sanction1, status1);
-        doc2 = new DoctorsForDB(gmcRef2, fName2, lName2, subDate2, addedDate2, un2, sanction2, status2);
-        doc3 = new DoctorsForDB(gmcRef3, fName3, lName3, subDate3, addedDate3, un3, sanction3, status3);
-        doc4 = new DoctorsForDB(gmcRef4, fName4, lName4, subDate4, addedDate4, un4, sanction4, status4);
-        doc5 = new DoctorsForDB(gmcRef5, fName5, lName5, subDate5, addedDate5, un5, sanction5, status5);
+        doc1 = new DoctorsForDB(gmcRef1, fName1, lName1, subDate1, addedDate1, un1, sanction1, status1, now());
+        doc2 = new DoctorsForDB(gmcRef2, fName2, lName2, subDate2, addedDate2, un2, sanction2, status2, now());
+        doc3 = new DoctorsForDB(gmcRef3, fName3, lName3, subDate3, addedDate3, un3, sanction3, status3, now());
+        doc4 = new DoctorsForDB(gmcRef4, fName4, lName4, subDate4, addedDate4, un4, sanction4, status4, now());
+        doc5 = new DoctorsForDB(gmcRef5, fName5, lName5, subDate5, addedDate5, un5, sanction5, status5, now());
 
         coreDTO1 = new TraineeCoreDTO(gmcRef1, cctDate1, memType1, progName1, grade1);
         coreDTO2 = new TraineeCoreDTO(gmcRef2, cctDate2, memType2, progName2, grade2);

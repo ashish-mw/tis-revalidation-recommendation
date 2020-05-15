@@ -48,6 +48,11 @@ public class DoctorsForDBService {
                 .build();
     }
 
+    public void updateTrainee(final DoctorsForDBDTO gmcDoctor) {
+        final DoctorsForDB doctorsForDB = DoctorsForDB.convert(gmcDoctor);
+        doctorsRepository.save(doctorsForDB);
+    }
+
     private TraineeInfoDTO convert(final DoctorsForDB doctorsForDB, final TraineeCoreDTO traineeCoreDTO) {
         final var traineeInfoDTOBuilder = TraineeInfoDTO.builder()
                 .gmcReferenceNumber(doctorsForDB.getGmcReferenceNumber())
@@ -55,9 +60,10 @@ public class DoctorsForDBService {
                 .doctorLastName(doctorsForDB.getDoctorLastName())
                 .submissionDate(doctorsForDB.getSubmissionDate())
                 .dateAdded(doctorsForDB.getDateAdded())
-                .underNotice(doctorsForDB.getUnderNotice())
+                .underNotice(doctorsForDB.getUnderNotice().value())
                 .sanction(doctorsForDB.getSanction())
-                .doctorStatus(doctorsForDB.getDoctorStatus());
+                .doctorStatus(doctorsForDB.getDoctorStatus().value()) //TODO update with legacy statuses
+                .lastUpdatedDate(doctorsForDB.getLastUpdatedDate());
 
         if (traineeCoreDTO != null) {
             traineeInfoDTOBuilder
@@ -91,8 +97,4 @@ public class DoctorsForDBService {
         return doctorsRepository.countByUnderNoticeIn(YES, ON_HOLD);
     }
 
-    public void updateTrainee(final DoctorsForDBDTO gmcDoctor) {
-        final DoctorsForDB doctorsForDB = DoctorsForDB.convert(gmcDoctor);
-        doctorsRepository.save(doctorsForDB);
-    }
 }

@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
 import uk.nhs.hee.tis.revalidation.dto.TraineeDoctorDTO;
 import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDTO;
+import uk.nhs.hee.tis.revalidation.entity.RevalidationStatus;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
@@ -50,7 +51,7 @@ public class DoctorsForDBControllerTest {
     private LocalDate dateAdded1, dateAdded2;
     private UnderNotice underNotice1, underNotice2;
     private String sanction1, sanction2;
-    private String doctorStatus1, doctorStatus2;
+    private RevalidationStatus doctorStatus1, doctorStatus2;
 
     @Before
     public void setup() {
@@ -68,8 +69,8 @@ public class DoctorsForDBControllerTest {
         underNotice2 = UnderNotice.ON_HOLD;
         sanction1 = faker.lorem().characters(2);
         sanction2 = faker.lorem().characters(2);
-        doctorStatus1 = faker.lorem().characters(0);
-        doctorStatus2 = faker.lorem().characters(0);
+        doctorStatus1 = RevalidationStatus.STARTED;
+        doctorStatus2 = RevalidationStatus.SUBMITTED_TO_GMC;
     }
 
     @Test
@@ -143,9 +144,9 @@ public class DoctorsForDBControllerTest {
                 .doctorLastName(lastName1)
                 .submissionDate(submissionDate1)
                 .dateAdded(dateAdded1)
-                .underNotice(underNotice1)
+                .underNotice(underNotice1.value())
                 .sanction(sanction1)
-                .doctorStatus(doctorStatus1)
+                .doctorStatus(doctorStatus1.value())
                 .build();
 
         final var doctor2 = TraineeInfoDTO.builder()
@@ -154,9 +155,9 @@ public class DoctorsForDBControllerTest {
                 .doctorLastName(lastName2)
                 .submissionDate(submissionDate2)
                 .dateAdded(dateAdded2)
-                .underNotice(underNotice2)
+                .underNotice(underNotice2.value())
                 .sanction(sanction2)
-                .doctorStatus(doctorStatus2)
+                .doctorStatus(doctorStatus2.value())
                 .build();
         return of(doctor1, doctor2);
     }

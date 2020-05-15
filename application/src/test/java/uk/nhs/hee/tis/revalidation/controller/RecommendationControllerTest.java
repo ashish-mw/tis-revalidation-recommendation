@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDTO;
+import uk.nhs.hee.tis.revalidation.entity.RevalidationStatus;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.service.RecommendationService;
 
@@ -43,7 +44,7 @@ public class RecommendationControllerTest {
     private LocalDate dateAdded = LocalDate.now();;
     private UnderNotice underNotice = faker.options().option(UnderNotice.class);
     private String sanction = faker.lorem().characters(2);
-    private String status =  faker.lorem().characters(10);
+    private RevalidationStatus status =  faker.options().option(RevalidationStatus.class);
     private LocalDate cctDate = LocalDate.now();
     private String programmeName = faker.lorem().sentence(3);
     private String programmeMembershipType = faker.lorem().characters(10);
@@ -66,12 +67,12 @@ public class RecommendationControllerTest {
                 .submissionDate(submissionDate)
                 .dateAdded(dateAdded)
                 .sanction(sanction)
-                .underNotice(underNotice)
+                .underNotice(underNotice.value())
                 .currentGrade(currentGrade)
                 .programmeMembershipType(programmeMembershipType)
                 .programmeName(programmeName)
                 .cctDate(cctDate)
-                .doctorStatus(status)
+                .doctorStatus(status.value())
                 .build();
     }
 

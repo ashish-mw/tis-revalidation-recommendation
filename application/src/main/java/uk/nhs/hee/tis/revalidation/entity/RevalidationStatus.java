@@ -8,22 +8,22 @@ public enum RevalidationStatus {
     READY_TO_SUBMIT("Ready to submit"),
     SUBMITTED_TO_GMC("Submitted to GMC");
 
-    private String status;
+    private final String status;
 
-    private RevalidationStatus(final String value) {
-        this.status = value;
+    RevalidationStatus(final String status) {
+        this.status = status;
     }
 
     public String value() {
         return this.status;
     }
 
-    public RevalidationStatus fromValue(final String status) {
+    public static RevalidationStatus fromValue(final String status) {
         for (RevalidationStatus revalidationStatus : RevalidationStatus.values()) {
             if (revalidationStatus.value().equalsIgnoreCase(status)) {
                 return revalidationStatus;
             }
         }
-        return NOT_STARTED;
+        return null;
     }
 }

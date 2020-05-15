@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.nhs.hee.tis.revalidation.dto.*;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
+import uk.nhs.hee.tis.revalidation.entity.RevalidationStatus;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 import static java.util.stream.Collectors.toList;
@@ -62,7 +63,7 @@ public class DoctorsForDBService {
                 .dateAdded(doctorsForDB.getDateAdded())
                 .underNotice(doctorsForDB.getUnderNotice().value())
                 .sanction(doctorsForDB.getSanction())
-                .doctorStatus(doctorsForDB.getDoctorStatus().value()) //TODO update with legacy statuses
+                .doctorStatus(RevalidationStatus.NOT_STARTED.value()) //TODO update with legacy statuses
                 .lastUpdatedDate(doctorsForDB.getLastUpdatedDate());
 
         if (traineeCoreDTO != null) {

@@ -53,9 +53,9 @@ public class RecommendationIT extends BaseIT {
         assertThat(traineeInfo.getDoctorLastName(), is(lName1));
         assertThat(traineeInfo.getSubmissionDate(), is(subDate1));
         assertThat(traineeInfo.getDateAdded(), is(addedDate1));
-        assertThat(traineeInfo.getUnderNotice(), is(un1));
+        assertThat(traineeInfo.getUnderNotice(), is(un1.value()));
         assertThat(traineeInfo.getSanction(), is(sanction1));
-        assertThat(traineeInfo.getDoctorStatus(), is(status1));
+        assertThat(traineeInfo.getDoctorStatus(), is(status1.value()));
         assertThat(traineeInfo.getCctDate(), is(cctDate1));
         assertThat(traineeInfo.getProgrammeName(), is(progName1));
         assertThat(traineeInfo.getProgrammeMembershipType(), is(memType1));
@@ -74,9 +74,9 @@ public class RecommendationIT extends BaseIT {
         assertThat(traineeInfo.getDoctorLastName(), is(lName1));
         assertThat(traineeInfo.getSubmissionDate(), is(subDate1));
         assertThat(traineeInfo.getDateAdded(), is(addedDate1));
-        assertThat(traineeInfo.getUnderNotice(), is(un1));
+        assertThat(traineeInfo.getUnderNotice(), is(un1.value()));
         assertThat(traineeInfo.getSanction(), is(sanction1));
-        assertThat(traineeInfo.getDoctorStatus(), is(status1));
+        assertThat(traineeInfo.getDoctorStatus(), is(status1.value()));
         assertThat(traineeInfo.getCctDate(), is(nullValue()));
         assertThat(traineeInfo.getProgrammeName(), is(nullValue()));
         assertThat(traineeInfo.getProgrammeMembershipType(), is(nullValue()));
@@ -95,9 +95,9 @@ public class RecommendationIT extends BaseIT {
         assertThat(traineeInfo.getDoctorLastName(), is(lName1));
         assertThat(traineeInfo.getSubmissionDate(), is(subDate1));
         assertThat(traineeInfo.getDateAdded(), is(addedDate1));
-        assertThat(traineeInfo.getUnderNotice(), is(un1));
+        assertThat(traineeInfo.getUnderNotice(), is(un1.value()));
         assertThat(traineeInfo.getSanction(), is(sanction1));
-        assertThat(traineeInfo.getDoctorStatus(), is(status1));
+        assertThat(traineeInfo.getDoctorStatus(), is(status1.value()));
         assertThat(traineeInfo.getCctDate(), is(nullValue()));
         assertThat(traineeInfo.getProgrammeName(), is(nullValue()));
         assertThat(traineeInfo.getProgrammeMembershipType(), is(nullValue()));
@@ -116,14 +116,12 @@ public class RecommendationIT extends BaseIT {
         assertThat(traineeInfo.getDoctorLastName(), is(lName1));
         assertThat(traineeInfo.getSubmissionDate(), is(subDate1));
         assertThat(traineeInfo.getDateAdded(), is(addedDate1));
-        assertThat(traineeInfo.getUnderNotice(), is(un1));
+        assertThat(traineeInfo.getUnderNotice(), is(un1.value()));
         assertThat(traineeInfo.getSanction(), is(sanction1));
-        assertThat(traineeInfo.getDoctorStatus(), is(status1));
+        assertThat(traineeInfo.getDoctorStatus(), is(status1.value()));
         assertThat(traineeInfo.getCctDate(), is(nullValue()));
         assertThat(traineeInfo.getProgrammeName(), is(nullValue()));
         assertThat(traineeInfo.getProgrammeMembershipType(), is(nullValue()));
         assertThat(traineeInfo.getCurrentGrade(), is(nullValue()));
     }
-
-    
 }

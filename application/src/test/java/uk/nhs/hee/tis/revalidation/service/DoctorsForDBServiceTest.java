@@ -14,6 +14,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
 import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDTO;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
+import uk.nhs.hee.tis.revalidation.entity.RevalidationStatus;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
@@ -61,7 +62,7 @@ public class DoctorsForDBServiceTest {
     private LocalDate addedDate1, addedDate2, addedDate3, addedDate4, addedDate5;
     private UnderNotice un1, un2, un3, un4, un5;
     private String sanction1, sanction2, sanction3, sanction4,sanction5;
-    private String status1, status2, status3, status4,status5;
+    private RevalidationStatus status1, status2, status3, status4,status5;
     private LocalDate cctDate1, cctDate2, cctDate3, cctDate4, cctDate5;
     private String progName1, progName2, progName3, progName4, progName5;
     private String memType1, memType2, memType3, memType4, memType5;
@@ -129,9 +130,9 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lname1));
         assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate1));
         assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate1));
-        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1));
+        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1.value()));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
-        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1));
+        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1.value()));
         assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate1));
         assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName1));
         assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType1));
@@ -142,9 +143,9 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(1).getDoctorLastName(), is(lname2));
         assertThat(doctorsForDB.get(1).getSubmissionDate(), is(subDate2));
         assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate2));
-        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
+        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2.value()));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
-        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
+        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2.value()));
         assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate2));
         assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName2));
         assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType2));
@@ -155,9 +156,9 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(2).getDoctorLastName(), is(lname3));
         assertThat(doctorsForDB.get(2).getSubmissionDate(), is(subDate3));
         assertThat(doctorsForDB.get(2).getDateAdded(), is(addedDate3));
-        assertThat(doctorsForDB.get(2).getUnderNotice(), is(un3));
+        assertThat(doctorsForDB.get(2).getUnderNotice(), is(un3.value()));
         assertThat(doctorsForDB.get(2).getSanction(), is(sanction3));
-        assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status3));
+        assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status3.value()));
         assertThat(doctorsForDB.get(2).getCctDate(), is(cctDate3));
         assertThat(doctorsForDB.get(2).getProgrammeName(), is(progName3));
         assertThat(doctorsForDB.get(2).getProgrammeMembershipType(), is(memType3));
@@ -168,9 +169,9 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(3).getDoctorLastName(), is(lname4));
         assertThat(doctorsForDB.get(3).getSubmissionDate(), is(subDate4));
         assertThat(doctorsForDB.get(3).getDateAdded(), is(addedDate4));
-        assertThat(doctorsForDB.get(3).getUnderNotice(), is(un4));
+        assertThat(doctorsForDB.get(3).getUnderNotice(), is(un4.value()));
         assertThat(doctorsForDB.get(3).getSanction(), is(sanction4));
-        assertThat(doctorsForDB.get(3).getDoctorStatus(), is(status4));
+        assertThat(doctorsForDB.get(3).getDoctorStatus(), is(status4.value()));
         assertThat(doctorsForDB.get(3).getCctDate(), is(cctDate4));
         assertThat(doctorsForDB.get(3).getProgrammeName(), is(progName4));
         assertThat(doctorsForDB.get(3).getProgrammeMembershipType(), is(memType4));
@@ -181,9 +182,9 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(4).getDoctorLastName(), is(lname5));
         assertThat(doctorsForDB.get(4).getSubmissionDate(), is(subDate5));
         assertThat(doctorsForDB.get(4).getDateAdded(), is(addedDate5));
-        assertThat(doctorsForDB.get(4).getUnderNotice(), is(un5));
+        assertThat(doctorsForDB.get(4).getUnderNotice(), is(un5.value()));
         assertThat(doctorsForDB.get(4).getSanction(), is(sanction5));
-        assertThat(doctorsForDB.get(4).getDoctorStatus(), is(status5));
+        assertThat(doctorsForDB.get(4).getDoctorStatus(), is(status5.value()));
         assertThat(doctorsForDB.get(4).getCctDate(), is(cctDate5));
         assertThat(doctorsForDB.get(4).getProgrammeName(), is(progName5));
         assertThat(doctorsForDB.get(4).getProgrammeMembershipType(), is(memType5));
@@ -230,9 +231,9 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lname1));
         assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate1));
         assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate1));
-        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1));
+        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1.value()));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
-        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1));
+        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1.value()));
         assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate1));
         assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName1));
         assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType1));
@@ -243,9 +244,9 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(1).getDoctorLastName(), is(lname2));
         assertThat(doctorsForDB.get(1).getSubmissionDate(), is(subDate2));
         assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate2));
-        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
+        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2.value()));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
-        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
+        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2.value()));
         assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate2));
         assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName2));
         assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType2));
@@ -313,9 +314,9 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lname1));
         assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate1));
         assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate1));
-        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1));
+        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1.value()));
         assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
-        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1));
+        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1.value()));
         assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate1));
         assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName1));
         assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType1));
@@ -326,9 +327,9 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(1).getDoctorLastName(), is(lname4));
         assertThat(doctorsForDB.get(1).getSubmissionDate(), is(subDate4));
         assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate4));
-        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un4));
+        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un4.value()));
         assertThat(doctorsForDB.get(1).getSanction(), is(sanction4));
-        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status4));
+        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status4.value()));
         assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate4));
         assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName4));
         assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType4));
@@ -378,11 +379,11 @@ public class DoctorsForDBServiceTest {
         sanction4 = faker.lorem().characters(2);
         sanction5 = faker.lorem().characters(2);
 
-        status1 = faker.lorem().characters(10);
-        status2 = faker.lorem().characters(10);
-        status3 = faker.lorem().characters(10);
-        status4 = faker.lorem().characters(10);
-        status5 = faker.lorem().characters(10);
+        status1 = faker.options().option(RevalidationStatus.class);
+        status2 = faker.options().option(RevalidationStatus.class);
+        status3 = faker.options().option(RevalidationStatus.class);
+        status4 = faker.options().option(RevalidationStatus.class);
+        status5 = faker.options().option(RevalidationStatus.class);
 
         cctDate1 = now();
         cctDate2 = now();
@@ -408,10 +409,10 @@ public class DoctorsForDBServiceTest {
         grade4 = faker.lorem().characters(5);
         grade5 = faker.lorem().characters(5);
 
-        doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1);
-        doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2);
-        doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3, status3);
-        doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4, status4);
-        doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5);
+        doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1, now());
+        doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2, now());
+        doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3, status3, now());
+        doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4, status4, now());
+        doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5, now());
     }
 }

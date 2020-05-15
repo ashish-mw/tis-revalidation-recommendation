@@ -37,13 +37,12 @@ public class JsonSerializationTest {
                 .gmcReferenceNumber("gmtRef")
                 .sanction("sanction")
                 .underNotice("under notice")
-                .doctorStatus("not started")
                 .dateAdded(of(2020, 4, 2))
                 .submissionDate(of(2020,3,31)).build();
 
         final var json = mapper.writeValueAsString(doctor);
 
-        assertThat(json,is("{\"gmcReferenceNumber\":\"gmtRef\",\"doctorFirstName\":\"first\",\"doctorLastName\":\"last\",\"submissionDate\":\"2020-03-31\",\"dateAdded\":\"2020-04-02\",\"underNotice\":\"under notice\",\"sanction\":\"sanction\",\"doctorStatus\":\"not started\"}"));
+        assertThat(json,is("{\"gmcReferenceNumber\":\"gmtRef\",\"doctorFirstName\":\"first\",\"doctorLastName\":\"last\",\"submissionDate\":\"2020-03-31\",\"dateAdded\":\"2020-04-02\",\"underNotice\":\"under notice\",\"sanction\":\"sanction\"}"));
     }
 
 }

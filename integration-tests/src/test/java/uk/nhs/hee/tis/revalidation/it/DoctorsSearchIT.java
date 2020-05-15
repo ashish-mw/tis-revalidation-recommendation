@@ -57,20 +57,20 @@ public class DoctorsSearchIT extends BaseIT {
         assertThat(doctorDTO.getCountTotal(), is(5L));
         assertThat(doctorDTO.getTotalResults(), is(1L));
 
-        final var doctorsForDB = doctorDTO.getTraineeInfo();
+        final var traineeInfo = doctorDTO.getTraineeInfo();
 
-        assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef3));
-        assertThat(doctorsForDB.get(0).getDoctorFirstName(), is(fName3));
-        assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lName3));
-        assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate3));
-        assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate3));
-        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un3));
-        assertThat(doctorsForDB.get(0).getSanction(), is(sanction3));
-        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status3));
-        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate3));
-        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName3));
-        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType3));
-        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade3));
+        assertThat(traineeInfo.get(0).getGmcReferenceNumber(), is(gmcRef3));
+        assertThat(traineeInfo.get(0).getDoctorFirstName(), is(fName3));
+        assertThat(traineeInfo.get(0).getDoctorLastName(), is(lName3));
+        assertThat(traineeInfo.get(0).getSubmissionDate(), is(subDate3));
+        assertThat(traineeInfo.get(0).getDateAdded(), is(addedDate3));
+        assertThat(traineeInfo.get(0).getUnderNotice(), is(un3.value()));
+        assertThat(traineeInfo.get(0).getSanction(), is(sanction3));
+        assertThat(traineeInfo.get(0).getDoctorStatus(), is(status3.value()));
+        assertThat(traineeInfo.get(0).getCctDate(), is(cctDate3));
+        assertThat(traineeInfo.get(0).getProgrammeName(), is(progName3));
+        assertThat(traineeInfo.get(0).getProgrammeMembershipType(), is(memType3));
+        assertThat(traineeInfo.get(0).getCurrentGrade(), is(grade3));
     }
 
     @Test
@@ -90,20 +90,20 @@ public class DoctorsSearchIT extends BaseIT {
         assertThat(doctorDTO.getCountTotal(), is(5L));
         assertThat(doctorDTO.getTotalResults(), is(1L));
 
-        final var doctorsForDB = doctorDTO.getTraineeInfo();
+        final var traineeInfo = doctorDTO.getTraineeInfo();
 
-        assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef2));
-        assertThat(doctorsForDB.get(0).getDoctorFirstName(), is(fName2));
-        assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lName2));
-        assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate2));
-        assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate2));
-        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un2));
-        assertThat(doctorsForDB.get(0).getSanction(), is(sanction2));
-        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status2));
-        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate2));
-        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName2));
-        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType2));
-        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade2));
+        assertThat(traineeInfo.get(0).getGmcReferenceNumber(), is(gmcRef2));
+        assertThat(traineeInfo.get(0).getDoctorFirstName(), is(fName2));
+        assertThat(traineeInfo.get(0).getDoctorLastName(), is(lName2));
+        assertThat(traineeInfo.get(0).getSubmissionDate(), is(subDate2));
+        assertThat(traineeInfo.get(0).getDateAdded(), is(addedDate2));
+        assertThat(traineeInfo.get(0).getUnderNotice(), is(un2.value()));
+        assertThat(traineeInfo.get(0).getSanction(), is(sanction2));
+        assertThat(traineeInfo.get(0).getDoctorStatus(), is(status2.value()));
+        assertThat(traineeInfo.get(0).getCctDate(), is(cctDate2));
+        assertThat(traineeInfo.get(0).getProgrammeName(), is(progName2));
+        assertThat(traineeInfo.get(0).getProgrammeMembershipType(), is(memType2));
+        assertThat(traineeInfo.get(0).getCurrentGrade(), is(grade2));
     }
 
     @Test
@@ -122,20 +122,20 @@ public class DoctorsSearchIT extends BaseIT {
         assertThat(doctorDTO.getCountTotal(), is(5L));
         assertThat(doctorDTO.getTotalResults(), is(1L));
 
-        final var doctorsForDB = doctorDTO.getTraineeInfo();
+        final var traineeInfo = doctorDTO.getTraineeInfo();
 
-        assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef5));
-        assertThat(doctorsForDB.get(0).getDoctorFirstName(), is(fName5));
-        assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lName5));
-        assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate5));
-        assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate5));
-        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un5));
-        assertThat(doctorsForDB.get(0).getSanction(), is(sanction5));
-        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status5));
-        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate5));
-        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName5));
-        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType5));
-        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade5));
+        assertThat(traineeInfo.get(0).getGmcReferenceNumber(), is(gmcRef5));
+        assertThat(traineeInfo.get(0).getDoctorFirstName(), is(fName5));
+        assertThat(traineeInfo.get(0).getDoctorLastName(), is(lName5));
+        assertThat(traineeInfo.get(0).getSubmissionDate(), is(subDate5));
+        assertThat(traineeInfo.get(0).getDateAdded(), is(addedDate5));
+        assertThat(traineeInfo.get(0).getUnderNotice(), is(un5.value()));
+        assertThat(traineeInfo.get(0).getSanction(), is(sanction5));
+        assertThat(traineeInfo.get(0).getDoctorStatus(), is(status5.value()));
+        assertThat(traineeInfo.get(0).getCctDate(), is(cctDate5));
+        assertThat(traineeInfo.get(0).getProgrammeName(), is(progName5));
+        assertThat(traineeInfo.get(0).getProgrammeMembershipType(), is(memType5));
+        assertThat(traineeInfo.get(0).getCurrentGrade(), is(grade5));
     }
 
     @Test
@@ -157,33 +157,33 @@ public class DoctorsSearchIT extends BaseIT {
         assertThat(doctorDTO.getCountTotal(), is(5L));
         assertThat(doctorDTO.getTotalResults(), is(2L));
 
-        final var doctorsForDB = doctorDTO.getTraineeInfo();
+        final var traineeInfo = doctorDTO.getTraineeInfo();
 
-        assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef2));
-        assertThat(doctorsForDB.get(0).getDoctorFirstName(), is(fName2));
-        assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lName2));
-        assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate2));
-        assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate2));
-        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un2));
-        assertThat(doctorsForDB.get(0).getSanction(), is(sanction2));
-        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status2));
-        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate2));
-        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName2));
-        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType2));
-        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade2));
+        assertThat(traineeInfo.get(0).getGmcReferenceNumber(), is(gmcRef2));
+        assertThat(traineeInfo.get(0).getDoctorFirstName(), is(fName2));
+        assertThat(traineeInfo.get(0).getDoctorLastName(), is(lName2));
+        assertThat(traineeInfo.get(0).getSubmissionDate(), is(subDate2));
+        assertThat(traineeInfo.get(0).getDateAdded(), is(addedDate2));
+        assertThat(traineeInfo.get(0).getUnderNotice(), is(un2.value()));
+        assertThat(traineeInfo.get(0).getSanction(), is(sanction2));
+        assertThat(traineeInfo.get(0).getDoctorStatus(), is(status2.value()));
+        assertThat(traineeInfo.get(0).getCctDate(), is(cctDate2));
+        assertThat(traineeInfo.get(0).getProgrammeName(), is(progName2));
+        assertThat(traineeInfo.get(0).getProgrammeMembershipType(), is(memType2));
+        assertThat(traineeInfo.get(0).getCurrentGrade(), is(grade2));
 
-        assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef4));
-        assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName4));
-        assertThat(doctorsForDB.get(1).getDoctorLastName(), is(lName4));
-        assertThat(doctorsForDB.get(1).getSubmissionDate(), is(subDate4));
-        assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate4));
-        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un4));
-        assertThat(doctorsForDB.get(1).getSanction(), is(sanction4));
-        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status4));
-        assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate4));
-        assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName4));
-        assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType4));
-        assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade4));
+        assertThat(traineeInfo.get(1).getGmcReferenceNumber(), is(gmcRef4));
+        assertThat(traineeInfo.get(1).getDoctorFirstName(), is(fName4));
+        assertThat(traineeInfo.get(1).getDoctorLastName(), is(lName4));
+        assertThat(traineeInfo.get(1).getSubmissionDate(), is(subDate4));
+        assertThat(traineeInfo.get(1).getDateAdded(), is(addedDate4));
+        assertThat(traineeInfo.get(1).getUnderNotice(), is(un4.value()));
+        assertThat(traineeInfo.get(1).getSanction(), is(sanction4));
+        assertThat(traineeInfo.get(1).getDoctorStatus(), is(status4.value()));
+        assertThat(traineeInfo.get(1).getCctDate(), is(cctDate4));
+        assertThat(traineeInfo.get(1).getProgrammeName(), is(progName4));
+        assertThat(traineeInfo.get(1).getProgrammeMembershipType(), is(memType4));
+        assertThat(traineeInfo.get(1).getCurrentGrade(), is(grade4));
     }
 
     @Test
@@ -209,59 +209,59 @@ public class DoctorsSearchIT extends BaseIT {
         assertThat(doctorDTO.getCountTotal(), is(5L));
         assertThat(doctorDTO.getTotalResults(), is(4L));
 
-        final var doctorsForDB = doctorDTO.getTraineeInfo();
+        final var traineeInfo = doctorDTO.getTraineeInfo();
 
-        assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef1));
-        assertThat(doctorsForDB.get(0).getDoctorFirstName(), is(fName1));
-        assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lName1));
-        assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate1));
-        assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate1));
-        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1));
-        assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
-        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1));
-        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate1));
-        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName1));
-        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType1));
-        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade1));
+        assertThat(traineeInfo.get(0).getGmcReferenceNumber(), is(gmcRef1));
+        assertThat(traineeInfo.get(0).getDoctorFirstName(), is(fName1));
+        assertThat(traineeInfo.get(0).getDoctorLastName(), is(lName1));
+        assertThat(traineeInfo.get(0).getSubmissionDate(), is(subDate1));
+        assertThat(traineeInfo.get(0).getDateAdded(), is(addedDate1));
+        assertThat(traineeInfo.get(0).getUnderNotice(), is(un1.value()));
+        assertThat(traineeInfo.get(0).getSanction(), is(sanction1));
+        assertThat(traineeInfo.get(0).getDoctorStatus(), is(status1.value()));
+        assertThat(traineeInfo.get(0).getCctDate(), is(cctDate1));
+        assertThat(traineeInfo.get(0).getProgrammeName(), is(progName1));
+        assertThat(traineeInfo.get(0).getProgrammeMembershipType(), is(memType1));
+        assertThat(traineeInfo.get(0).getCurrentGrade(), is(grade1));
 
-        assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
-        assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName2));
-        assertThat(doctorsForDB.get(1).getDoctorLastName(), is(lName2));
-        assertThat(doctorsForDB.get(1).getSubmissionDate(), is(subDate2));
-        assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate2));
-        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
-        assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
-        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
-        assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate2));
-        assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName2));
-        assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType2));
-        assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade2));
+        assertThat(traineeInfo.get(1).getGmcReferenceNumber(), is(gmcRef2));
+        assertThat(traineeInfo.get(1).getDoctorFirstName(), is(fName2));
+        assertThat(traineeInfo.get(1).getDoctorLastName(), is(lName2));
+        assertThat(traineeInfo.get(1).getSubmissionDate(), is(subDate2));
+        assertThat(traineeInfo.get(1).getDateAdded(), is(addedDate2));
+        assertThat(traineeInfo.get(1).getUnderNotice(), is(un2.value()));
+        assertThat(traineeInfo.get(1).getSanction(), is(sanction2));
+        assertThat(traineeInfo.get(1).getDoctorStatus(), is(status2.value()));
+        assertThat(traineeInfo.get(1).getCctDate(), is(cctDate2));
+        assertThat(traineeInfo.get(1).getProgrammeName(), is(progName2));
+        assertThat(traineeInfo.get(1).getProgrammeMembershipType(), is(memType2));
+        assertThat(traineeInfo.get(1).getCurrentGrade(), is(grade2));
 
-        assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef4));
-        assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fName4));
-        assertThat(doctorsForDB.get(2).getDoctorLastName(), is(lName4));
-        assertThat(doctorsForDB.get(2).getSubmissionDate(), is(subDate4));
-        assertThat(doctorsForDB.get(2).getDateAdded(), is(addedDate4));
-        assertThat(doctorsForDB.get(2).getUnderNotice(), is(un4));
-        assertThat(doctorsForDB.get(2).getSanction(), is(sanction4));
-        assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status4));
-        assertThat(doctorsForDB.get(2).getCctDate(), is(cctDate4));
-        assertThat(doctorsForDB.get(2).getProgrammeName(), is(progName4));
-        assertThat(doctorsForDB.get(2).getProgrammeMembershipType(), is(memType4));
-        assertThat(doctorsForDB.get(2).getCurrentGrade(), is(grade4));
+        assertThat(traineeInfo.get(2).getGmcReferenceNumber(), is(gmcRef4));
+        assertThat(traineeInfo.get(2).getDoctorFirstName(), is(fName4));
+        assertThat(traineeInfo.get(2).getDoctorLastName(), is(lName4));
+        assertThat(traineeInfo.get(2).getSubmissionDate(), is(subDate4));
+        assertThat(traineeInfo.get(2).getDateAdded(), is(addedDate4));
+        assertThat(traineeInfo.get(2).getUnderNotice(), is(un4.value()));
+        assertThat(traineeInfo.get(2).getSanction(), is(sanction4));
+        assertThat(traineeInfo.get(2).getDoctorStatus(), is(status4.value()));
+        assertThat(traineeInfo.get(2).getCctDate(), is(cctDate4));
+        assertThat(traineeInfo.get(2).getProgrammeName(), is(progName4));
+        assertThat(traineeInfo.get(2).getProgrammeMembershipType(), is(memType4));
+        assertThat(traineeInfo.get(2).getCurrentGrade(), is(grade4));
 
-        assertThat(doctorsForDB.get(3).getGmcReferenceNumber(), is(gmcRef5));
-        assertThat(doctorsForDB.get(3).getDoctorFirstName(), is(fName5));
-        assertThat(doctorsForDB.get(3).getDoctorLastName(), is(lName5));
-        assertThat(doctorsForDB.get(3).getSubmissionDate(), is(subDate5));
-        assertThat(doctorsForDB.get(3).getDateAdded(), is(addedDate5));
-        assertThat(doctorsForDB.get(3).getUnderNotice(), is(un5));
-        assertThat(doctorsForDB.get(3).getSanction(), is(sanction5));
-        assertThat(doctorsForDB.get(3).getDoctorStatus(), is(status5));
-        assertThat(doctorsForDB.get(3).getCctDate(), is(cctDate5));
-        assertThat(doctorsForDB.get(3).getProgrammeName(), is(progName5));
-        assertThat(doctorsForDB.get(3).getProgrammeMembershipType(), is(memType5));
-        assertThat(doctorsForDB.get(3).getCurrentGrade(), is(grade5));
+        assertThat(traineeInfo.get(3).getGmcReferenceNumber(), is(gmcRef5));
+        assertThat(traineeInfo.get(3).getDoctorFirstName(), is(fName5));
+        assertThat(traineeInfo.get(3).getDoctorLastName(), is(lName5));
+        assertThat(traineeInfo.get(3).getSubmissionDate(), is(subDate5));
+        assertThat(traineeInfo.get(3).getDateAdded(), is(addedDate5));
+        assertThat(traineeInfo.get(3).getUnderNotice(), is(un5.value()));
+        assertThat(traineeInfo.get(3).getSanction(), is(sanction5));
+        assertThat(traineeInfo.get(3).getDoctorStatus(), is(status5.value()));
+        assertThat(traineeInfo.get(3).getCctDate(), is(cctDate5));
+        assertThat(traineeInfo.get(3).getProgrammeName(), is(progName5));
+        assertThat(traineeInfo.get(3).getProgrammeMembershipType(), is(memType5));
+        assertThat(traineeInfo.get(3).getCurrentGrade(), is(grade5));
     }
 
     @Test
@@ -303,46 +303,46 @@ public class DoctorsSearchIT extends BaseIT {
         assertThat(doctorDTO.getCountUnderNotice(), is(4L));
         assertThat(doctorDTO.getTotalResults(), is(3L));
 
-        final var doctorsForDB = doctorDTO.getTraineeInfo();
+        final var traineeInfo = doctorDTO.getTraineeInfo();
 
-        assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef1));
-        assertThat(doctorsForDB.get(0).getDoctorFirstName(), is(fName1));
-        assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lName1));
-        assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate1));
-        assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate1));
-        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1));
-        assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
-        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1));
-        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate1));
-        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName1));
-        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType1));
-        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade1));
+        assertThat(traineeInfo.get(0).getGmcReferenceNumber(), is(gmcRef1));
+        assertThat(traineeInfo.get(0).getDoctorFirstName(), is(fName1));
+        assertThat(traineeInfo.get(0).getDoctorLastName(), is(lName1));
+        assertThat(traineeInfo.get(0).getSubmissionDate(), is(subDate1));
+        assertThat(traineeInfo.get(0).getDateAdded(), is(addedDate1));
+        assertThat(traineeInfo.get(0).getUnderNotice(), is(un1.value()));
+        assertThat(traineeInfo.get(0).getSanction(), is(sanction1));
+        assertThat(traineeInfo.get(0).getDoctorStatus(), is(status1.value()));
+        assertThat(traineeInfo.get(0).getCctDate(), is(cctDate1));
+        assertThat(traineeInfo.get(0).getProgrammeName(), is(progName1));
+        assertThat(traineeInfo.get(0).getProgrammeMembershipType(), is(memType1));
+        assertThat(traineeInfo.get(0).getCurrentGrade(), is(grade1));
 
-        assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
-        assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName2));
-        assertThat(doctorsForDB.get(1).getDoctorLastName(), is(lName2));
-        assertThat(doctorsForDB.get(1).getSubmissionDate(), is(subDate2));
-        assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate2));
-        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2));
-        assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
-        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2));
-        assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate2));
-        assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName2));
-        assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType2));
-        assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade2));
+        assertThat(traineeInfo.get(1).getGmcReferenceNumber(), is(gmcRef2));
+        assertThat(traineeInfo.get(1).getDoctorFirstName(), is(fName2));
+        assertThat(traineeInfo.get(1).getDoctorLastName(), is(lName2));
+        assertThat(traineeInfo.get(1).getSubmissionDate(), is(subDate2));
+        assertThat(traineeInfo.get(1).getDateAdded(), is(addedDate2));
+        assertThat(traineeInfo.get(1).getUnderNotice(), is(un2.value()));
+        assertThat(traineeInfo.get(1).getSanction(), is(sanction2));
+        assertThat(traineeInfo.get(1).getDoctorStatus(), is(status2.value()));
+        assertThat(traineeInfo.get(1).getCctDate(), is(cctDate2));
+        assertThat(traineeInfo.get(1).getProgrammeName(), is(progName2));
+        assertThat(traineeInfo.get(1).getProgrammeMembershipType(), is(memType2));
+        assertThat(traineeInfo.get(1).getCurrentGrade(), is(grade2));
 
-        assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef4));
-        assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fName4));
-        assertThat(doctorsForDB.get(2).getDoctorLastName(), is(lName4));
-        assertThat(doctorsForDB.get(2).getSubmissionDate(), is(subDate4));
-        assertThat(doctorsForDB.get(2).getDateAdded(), is(addedDate4));
-        assertThat(doctorsForDB.get(2).getUnderNotice(), is(un4));
-        assertThat(doctorsForDB.get(2).getSanction(), is(sanction4));
-        assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status4));
-        assertThat(doctorsForDB.get(2).getCctDate(), is(cctDate4));
-        assertThat(doctorsForDB.get(2).getProgrammeName(), is(progName4));
-        assertThat(doctorsForDB.get(2).getProgrammeMembershipType(), is(memType4));
-        assertThat(doctorsForDB.get(2).getCurrentGrade(), is(grade4));
+        assertThat(traineeInfo.get(2).getGmcReferenceNumber(), is(gmcRef4));
+        assertThat(traineeInfo.get(2).getDoctorFirstName(), is(fName4));
+        assertThat(traineeInfo.get(2).getDoctorLastName(), is(lName4));
+        assertThat(traineeInfo.get(2).getSubmissionDate(), is(subDate4));
+        assertThat(traineeInfo.get(2).getDateAdded(), is(addedDate4));
+        assertThat(traineeInfo.get(2).getUnderNotice(), is(un4.value()));
+        assertThat(traineeInfo.get(2).getSanction(), is(sanction4));
+        assertThat(traineeInfo.get(2).getDoctorStatus(), is(status4.value()));
+        assertThat(traineeInfo.get(2).getCctDate(), is(cctDate4));
+        assertThat(traineeInfo.get(2).getProgrammeName(), is(progName4));
+        assertThat(traineeInfo.get(2).getProgrammeMembershipType(), is(memType4));
+        assertThat(traineeInfo.get(2).getCurrentGrade(), is(grade4));
     }
 
     @Test
@@ -380,32 +380,32 @@ public class DoctorsSearchIT extends BaseIT {
         assertThat(doctorDTO.getCountTotal(), is(5L));
         assertThat(doctorDTO.getTotalResults(), is(2L));
 
-        final var doctorsForDB = doctorDTO.getTraineeInfo();
+        final var traineeInfo = doctorDTO.getTraineeInfo();
 
-        assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef2));
-        assertThat(doctorsForDB.get(0).getDoctorFirstName(), is(fName2));
-        assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lName2));
-        assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate2));
-        assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate2));
-        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un2));
-        assertThat(doctorsForDB.get(0).getSanction(), is(sanction2));
-        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status2));
-        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate2));
-        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName2));
-        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType2));
-        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade2));
+        assertThat(traineeInfo.get(0).getGmcReferenceNumber(), is(gmcRef2));
+        assertThat(traineeInfo.get(0).getDoctorFirstName(), is(fName2));
+        assertThat(traineeInfo.get(0).getDoctorLastName(), is(lName2));
+        assertThat(traineeInfo.get(0).getSubmissionDate(), is(subDate2));
+        assertThat(traineeInfo.get(0).getDateAdded(), is(addedDate2));
+        assertThat(traineeInfo.get(0).getUnderNotice(), is(un2.value()));
+        assertThat(traineeInfo.get(0).getSanction(), is(sanction2));
+        assertThat(traineeInfo.get(0).getDoctorStatus(), is(status2.value()));
+        assertThat(traineeInfo.get(0).getCctDate(), is(cctDate2));
+        assertThat(traineeInfo.get(0).getProgrammeName(), is(progName2));
+        assertThat(traineeInfo.get(0).getProgrammeMembershipType(), is(memType2));
+        assertThat(traineeInfo.get(0).getCurrentGrade(), is(grade2));
 
-        assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef4));
-        assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fName4));
-        assertThat(doctorsForDB.get(1).getDoctorLastName(), is(lName4));
-        assertThat(doctorsForDB.get(1).getSubmissionDate(), is(subDate4));
-        assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate4));
-        assertThat(doctorsForDB.get(1).getUnderNotice(), is(un4));
-        assertThat(doctorsForDB.get(1).getSanction(), is(sanction4));
-        assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status4));
-        assertThat(doctorsForDB.get(1).getCctDate(), is(cctDate4));
-        assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName4));
-        assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType4));
-        assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade4));
+        assertThat(traineeInfo.get(1).getGmcReferenceNumber(), is(gmcRef4));
+        assertThat(traineeInfo.get(1).getDoctorFirstName(), is(fName4));
+        assertThat(traineeInfo.get(1).getDoctorLastName(), is(lName4));
+        assertThat(traineeInfo.get(1).getSubmissionDate(), is(subDate4));
+        assertThat(traineeInfo.get(1).getDateAdded(), is(addedDate4));
+        assertThat(traineeInfo.get(1).getUnderNotice(), is(un4.value()));
+        assertThat(traineeInfo.get(1).getSanction(), is(sanction4));
+        assertThat(traineeInfo.get(1).getDoctorStatus(), is(status4.value()));
+        assertThat(traineeInfo.get(1).getCctDate(), is(cctDate4));
+        assertThat(traineeInfo.get(1).getProgrammeName(), is(progName4));
+        assertThat(traineeInfo.get(1).getProgrammeMembershipType(), is(memType4));
+        assertThat(traineeInfo.get(1).getCurrentGrade(), is(grade4));
     }
 }

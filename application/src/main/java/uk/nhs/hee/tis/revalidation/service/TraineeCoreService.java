@@ -41,6 +41,8 @@ public class TraineeCoreService {
             } catch (final HttpStatusCodeException exception) {
                 int statusCode = exception.getStatusCode().value();
                 log.error("Fail to connect to TCS service. Status code: {}", statusCode, exception);
+            } catch (final Exception e) {
+                log.error("Fail to connect to TCS service", e);
             }
 
             return traineeCoreDTOS;

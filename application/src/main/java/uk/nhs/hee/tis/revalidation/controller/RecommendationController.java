@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.nhs.hee.tis.revalidation.dto.RecommendationDTO;
 import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDTO;
 import uk.nhs.hee.tis.revalidation.service.RecommendationService;
 
@@ -29,13 +30,13 @@ public class RecommendationController {
     @ApiOperation(value = "Get recommendation details of a trainee", notes = "It will return trainee's recommendation details", response = TraineeInfoDTO.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Trainee recommendation details", response = TraineeInfoDTO.class)})
     @GetMapping("/{gmcId}")
-    public ResponseEntity<TraineeInfoDTO> getRecommendation(@PathVariable("gmcId") final String gmcId) {
+    public ResponseEntity<RecommendationDTO> getRecommendation(@PathVariable("gmcId") final String gmcId) {
 
         if (Objects.nonNull(gmcId)) {
-            final TraineeInfoDTO traineeInfo = service.getTraineeInfo(gmcId);
-            return ResponseEntity.ok().body(traineeInfo);
+            final var recommendationDTO = service.getTraineeInfo(gmcId);
+            return ResponseEntity.ok().body(recommendationDTO);
         }
 
-        return new ResponseEntity<>(TraineeInfoDTO.builder().build(), HttpStatus.OK);
+        return new ResponseEntity<>(RecommendationDTO.builder().build(), HttpStatus.OK);
     }
 }

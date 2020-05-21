@@ -9,12 +9,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDTO;
-import uk.nhs.hee.tis.revalidation.entity.RevalidationStatus;
-import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
+import uk.nhs.hee.tis.revalidation.dto.RecommendationDTO;
+import uk.nhs.hee.tis.revalidation.dto.RevalidationDTO;
+import uk.nhs.hee.tis.revalidation.entity.*;
 import uk.nhs.hee.tis.revalidation.service.RecommendationService;
 
 import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -49,30 +51,46 @@ public class RecommendationControllerTest {
     private String programmeName = faker.lorem().sentence(3);
     private String programmeMembershipType = faker.lorem().characters(10);
     private String currentGrade = faker.lorem().characters(4);
+    private String deferralReason = faker.options().option(DeferralReason.class).name();
+    private String deferralDate = "2018-03-15";
+    private String deferralComments = faker.lorem().sentence(5);
+    private String revalidationType = faker.options().option(RevalidationType.class).name();
+    private String gmcOutcome = faker.options().option(RevalidationGmcOutcome.class).name();
+    private Date gmcSubmissionDate = new Date();
+    private Date actualSubmissionDate = new Date();
+    private String admin = faker.name().fullName();
 
     @Test
     public void shouldReturnTraineeRecommendation() throws Exception {
-        final TraineeInfoDTO traineeInfoDTO = prepareTraineeInforDTO();
-        when(service.getTraineeInfo(gmcId)).thenReturn(traineeInfoDTO);
+        final var recommendationDTO = prepareRecommendationDTO();
+        when(service.getTraineeInfo(gmcId)).thenReturn(recommendationDTO);
         this.mockMvc.perform(get(RECOMMENDATION_API_URL, gmcId))
                 .andExpect(status().isOk())
-                .andExpect(content().json(mapper.writeValueAsString(traineeInfoDTO)));
+                .andExpect(content().json(mapper.writeValueAsString(recommendationDTO)));
 
     }
 
-    private TraineeInfoDTO prepareTraineeInforDTO() {
-        return TraineeInfoDTO.builder()
-                .doctorFirstName(firstName)
-                .doctorFirstName(lastName)
-                .submissionDate(submissionDate)
-                .dateAdded(dateAdded)
-                .sanction(sanction)
-                .underNotice(underNotice.value())
+    private RecommendationDTO prepareRecommendationDTO() {
+        return RecommendationDTO.builder()
+                .fullName(firstName+" "+lastName)
+                .gmcNumber(gmcId)
                 .currentGrade(currentGrade)
                 .programmeMembershipType(programmeMembershipType)
-                .programmeName(programmeName)
                 .cctDate(cctDate)
-                .doctorStatus(status.value())
+                .revalidations(List.of(prepareRevalidationDTO()))
+                .build();
+    }
+
+    private RevalidationDTO prepareRevalidationDTO() {
+        return RevalidationDTO.builder()
+                .deferralComment(deferralComments)
+                .deferralDate(deferralDate)
+                .deferralReason(deferralReason)
+                .gmcOutcome(gmcOutcome)
+                .revalidationType(revalidationType)
+                .admin(admin)
+                .gmcSubmissionDate(gmcSubmissionDate)
+                .actualSubmissionDate(actualSubmissionDate)
                 .build();
     }
 

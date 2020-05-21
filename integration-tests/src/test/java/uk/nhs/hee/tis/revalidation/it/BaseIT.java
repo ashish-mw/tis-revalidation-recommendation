@@ -19,7 +19,7 @@ import static java.time.LocalDate.now;
 
 public class BaseIT {
 
-    private final Faker faker = new Faker();
+    protected final Faker faker = new Faker();
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule();

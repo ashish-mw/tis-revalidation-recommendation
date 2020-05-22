@@ -76,6 +76,7 @@ public class RecommendationServiceTest {
     private String deferralResaon1, deferralResaon2;
     private String gmcOutcome1, gmcOutcome2;
     private String revalidatonType1, revalidatonType2;
+    private String revalidationStatus1, revalidationStatus2;
     private String gmcSubmissionDate1, gmcSubmissionDate2;
     private String acutalSubmissionDate1, acutalSubmissionDate2;
     private String admin1, admin2;
@@ -98,6 +99,7 @@ public class RecommendationServiceTest {
         deferralDate1 = faker.date().toString();
         deferralResaon1 = faker.options().option(DeferralReason.class).name();
         revalidatonType1 = faker.options().option(RevalidationType.class).name();
+        revalidationStatus1 = faker.options().option(RevalidationStatus.class).name();
         gmcOutcome1 = faker.options().option(RevalidationGmcOutcome.class).name();
         gmcSubmissionDate1 = "2018-03-15";
         acutalSubmissionDate1 = "2018-03-15";
@@ -107,6 +109,7 @@ public class RecommendationServiceTest {
         deferralDate2 = faker.date().toString();
         deferralResaon2 = faker.options().option(DeferralReason.class).name();
         revalidatonType2 = faker.options().option(RevalidationType.class).name();
+        revalidationStatus2 = faker.options().option(RevalidationStatus.class).name();
         gmcOutcome2 = faker.options().option(RevalidationGmcOutcome.class).name();
         gmcSubmissionDate2 = "2018-03-15";
         acutalSubmissionDate2 = "2018-03-15";
@@ -128,7 +131,8 @@ public class RecommendationServiceTest {
         when(snapshotRevalidation1.getDeferralComment()).thenReturn(deferralComment1);
         when(snapshotRevalidation1.getDeferralReason()).thenReturn(deferralResaon1);
         when(snapshotRevalidation1.getDeferralDate()).thenReturn(deferralDate1);
-        when(snapshotRevalidation1.getRevalidationStatusCode()).thenReturn(revalidatonType1);
+        when(snapshotRevalidation1.getRevalidationStatusCode()).thenReturn(revalidationStatus1);
+        when(snapshotRevalidation1.getProposedOutcomeCode()).thenReturn(revalidatonType1);
         when(snapshotRevalidation1.getGmcSubmissionDateTime()).thenReturn(gmcSubmissionDate1);
         when(snapshotRevalidation1.getSubmissionDate()).thenReturn(acutalSubmissionDate1);
         when(snapshotRevalidation1.getGmcOutcomeCode()).thenReturn(gmcOutcome1);
@@ -138,7 +142,8 @@ public class RecommendationServiceTest {
         when(snapshotRevalidation2.getDeferralComment()).thenReturn(deferralComment2);
         when(snapshotRevalidation2.getDeferralReason()).thenReturn(deferralResaon2);
         when(snapshotRevalidation2.getDeferralDate()).thenReturn(deferralDate2);
-        when(snapshotRevalidation2.getRevalidationStatusCode()).thenReturn(revalidatonType2);
+        when(snapshotRevalidation2.getRevalidationStatusCode()).thenReturn(revalidationStatus2);
+        when(snapshotRevalidation2.getProposedOutcomeCode()).thenReturn(revalidatonType2);
         when(snapshotRevalidation2.getGmcSubmissionDateTime()).thenReturn(gmcSubmissionDate2);
         when(snapshotRevalidation2.getSubmissionDate()).thenReturn(acutalSubmissionDate2);
         when(snapshotRevalidation2.getGmcOutcomeCode()).thenReturn(gmcOutcome2);
@@ -158,6 +163,7 @@ public class RecommendationServiceTest {
         assertThat(revalidationDTO.getAdmin(), is(admin1));
         assertThat(revalidationDTO.getGmcOutcome(), is(gmcOutcome1));
         assertThat(revalidationDTO.getRevalidationType(), is(revalidatonType1));
+        assertThat(revalidationDTO.getRevalidationStatus(), is(revalidationStatus1));
         assertThat(revalidationDTO.getGmcSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(gmcSubmissionDate1)));
         assertThat(revalidationDTO.getActualSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(acutalSubmissionDate1)));
 
@@ -168,6 +174,7 @@ public class RecommendationServiceTest {
         assertThat(revalidationDTO.getAdmin(), is(admin2));
         assertThat(revalidationDTO.getGmcOutcome(), is(gmcOutcome2));
         assertThat(revalidationDTO.getRevalidationType(), is(revalidatonType2));
+        assertThat(revalidationDTO.getRevalidationStatus(), is(revalidationStatus2));
         assertThat(revalidationDTO.getGmcSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(gmcSubmissionDate2)));
         assertThat(revalidationDTO.getActualSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(acutalSubmissionDate2)));
 

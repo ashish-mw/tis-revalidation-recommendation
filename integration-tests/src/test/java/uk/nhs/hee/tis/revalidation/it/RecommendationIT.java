@@ -93,7 +93,8 @@ public class RecommendationIT extends BaseIT {
         assertThat(revalidationDTO.getAdmin(), is(admin1));
         assertThat(revalidationDTO.getActualSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(submissionDate1)));
         assertThat(revalidationDTO.getGmcSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(gmcSubmissionDateTime1)));
-        assertThat(revalidationDTO.getRevalidationType(), is(revalidationStatusCode1));
+        assertThat(revalidationDTO.getRevalidationStatus(), is(revalidationStatusCode1));
+        assertThat(revalidationDTO.getRevalidationType(), is(proposedOutcomeCode1));
         assertThat(revalidationDTO.getGmcOutcome(), is(gmcOutcomeCode1));
 
         revalidationDTO = recommendation.getRevalidations().get(1);
@@ -103,7 +104,8 @@ public class RecommendationIT extends BaseIT {
         assertThat(revalidationDTO.getAdmin(), is(admin2));
         assertThat(revalidationDTO.getActualSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(submissionDate2)));
         assertThat(revalidationDTO.getGmcSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(gmcSubmissionDateTime2)));
-        assertThat(revalidationDTO.getRevalidationType(), is(revalidationStatusCode2));
+        assertThat(revalidationDTO.getRevalidationStatus(), is(revalidationStatusCode2));
+        assertThat(revalidationDTO.getRevalidationType(), is(proposedOutcomeCode2));
         assertThat(revalidationDTO.getGmcOutcome(), is(gmcOutcomeCode2));
     }
 

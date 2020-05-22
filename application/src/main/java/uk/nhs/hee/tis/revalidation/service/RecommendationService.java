@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import uk.nhs.hee.tis.revalidation.dto.RecommendationDTO;
 import uk.nhs.hee.tis.revalidation.dto.RevalidationDTO;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
@@ -69,7 +70,8 @@ public class RecommendationService {
                     .deferralReason(revalidation.getDeferralReason())
                     .deferralComment(revalidation.getDeferralComment())
                     .gmcOutcome(revalidation.getGmcOutcomeCode())
-                    .revalidationType(revalidation.getRevalidationStatusCode())
+                    .revalidationStatus(toUpperCase(revalidation.getRevalidationStatusCode()))
+                    .revalidationType(toUpperCase(revalidation.getProposedOutcomeCode()))
                     .gmcSubmissionDate(parseDate(revalidation.getGmcSubmissionDateTime()))
                     .actualSubmissionDate(parseDate(revalidation.getSubmissionDate()))
                     .admin(revalidation.getAdmin())
@@ -78,11 +80,17 @@ public class RecommendationService {
     }
 
     private Date parseDate(final String date) {
-        try {
-            return SIMPLE_DATE_FORMAT.parse(date);
-        } catch (ParseException e) {
-            log.error("Fail to parse date");
+        if (!StringUtils.isEmpty(date)) {
+            try {
+                return SIMPLE_DATE_FORMAT.parse(date);
+            } catch (ParseException e) {
+                log.error("Fail to parse date");
+            }
         }
         return null;
+    }
+
+    private String toUpperCase(final String code) {
+        return !StringUtils.isEmpty(code) ? code.toUpperCase() : code;
     }
 }

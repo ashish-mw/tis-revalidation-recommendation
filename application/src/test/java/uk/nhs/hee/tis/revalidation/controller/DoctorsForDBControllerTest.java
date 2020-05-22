@@ -146,7 +146,7 @@ public class DoctorsForDBControllerTest {
                 .dateAdded(dateAdded1)
                 .underNotice(underNotice1.value())
                 .sanction(sanction1)
-                .doctorStatus(doctorStatus1.value())
+                .doctorStatus(doctorStatus1.name())
                 .build();
 
         final var doctor2 = TraineeInfoDTO.builder()
@@ -157,7 +157,7 @@ public class DoctorsForDBControllerTest {
                 .dateAdded(dateAdded2)
                 .underNotice(underNotice2.value())
                 .sanction(sanction2)
-                .doctorStatus(doctorStatus2.value())
+                .doctorStatus(doctorStatus2.name())
                 .build();
         return of(doctor1, doctor2);
     }

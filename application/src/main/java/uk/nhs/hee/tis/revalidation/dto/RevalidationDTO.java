@@ -18,6 +18,7 @@ public class RevalidationDTO {
     private Date gmcSubmissionDate;
     private Date actualSubmissionDate;
     private String gmcRevalidationId;
+    private String revalidationStatus;
     private String deferralDate;
     private String deferralReason;
     private String deferralComment;

@@ -61,9 +61,9 @@ public class DoctorsForDBService {
                 .doctorLastName(doctorsForDB.getDoctorLastName())
                 .submissionDate(doctorsForDB.getSubmissionDate())
                 .dateAdded(doctorsForDB.getDateAdded())
-                .underNotice(doctorsForDB.getUnderNotice().value())
+                .underNotice(doctorsForDB.getUnderNotice().name())
                 .sanction(doctorsForDB.getSanction())
-                .doctorStatus(doctorsForDB.getDoctorStatus().value()) //TODO update with legacy statuses
+                .doctorStatus(doctorsForDB.getDoctorStatus().name()) //TODO update with legacy statuses
                 .lastUpdatedDate(doctorsForDB.getLastUpdatedDate());
 
         if (traineeCoreDTO != null) {

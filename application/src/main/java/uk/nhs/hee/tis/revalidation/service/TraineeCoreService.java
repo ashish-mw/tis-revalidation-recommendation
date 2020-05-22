@@ -27,10 +27,11 @@ public class TraineeCoreService {
     private String tcsUrl;
 
     public Map<String, TraineeCoreDTO> getTraineeInformationFromCore(final List<String> gmcIds) {
-
+        log.info("Fetching trainee core info from TCS for GmcId: {}", gmcIds);
         if (!gmcIds.isEmpty()) {
             final var gmcId = gmcIds.stream().collect(joining(","));
             final var requestUrl = format("%s/%s", tcsUrl, gmcId);
+            log.debug("Tcs url to fetch core information: {}", requestUrl);
             Map<String, TraineeCoreDTO> traineeCoreDTOS = Map.of();
             try {
                 traineeCoreDTOS = restTemplate
@@ -39,7 +40,7 @@ public class TraineeCoreService {
                                 }).getBody();
 
             } catch (final HttpStatusCodeException exception) {
-                int statusCode = exception.getStatusCode().value();
+                final var statusCode = exception.getStatusCode().value();
                 log.error("Fail to connect to TCS service. Status code: {}", statusCode, exception);
             } catch (final Exception e) {
                 log.error("Fail to connect to TCS service", e);

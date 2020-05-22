@@ -13,10 +13,8 @@ import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.SnapshotRepository;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import static java.util.Optional.of;
@@ -25,12 +23,13 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
+import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDate;
+import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDateTime;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RecommendationServiceTest {
 
     private final Faker faker = new Faker();
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
     @InjectMocks
     private RecommendationService recommendationService;
@@ -100,8 +99,8 @@ public class RecommendationServiceTest {
         deferralResaon1 = faker.options().option(DeferralReason.class).name();
         revalidatonType1 = faker.options().option(RevalidationType.class).name();
         revalidationStatus1 = faker.options().option(RevalidationStatus.class).name();
-        gmcOutcome1 = faker.options().option(RevalidationGmcOutcome.class).name();
-        gmcSubmissionDate1 = "2018-03-15";
+        gmcOutcome1 = RevalidationGmcOutcome.APPROVED.name();
+        gmcSubmissionDate1 = "2018-03-15 12:00:00";
         acutalSubmissionDate1 = "2018-03-15";
         admin1 = faker.funnyName().name();
 
@@ -110,8 +109,8 @@ public class RecommendationServiceTest {
         deferralResaon2 = faker.options().option(DeferralReason.class).name();
         revalidatonType2 = faker.options().option(RevalidationType.class).name();
         revalidationStatus2 = faker.options().option(RevalidationStatus.class).name();
-        gmcOutcome2 = faker.options().option(RevalidationGmcOutcome.class).name();
-        gmcSubmissionDate2 = "2018-03-15";
+        gmcOutcome2 = RevalidationGmcOutcome.APPROVED.name();
+        gmcSubmissionDate2 = "2018-03-15 12:00:00";
         acutalSubmissionDate2 = "2018-03-15";
         admin2 = faker.funnyName().name();
     }
@@ -135,7 +134,6 @@ public class RecommendationServiceTest {
         when(snapshotRevalidation1.getProposedOutcomeCode()).thenReturn(revalidatonType1);
         when(snapshotRevalidation1.getGmcSubmissionDateTime()).thenReturn(gmcSubmissionDate1);
         when(snapshotRevalidation1.getSubmissionDate()).thenReturn(acutalSubmissionDate1);
-        when(snapshotRevalidation1.getGmcOutcomeCode()).thenReturn(gmcOutcome1);
 
         when(snapshot2.getRevalidation()).thenReturn(snapshotRevalidation2);
         when(snapshotRevalidation2.getAdmin()).thenReturn(admin2);
@@ -146,7 +144,6 @@ public class RecommendationServiceTest {
         when(snapshotRevalidation2.getProposedOutcomeCode()).thenReturn(revalidatonType2);
         when(snapshotRevalidation2.getGmcSubmissionDateTime()).thenReturn(gmcSubmissionDate2);
         when(snapshotRevalidation2.getSubmissionDate()).thenReturn(acutalSubmissionDate2);
-        when(snapshotRevalidation2.getGmcOutcomeCode()).thenReturn(gmcOutcome2);
 
         final var recommendation = recommendationService.getTraineeInfo(gmcId);
         assertThat(recommendation.getGmcNumber(), is(gmcId));
@@ -164,8 +161,8 @@ public class RecommendationServiceTest {
         assertThat(revalidationDTO.getGmcOutcome(), is(gmcOutcome1));
         assertThat(revalidationDTO.getRevalidationType(), is(revalidatonType1));
         assertThat(revalidationDTO.getRevalidationStatus(), is(revalidationStatus1));
-        assertThat(revalidationDTO.getGmcSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(gmcSubmissionDate1)));
-        assertThat(revalidationDTO.getActualSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(acutalSubmissionDate1)));
+        assertThat(revalidationDTO.getGmcSubmissionDate(), is(formatDateTime(gmcSubmissionDate1)));
+        assertThat(revalidationDTO.getActualSubmissionDate(), is(formatDate(acutalSubmissionDate1)));
 
         revalidationDTO = recommendation.getRevalidations().get(1);
         assertThat(revalidationDTO.getDeferralReason(), is(deferralResaon2));
@@ -175,8 +172,8 @@ public class RecommendationServiceTest {
         assertThat(revalidationDTO.getGmcOutcome(), is(gmcOutcome2));
         assertThat(revalidationDTO.getRevalidationType(), is(revalidatonType2));
         assertThat(revalidationDTO.getRevalidationStatus(), is(revalidationStatus2));
-        assertThat(revalidationDTO.getGmcSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(gmcSubmissionDate2)));
-        assertThat(revalidationDTO.getActualSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(acutalSubmissionDate2)));
+        assertThat(revalidationDTO.getGmcSubmissionDate(), is(formatDateTime(gmcSubmissionDate2)));
+        assertThat(revalidationDTO.getActualSubmissionDate(), is(formatDate(acutalSubmissionDate2)));
 
     }
 

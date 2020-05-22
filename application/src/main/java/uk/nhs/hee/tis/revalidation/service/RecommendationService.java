@@ -7,25 +7,22 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import uk.nhs.hee.tis.revalidation.dto.RecommendationDTO;
 import uk.nhs.hee.tis.revalidation.dto.RevalidationDTO;
+import uk.nhs.hee.tis.revalidation.entity.RevalidationGmcOutcome;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.SnapshotRepository;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import static java.lang.String.format;
 import static java.util.List.of;
 import static java.util.stream.Collectors.toList;
+import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDate;
+import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDateTime;
 
 @Slf4j
 @Transactional
 @Service
 public class RecommendationService {
-
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
     @Autowired
     private DoctorsForDBRepository doctorsForDBRepository;
@@ -37,6 +34,7 @@ public class RecommendationService {
     private TraineeCoreService traineeCoreService;
 
     public RecommendationDTO getTraineeInfo(final String gmcId) {
+        log.info("Fetching trainee info for GmcId: {}", gmcId);
         final var optionalDoctorsForDB = doctorsForDBRepository.findById(gmcId);
 
         if (optionalDoctorsForDB.isPresent()) {
@@ -61,6 +59,7 @@ public class RecommendationService {
     }
 
     private List<RevalidationDTO> getCurrentAndLegacyRevalidation(final String gmcId) {
+        log.info("Fetching snapshot record for GmcId: {}", gmcId);
         final var snapshots = snapshotRepository.findByGmcNumber(gmcId);
 
         return snapshots.stream().map(snapshot -> {
@@ -69,25 +68,14 @@ public class RecommendationService {
                     .deferralDate(revalidation.getDeferralDate())
                     .deferralReason(revalidation.getDeferralReason())
                     .deferralComment(revalidation.getDeferralComment())
-                    .gmcOutcome(revalidation.getGmcOutcomeCode())
+                    .gmcOutcome(RevalidationGmcOutcome.APPROVED.name()) //TODO: fetch information from 'checkStatusForRecommendation'
                     .revalidationStatus(toUpperCase(revalidation.getRevalidationStatusCode()))
                     .revalidationType(toUpperCase(revalidation.getProposedOutcomeCode()))
-                    .gmcSubmissionDate(parseDate(revalidation.getGmcSubmissionDateTime()))
-                    .actualSubmissionDate(parseDate(revalidation.getSubmissionDate()))
+                    .gmcSubmissionDate(formatDateTime(revalidation.getGmcSubmissionDateTime()))
+                    .actualSubmissionDate(formatDate(revalidation.getSubmissionDate()))
                     .admin(revalidation.getAdmin())
                     .build();
         }).collect(toList());
-    }
-
-    private Date parseDate(final String date) {
-        if (!StringUtils.isEmpty(date)) {
-            try {
-                return SIMPLE_DATE_FORMAT.parse(date);
-            } catch (ParseException e) {
-                log.error("Fail to parse date");
-            }
-        }
-        return null;
     }
 
     private String toUpperCase(final String code) {

@@ -15,7 +15,7 @@ import uk.nhs.hee.tis.revalidation.entity.*;
 import uk.nhs.hee.tis.revalidation.service.RecommendationService;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -56,8 +56,8 @@ public class RecommendationControllerTest {
     private String deferralComments = faker.lorem().sentence(5);
     private String revalidationType = faker.options().option(RevalidationType.class).name();
     private String gmcOutcome = faker.options().option(RevalidationGmcOutcome.class).name();
-    private Date gmcSubmissionDate = new Date();
-    private Date actualSubmissionDate = new Date();
+    private LocalDateTime gmcSubmissionDate = LocalDateTime.now();
+    private LocalDate actualSubmissionDate = LocalDate.now();
     private String admin = faker.name().fullName();
 
     @Test

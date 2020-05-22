@@ -10,15 +10,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.nhs.hee.tis.revalidation.RevalidationApplication;
-import uk.nhs.hee.tis.revalidation.dto.RecommendationDTO;
 import uk.nhs.hee.tis.revalidation.entity.*;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.SnapshotRepository;
 import uk.nhs.hee.tis.revalidation.service.RecommendationService;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 import static java.util.Map.of;
@@ -26,6 +23,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDate;
+import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDateTime;
 
 @Slf4j
 @RunWith(SpringRunner.class)
@@ -33,8 +32,6 @@ import static org.junit.Assert.assertThat;
 @TestPropertySource("classpath:application-test.yml")
 @ActiveProfiles("test")
 public class RecommendationIT extends BaseIT {
-
-    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
     @Autowired
     private RecommendationService recommendationService;
@@ -77,7 +74,7 @@ public class RecommendationIT extends BaseIT {
         final var coreData = of(gmcRef1, coreDTO1);
         stubCoreRequest(coreData);
 
-        final RecommendationDTO recommendation = recommendationService.getTraineeInfo(gmcRef1);
+        final var recommendation = recommendationService.getTraineeInfo(gmcRef1);
 
         assertThat(recommendation.getGmcNumber(), is(gmcRef1));
         assertThat(recommendation.getFullName(), is(fullName(fName1, lName1)));
@@ -91,8 +88,8 @@ public class RecommendationIT extends BaseIT {
         assertThat(revalidationDTO.getDeferralDate(), is(deferralDate1));
         assertThat(revalidationDTO.getDeferralReason(), is(deferralReason1));
         assertThat(revalidationDTO.getAdmin(), is(admin1));
-        assertThat(revalidationDTO.getActualSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(submissionDate1)));
-        assertThat(revalidationDTO.getGmcSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(gmcSubmissionDateTime1)));
+        assertThat(revalidationDTO.getActualSubmissionDate(), is(formatDate(submissionDate1)));
+        assertThat(revalidationDTO.getGmcSubmissionDate(), is(formatDateTime(gmcSubmissionDateTime1)));
         assertThat(revalidationDTO.getRevalidationStatus(), is(revalidationStatusCode1));
         assertThat(revalidationDTO.getRevalidationType(), is(proposedOutcomeCode1));
         assertThat(revalidationDTO.getGmcOutcome(), is(gmcOutcomeCode1));
@@ -102,8 +99,8 @@ public class RecommendationIT extends BaseIT {
         assertThat(revalidationDTO.getDeferralDate(), is(deferralDate2));
         assertThat(revalidationDTO.getDeferralReason(), is(deferralReason2));
         assertThat(revalidationDTO.getAdmin(), is(admin2));
-        assertThat(revalidationDTO.getActualSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(submissionDate2)));
-        assertThat(revalidationDTO.getGmcSubmissionDate(), is(SIMPLE_DATE_FORMAT.parse(gmcSubmissionDateTime2)));
+        assertThat(revalidationDTO.getActualSubmissionDate(), is(formatDate(submissionDate2)));
+        assertThat(revalidationDTO.getGmcSubmissionDate(), is(formatDateTime(gmcSubmissionDateTime2)));
         assertThat(revalidationDTO.getRevalidationStatus(), is(revalidationStatusCode2));
         assertThat(revalidationDTO.getRevalidationType(), is(proposedOutcomeCode2));
         assertThat(revalidationDTO.getGmcOutcome(), is(gmcOutcomeCode2));
@@ -114,7 +111,7 @@ public class RecommendationIT extends BaseIT {
         doctorsForDBRepository.saveAll(List.of(doc1));
         stubCoreRequestReturn404();
 
-        final RecommendationDTO recommendation = recommendationService.getTraineeInfo(gmcRef1);
+        final var recommendation = recommendationService.getTraineeInfo(gmcRef1);
 
         assertThat(recommendation.getGmcNumber(), is(gmcRef1));
         assertThat(recommendation.getFullName(), is(fullName(fName1, lName1)));
@@ -128,7 +125,7 @@ public class RecommendationIT extends BaseIT {
         doctorsForDBRepository.saveAll(List.of(doc1));
         stubCoreRequestReturn400();
 
-        final RecommendationDTO recommendation = recommendationService.getTraineeInfo(gmcRef1);
+        final var recommendation = recommendationService.getTraineeInfo(gmcRef1);
 
         assertThat(recommendation.getGmcNumber(), is(gmcRef1));
         assertThat(recommendation.getFullName(), is(fullName(fName1, lName1)));
@@ -142,7 +139,7 @@ public class RecommendationIT extends BaseIT {
         doctorsForDBRepository.saveAll(List.of(doc1));
         stubCoreRequestReturn500();
 
-        final RecommendationDTO recommendation = recommendationService.getTraineeInfo(gmcRef1);
+        final var recommendation = recommendationService.getTraineeInfo(gmcRef1);
 
         assertThat(recommendation.getGmcNumber(), is(gmcRef1));
         assertThat(recommendation.getFullName(), is(fullName(fName1, lName1)));
@@ -157,10 +154,10 @@ public class RecommendationIT extends BaseIT {
         deferralReason1 = faker.options().option(DeferralReason.class).name();
         deferralComment1 = faker.lorem().sentence(5);
         revalidationStatusCode1 = faker.options().option(RevalidationStatus.class).name();
-        gmcSubmissionDateTime1 = "2018-03-15";
+        gmcSubmissionDateTime1 = "2018-03-15 12:00:00";
         gmcSubmissionReturnCode1 = "0";
         gmcRecommendationId1 = faker.idNumber().toString();
-        gmcOutcomeCode1 = faker.options().option(RevalidationGmcOutcome.class).name();
+        gmcOutcomeCode1 = RevalidationGmcOutcome.APPROVED.name();
         gmcStatusCheckDateTime1 = "2018-03-15";
         admin1 = faker.name().fullName();
         submissionDate1 = "2018-03-15";
@@ -172,10 +169,10 @@ public class RecommendationIT extends BaseIT {
         deferralReason2 = faker.options().option(DeferralReason.class).name();
         deferralComment2 = faker.lorem().sentence(5);
         revalidationStatusCode2 = faker.options().option(RevalidationStatus.class).name();
-        gmcSubmissionDateTime2 = "2018-03-15";
+        gmcSubmissionDateTime2 = "2018-03-15 12:00:00";
         gmcSubmissionReturnCode2 = "0";
         gmcRecommendationId2 = faker.idNumber().toString();
-        gmcOutcomeCode2 = faker.options().option(RevalidationGmcOutcome.class).name();
+        gmcOutcomeCode2 = RevalidationGmcOutcome.APPROVED.name();
         gmcStatusCheckDateTime2 = "2018-03-15";
         admin2 = faker.name().fullName();
         submissionDate2 = "2018-03-15";

@@ -5,7 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -15,8 +16,8 @@ public class RevalidationDTO {
 
     private String gmcOutcome;
     private String revalidationType;
-    private Date gmcSubmissionDate;
-    private Date actualSubmissionDate;
+    private LocalDateTime gmcSubmissionDate;
+    private LocalDate actualSubmissionDate;
     private String gmcRevalidationId;
     private String revalidationStatus;
     private String deferralDate;

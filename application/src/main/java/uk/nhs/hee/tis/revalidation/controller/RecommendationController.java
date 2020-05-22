@@ -31,7 +31,7 @@ public class RecommendationController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Trainee recommendation details", response = TraineeInfoDTO.class)})
     @GetMapping("/{gmcId}")
     public ResponseEntity<RecommendationDTO> getRecommendation(@PathVariable("gmcId") final String gmcId) {
-
+        log.info("Receive request to fetch recommendations for GmcId: {}", gmcId);
         if (Objects.nonNull(gmcId)) {
             final var recommendationDTO = service.getTraineeInfo(gmcId);
             return ResponseEntity.ok().body(recommendationDTO);

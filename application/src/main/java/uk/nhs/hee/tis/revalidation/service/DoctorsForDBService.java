@@ -31,7 +31,7 @@ public class DoctorsForDBService {
     @Autowired
     private TraineeCoreService traineeCoreService;
 
-    public TraineeSummaryDTO getAllTraineeDoctorDetails(final TraineeRequestDTO requestDTO) {
+    public TraineeSummaryDto getAllTraineeDoctorDetails(final TraineeRequestDto requestDTO) {
         final var paginatedDoctors = getSortedAndFilteredDoctorsByPageNumber(requestDTO);
         final var doctorsList = paginatedDoctors.get().collect(toList());
         final var gmcIds = doctorsList.stream().map(doc -> doc.getGmcReferenceNumber()).collect(toList());
@@ -39,7 +39,7 @@ public class DoctorsForDBService {
         final var traineeDoctors = doctorsList.stream().map(d ->
                 convert(d, traineeCoreInfo.get(d.getGmcReferenceNumber()))).collect(toList());
 
-        return TraineeSummaryDTO.builder()
+        return TraineeSummaryDto.builder()
                 .traineeInfo(traineeDoctors)
                 .countTotal(getCountAll())
                 .countUnderNotice(getCountUnderNotice())
@@ -48,13 +48,13 @@ public class DoctorsForDBService {
                 .build();
     }
 
-    public void updateTrainee(final DoctorsForDBDTO gmcDoctor) {
+    public void updateTrainee(final DoctorsForDbDto gmcDoctor) {
         final DoctorsForDB doctorsForDB = DoctorsForDB.convert(gmcDoctor);
         doctorsRepository.save(doctorsForDB);
     }
 
-    private TraineeInfoDTO convert(final DoctorsForDB doctorsForDB, final TraineeCoreDTO traineeCoreDTO) {
-        final var traineeInfoDTOBuilder = TraineeInfoDTO.builder()
+    private TraineeInfoDto convert(final DoctorsForDB doctorsForDB, final TraineeCoreDto traineeCoreDTO) {
+        final var traineeInfoDTOBuilder = TraineeInfoDto.builder()
                 .gmcReferenceNumber(doctorsForDB.getGmcReferenceNumber())
                 .doctorFirstName(doctorsForDB.getDoctorFirstName())
                 .doctorLastName(doctorsForDB.getDoctorLastName())
@@ -77,7 +77,7 @@ public class DoctorsForDBService {
 
     }
 
-    private Page<DoctorsForDB> getSortedAndFilteredDoctorsByPageNumber(final TraineeRequestDTO requestDTO) {
+    private Page<DoctorsForDB> getSortedAndFilteredDoctorsByPageNumber(final TraineeRequestDto requestDTO) {
         final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
         final var pageableAndSortable = of(requestDTO.getPageNumber(), pageSize, by(direction, requestDTO.getSortColumn()));
         if (requestDTO.isUnderNotice()) {

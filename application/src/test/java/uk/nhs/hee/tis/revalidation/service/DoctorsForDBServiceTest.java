@@ -11,8 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDTO;
-import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
+import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
@@ -49,7 +49,7 @@ public class DoctorsForDBServiceTest {
     private TraineeCoreService traineeCoreService;
 
     @Mock
-    private TraineeCoreDTO coreDTO1, coreDTO2, coreDTO3, coreDTO4, coreDTO5;
+    private TraineeCoreDto coreDTO1, coreDTO2, coreDTO3, coreDTO4, coreDTO5;
 
     @Mock
     private Page page;
@@ -110,7 +110,7 @@ public class DoctorsForDBServiceTest {
         when(page.getTotalPages()).thenReturn(1);
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
         when(repository.count()).thenReturn(5l);
-        final var requestDTO = TraineeRequestDTO.builder()
+        final var requestDTO = TraineeRequestDto.builder()
                 .sortOrder("desc")
                 .sortColumn("submissionDate")
                 .pageNumber(1)
@@ -212,7 +212,7 @@ public class DoctorsForDBServiceTest {
         when(page.getTotalPages()).thenReturn(1);
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
         when(repository.count()).thenReturn(5l);
-        final var requestDTO = TraineeRequestDTO.builder()
+        final var requestDTO = TraineeRequestDto.builder()
                 .sortOrder("desc")
                 .sortColumn("submissionDate")
                 .underNotice(true)
@@ -259,7 +259,7 @@ public class DoctorsForDBServiceTest {
         when(repository.findAll(pageableAndSortable,"")).thenReturn(page);
         when(page.get()).thenReturn(Stream.of());
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(0l);
-        final var requestDTO = TraineeRequestDTO.builder()
+        final var requestDTO = TraineeRequestDto.builder()
                 .sortOrder("desc")
                 .sortColumn("submissionDate")
                 .pageNumber(1)
@@ -295,7 +295,7 @@ public class DoctorsForDBServiceTest {
         when(page.getTotalElements()).thenReturn(2l);
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
         when(repository.count()).thenReturn(5l);
-        final var requestDTO = TraineeRequestDTO.builder()
+        final var requestDTO = TraineeRequestDto.builder()
                 .sortOrder("desc")
                 .sortColumn("submissionDate")
                 .pageNumber(1)

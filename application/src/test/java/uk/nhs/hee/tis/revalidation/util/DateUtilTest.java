@@ -16,19 +16,16 @@ public class DateUtilTest {
         assertThat(localDateTime.getYear(), is(2017));
         assertThat(localDateTime.getMonthValue(), is(07));
         assertThat(localDateTime.getDayOfMonth(), is(19));
-        assertThat(localDateTime.getHour(), is(12));
-        assertThat(localDateTime.getMinute(), is(58));
-        assertThat(localDateTime.getSecond(), is(2));
     }
 
     @Test
     public void shouldFormatDate() {
         final var dateToFormat = "2017-07-19";
-        final var localDateTime = DateUtil.formatDate(dateToFormat);
-        assertThat(localDateTime, is(notNullValue()));
-        assertThat(localDateTime.getYear(), is(2017));
-        assertThat(localDateTime.getMonthValue(), is(07));
-        assertThat(localDateTime.getDayOfMonth(), is(19));
+        final var localDate = DateUtil.formatDate(dateToFormat);
+        assertThat(localDate, is(notNullValue()));
+        assertThat(localDate.getYear(), is(2017));
+        assertThat(localDate.getMonthValue(), is(07));
+        assertThat(localDate.getDayOfMonth(), is(19));
     }
 
     @Test

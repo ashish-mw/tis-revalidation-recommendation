@@ -10,7 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.nhs.hee.tis.revalidation.RevalidationApplication;
-import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationType;
 import uk.nhs.hee.tis.revalidation.entity.Snapshot;
@@ -30,6 +30,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.*;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.*;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.*;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDate;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDateTime;
@@ -167,7 +168,7 @@ public class RecommendationIT extends BaseIT {
     @Test
     public void shouldSaveRecommendationOfTypeRevalidate() {
         doctorsForDBRepository.saveAll(List.of(doc1));
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcRef1)
                 .recommendationType(REVALIDATE.name())
                 .comments(List.of("recommendation comments"))
@@ -185,7 +186,7 @@ public class RecommendationIT extends BaseIT {
     @Test
     public void shouldSaveRecommendationOfTypeNonEngagement() {
         doctorsForDBRepository.saveAll(List.of(doc2));
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcRef2)
                 .recommendationType(NON_ENGAGEMENT.name())
                 .comments(List.of("recommendation comments"))
@@ -204,7 +205,7 @@ public class RecommendationIT extends BaseIT {
     public void shouldSaveRecommendationOfTypeDefer() {
         doctorsForDBRepository.saveAll(List.of(doc2));
         final var deferralDate = subDate2.plusDays(70);
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcRef2)
                 .recommendationType(DEFER.name())
                 .deferralDate(deferralDate)
@@ -228,7 +229,7 @@ public class RecommendationIT extends BaseIT {
     @Test
     public void shouldSubmitRevalidateRecommendation() {
         doctorsForDBRepository.saveAll(List.of(doc1));
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcRef1)
                 .recommendationType(REVALIDATE.name())
                 .comments(List.of("recommendation comments"))
@@ -241,14 +242,14 @@ public class RecommendationIT extends BaseIT {
         //check if status is changes
         final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
         assertTrue(recommendationById.isPresent());
-        assertThat(recommendationById.get().getRecommendationStatus(), is(RecommendationStatus.SUBMITTED_TO_GMC));
+        assertThat(recommendationById.get().getRecommendationStatus(), is(SUBMITTED_TO_GMC));
     }
 
     @Test
     public void shouldSubmitDeferRecommendation() {
         doctorsForDBRepository.saveAll(List.of(doc1));
         final var deferralReasonByCode = deferralReasonService.getDeferralReasonByCode("1");
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcRef1)
                 .recommendationType(DEFER.name())
                 .comments(List.of("recommendation comments"))
@@ -264,7 +265,40 @@ public class RecommendationIT extends BaseIT {
         //check if status is changes
         final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
         assertTrue(recommendationById.isPresent());
-        assertThat(recommendationById.get().getRecommendationStatus(), is(RecommendationStatus.SUBMITTED_TO_GMC));
+        assertThat(recommendationById.get().getRecommendationStatus(), is(SUBMITTED_TO_GMC));
+    }
+
+    @Test
+    public void shouldUpdateRecommendationOfTypeRevalidate() {
+        doctorsForDBRepository.saveAll(List.of(doc1));
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcRef1)
+                .recommendationType(REVALIDATE.name())
+                .comments(List.of("recommendation comments"))
+                .build();
+        final var savedRecommendation = recommendationService.saveRecommendation(recordDTO);
+        assertNotNull(savedRecommendation);
+        assertThat(savedRecommendation.getGmcNumber(), is(gmcRef1));
+        assertThat(savedRecommendation.getRecommendationType(), is(REVALIDATE));
+        assertThat(savedRecommendation.getGmcSubmissionDate(), is(subDate1));
+        assertThat(savedRecommendation.getRecommendationStatus(), is(READY_TO_REVIEW));
+        assertThat(savedRecommendation.getComments(), is(List.of("recommendation comments")));
+
+        final var updateRecordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcRef1)
+                .recommendationId(savedRecommendation.getId())
+                .recommendationType(REVALIDATE.name())
+                .comments(List.of("recommendation comments", "new comments"))
+                .build();
+
+        final var updatedRecommendation = recommendationService.updateRecommendation(updateRecordDTO);
+        assertNotNull(updatedRecommendation);
+        assertThat(updatedRecommendation.getGmcNumber(), is(gmcRef1));
+        assertThat(updatedRecommendation.getRecommendationType(), is(REVALIDATE));
+        assertThat(updatedRecommendation.getGmcSubmissionDate(), is(subDate1));
+        assertThat(updatedRecommendation.getRecommendationStatus(), is(READY_TO_REVIEW));
+        assertThat(updatedRecommendation.getComments(), is(List.of("recommendation comments", "new comments")));
+
     }
 
     private void setupSnapshotData() {

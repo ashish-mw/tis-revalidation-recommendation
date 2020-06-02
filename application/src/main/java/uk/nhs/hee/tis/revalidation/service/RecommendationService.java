@@ -5,13 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationDTO;
-import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationDto;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.Recommendation;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationType;
 import uk.nhs.hee.tis.revalidation.exception.InvalidDeferralDateException;
+import uk.nhs.hee.tis.revalidation.exception.InvalidRecommendationIdException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
 import uk.nhs.hee.tis.revalidation.repository.SnapshotRepository;
@@ -26,6 +27,7 @@ import static java.util.stream.Collectors.toList;
 import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.SUCCESS;
 import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.fromCode;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.UNDER_REVIEW;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.READY_TO_REVIEW;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.SUBMITTED_TO_GMC;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.NON_ENGAGEMENT;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.REVALIDATE;
@@ -58,7 +60,7 @@ public class RecommendationService {
     @Autowired
     private GmcClientService gmcClientService;
 
-    public TraineeRecommendationDTO getTraineeInfo(final String gmcId) {
+    public TraineeRecommendationDto getTraineeInfo(final String gmcId) {
         log.info("Fetching trainee info for GmcId: {}", gmcId);
         final var optionalDoctorsForDB = doctorsForDBRepository.findById(gmcId);
 
@@ -66,7 +68,7 @@ public class RecommendationService {
             final var doctorsForDB = optionalDoctorsForDB.get();
             final var traineeCoreInfo = traineeCoreService.getTraineeInformationFromCore(of(gmcId));
 
-            final var recommendationDTOBuilder = TraineeRecommendationDTO.builder()
+            final var recommendationDTOBuilder = TraineeRecommendationDto.builder()
                     .fullName(format("%s %s", doctorsForDB.getDoctorFirstName(), doctorsForDB.getDoctorLastName()))
                     .gmcNumber(doctorsForDB.getGmcReferenceNumber())
                     .underNotice(doctorsForDB.getUnderNotice().value());
@@ -85,7 +87,7 @@ public class RecommendationService {
         return null;
     }
 
-    public Recommendation saveRecommendation(final TraineeRecommendationRecordDTO recordDTO) {
+    public Recommendation saveRecommendation(final TraineeRecommendationRecordDto recordDTO) {
         final var doctorsForDB = doctorsForDBRepository.findById(recordDTO.getGmcNumber());
         final var submissionDate = doctorsForDB.get().getSubmissionDate();
 
@@ -94,8 +96,10 @@ public class RecommendationService {
 
         if (REVALIDATE.equals(recommendationType) || NON_ENGAGEMENT.equals(recommendationType)) {
             recommendation = Recommendation.builder()
+                    .id(recordDTO.getRecommendationId())
                     .gmcNumber(recordDTO.getGmcNumber())
                     .recommendationType(recommendationType)
+                    .recommendationStatus(READY_TO_REVIEW)
                     .comments(recordDTO.getComments())
                     .gmcSubmissionDate(submissionDate)
                     .build();
@@ -106,9 +110,11 @@ public class RecommendationService {
             final var deferralSubReason = deferralReason.getSubReasonByCode(recordDTO.getDeferralSubReason());
             if (validateDeferralDate) {
                 recommendation = Recommendation.builder()
+                        .id(recordDTO.getRecommendationId())
                         .gmcNumber(recordDTO.getGmcNumber())
                         .comments(recordDTO.getComments())
                         .recommendationType(recommendationType)
+                        .recommendationStatus(READY_TO_REVIEW)
                         .deferralDate(recordDTO.getDeferralDate())
                         .deferralReason(deferralReason.getCode())
                         .deferralSubReason(deferralSubReason.getCode())
@@ -122,17 +128,25 @@ public class RecommendationService {
         return recommendationRepository.save(recommendation);
     }
 
+    public Recommendation updateRecommendation(final TraineeRecommendationRecordDto recordDTO) {
+        validationRecommendationId(recordDTO.getRecommendationId());
+        return saveRecommendation(recordDTO);
+    }
+
     public boolean submitRecommendation(final String recommendationId, final String gmcNumber) {
         final var doctorsForDB = doctorsForDBRepository.findById(gmcNumber);
         final var recommendation = findRecommendationByIdAndGmcNumber(recommendationId, gmcNumber);
 
-        final var tryRecommendationV2Response = gmcClientService.submitToGmc(doctorsForDB.get(), recommendation);
+        final var doctor = doctorsForDB.get();
+        final var tryRecommendationV2Response = gmcClientService.submitToGmc(doctor, recommendation);
         final var tryRecommendationV2Result = tryRecommendationV2Response.getTryRecommendationV2Result();
         if (tryRecommendationV2Result != null) {
             final var returnCode = tryRecommendationV2Result.getReturnCode();
             if (SUCCESS.getCode().equals(returnCode)) {
                 recommendation.setRecommendationStatus(SUBMITTED_TO_GMC);
                 recommendation.setOutcome(UNDER_REVIEW);
+                recommendation.setActualSubmissionDate(doctor.getSubmissionDate());
+                recommendation.setGmcRevalidationId(tryRecommendationV2Result.getRecommendationID());
                 recommendationRepository.save(recommendation);
                 return true;
             } else {
@@ -152,14 +166,30 @@ public class RecommendationService {
         return recommendationRepository.findById(recommendationId);
     }
 
-    private List<TraineeRecommendationRecordDTO> getCurrentAndLegacyRecommendation(final DoctorsForDB doctorsForDB) {
+    private List<TraineeRecommendationRecordDto> getCurrentAndLegacyRecommendation(final DoctorsForDB doctorsForDB) {
         final var gmcId = doctorsForDB.getGmcReferenceNumber();
         log.info("Fetching snapshot record for GmcId: {}", gmcId);
         final var snapshots = snapshotRepository.findByGmcNumber(gmcId);
+        final var recommendations = recommendationRepository.findByGmcNumber(gmcId);
+        final var currentRecommendations = recommendations.stream().map(rec -> {
+            return TraineeRecommendationRecordDto.builder()
+                    .deferralDate(rec.getDeferralDate())
+                    .deferralReason(rec.getDeferralReason())
+                    .deferralSubReason(rec.getDeferralSubReason())
+                    .gmcOutcome(checkRecommendationStatus(gmcId, rec.getGmcRevalidationId(),
+                            rec.getId(), doctorsForDB.getDesignatedBodyCode()))
+                    .recommendationStatus(rec.getRecommendationStatus().name())
+                    .recommendationType(rec.getRecommendationType().getType())
+                    .gmcSubmissionDate(doctorsForDB.getSubmissionDate())
+                    .actualSubmissionDate(rec.getActualSubmissionDate())
+                    .gmcOutcome(rec.getOutcome().getOutcome())
+                    .admin(rec.getAdmin())
+                    .build();
+        }).collect(toList());
 
-        return snapshots.stream().map(snapshot -> {
+        final var snapshotRecommendations = snapshots.stream().map(snapshot -> {
             final var revalidation = snapshot.getRevalidation();
-            return TraineeRecommendationRecordDTO.builder()
+            return TraineeRecommendationRecordDto.builder()
                     .deferralDate(formatDate(revalidation.getDeferralDate()))
                     .deferralReason(revalidation.getDeferralReason())
                     .deferralComment(revalidation.getDeferralComment())
@@ -172,10 +202,13 @@ public class RecommendationService {
                     .admin(revalidation.getAdmin())
                     .build();
         }).collect(toList());
+
+        snapshotRecommendations.addAll(currentRecommendations);
+        return snapshotRecommendations;
     }
 
     private String checkRecommendationStatus(final String gmcId, final String gmcRecommendationId,
-                                                           final String recommendationId, final String designatedBody) {
+                                             final String recommendationId, final String designatedBody) {
         final var checkRecommendationStatusResponse = gmcClientService.checkRecommendationStatus(gmcId, gmcRecommendationId, recommendationId, designatedBody);
         final var checkRecommendationStatusResult = checkRecommendationStatusResponse.getCheckRecommendationStatusResult();
         final var gmdReturnCode = checkRecommendationStatusResult.getReturnCode();
@@ -201,5 +234,14 @@ public class RecommendationService {
         final var submissionDateWith365Days = submissionDate.plusDays(MAX_DAYS_FROM_SUBMISSION_DATE);
 
         return deferralDate.isAfter(submissionDateWith60Days) && deferralDate.isBefore(submissionDateWith365Days);
+    }
+
+    //before saving new recommendationId, check if the request is for update
+    private void validationRecommendationId(final String recommendationId) {
+        log.info("Request for the update of existing recommendation: {}", recommendationId);
+        final var existingRecommendation = recommendationRepository.findById(recommendationId);
+        if (existingRecommendation.isEmpty()) {
+            throw new InvalidRecommendationIdException("No recommendation record found against given recommendationId");
+        }
     }
 }

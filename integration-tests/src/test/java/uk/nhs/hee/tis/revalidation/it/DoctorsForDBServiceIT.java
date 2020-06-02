@@ -12,7 +12,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.nhs.hee.tis.revalidation.RevalidationApplication;
-import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
@@ -64,7 +64,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
         final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3, gmcRef4, coreDTO4, gmcRef5, coreDTO5);
         stubCoreRequest(coreData);
 
-        final var requestDTO = TraineeRequestDTO.builder()
+        final var requestDTO = TraineeRequestDto.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .searchQuery("")
@@ -156,7 +156,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
         final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3);
         stubCoreRequest(coreData);
 
-        final var requestDTO = TraineeRequestDTO.builder()
+        final var requestDTO = TraineeRequestDto.builder()
                 .sortColumn("doctorFirstName")
                 .sortOrder("asc")
                 .searchQuery("")
@@ -223,7 +223,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
         final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3);
         stubCoreRequest(coreData);
 
-        final var requestDTO = TraineeRequestDTO.builder()
+        final var requestDTO = TraineeRequestDto.builder()
                 .sortColumn("doctorLastName")
                 .sortOrder("desc")
                 .searchQuery("")
@@ -293,7 +293,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
         final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3, gmcRef4, coreDTO4, gmcRef5, coreDTO5);
         stubCoreRequest(coreData);
 
-        final var requestDTO = TraineeRequestDTO.builder()
+        final var requestDTO = TraineeRequestDto.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .searchQuery("")
@@ -336,7 +336,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
         final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3, gmcRef4, coreDTO4, gmcRef5, coreDTO5);
         stubCoreRequest(coreData);
 
-        final var requestDTO = TraineeRequestDTO.builder()
+        final var requestDTO = TraineeRequestDto.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .underNotice(true)
@@ -420,7 +420,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
         final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3, gmcRef4, coreDTO4, gmcRef5, coreDTO5);
         stubCoreRequest(coreData);
 
-        var requestDTO = TraineeRequestDTO.builder()
+        var requestDTO = TraineeRequestDto.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .pageNumber(0)
@@ -461,7 +461,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(traineeInfo.get(1).getProgrammeMembershipType(), is(memType2));
         assertThat(traineeInfo.get(1).getCurrentGrade(), is(grade2));
 
-        requestDTO = TraineeRequestDTO.builder()
+        requestDTO = TraineeRequestDto.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .pageNumber(1)
@@ -500,7 +500,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(traineeInfo.get(1).getProgrammeMembershipType(), is(memType1));
         assertThat(traineeInfo.get(1).getCurrentGrade(), is(grade1));
 
-        requestDTO = TraineeRequestDTO.builder()
+        requestDTO = TraineeRequestDto.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .pageNumber(2)
@@ -544,7 +544,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
         doc5.setSubmissionDate(subDate5);
         repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
 
-        var requestDTO = TraineeRequestDTO.builder()
+        var requestDTO = TraineeRequestDto.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .pageNumber(6)

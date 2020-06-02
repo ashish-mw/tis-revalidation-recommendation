@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.nhs.hee.tis.revalidation.RevalidationApplication;
-import uk.nhs.hee.tis.revalidation.dto.DoctorsForDBDTO;
+import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
@@ -65,7 +65,7 @@ public class RevalidationIT {
         underNotice = faker.options().option(UnderNotice.class);
         sanction = faker.lorem().characters(2);
 
-        final var gmcDoctorDTO = DoctorsForDBDTO.builder()
+        final var gmcDoctorDTO = DoctorsForDbDto.builder()
                 .gmcReferenceNumber(gmcReference)
                 .doctorFirstName(firstName)
                 .doctorLastName(lastName)

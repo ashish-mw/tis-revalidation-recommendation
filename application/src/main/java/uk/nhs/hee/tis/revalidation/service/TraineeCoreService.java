@@ -7,7 +7,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDto;
 
 import java.util.List;
 import java.util.Map;
@@ -26,17 +26,17 @@ public class TraineeCoreService {
     @Value("${app.reval.tcs.url}")
     private String tcsUrl;
 
-    public Map<String, TraineeCoreDTO> getTraineeInformationFromCore(final List<String> gmcIds) {
+    public Map<String, TraineeCoreDto> getTraineeInformationFromCore(final List<String> gmcIds) {
         log.info("Fetching trainee core info from TCS for GmcId: {}", gmcIds);
         if (!gmcIds.isEmpty()) {
             final var gmcId = gmcIds.stream().collect(joining(","));
             final var requestUrl = format("%s/%s", tcsUrl, gmcId);
             log.debug("Tcs url to fetch core information: {}", requestUrl);
-            Map<String, TraineeCoreDTO> traineeCoreDTOS = Map.of();
+            Map<String, TraineeCoreDto> traineeCoreDTOS = Map.of();
             try {
                 traineeCoreDTOS = restTemplate
                         .exchange(requestUrl, GET, null,
-                                new ParameterizedTypeReference<Map<String, TraineeCoreDTO>>() {
+                                new ParameterizedTypeReference<Map<String, TraineeCoreDto>>() {
                                 }).getBody();
 
             } catch (final HttpStatusCodeException exception) {

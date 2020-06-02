@@ -11,11 +11,12 @@ import uk.nhs.hee.tis.gmc.client.generated.CheckRecommendationStatusResponse;
 import uk.nhs.hee.tis.gmc.client.generated.CheckRecommendationStatusResponseCT;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationResponseCT;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationV2Response;
-import uk.nhs.hee.tis.revalidation.dto.DeferralReasonDTO;
-import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDTO;
-import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDTO;
+import uk.nhs.hee.tis.revalidation.dto.DeferralReasonDto;
+import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDto;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.entity.*;
 import uk.nhs.hee.tis.revalidation.exception.InvalidDeferralDateException;
+import uk.nhs.hee.tis.revalidation.exception.InvalidRecommendationIdException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
 import uk.nhs.hee.tis.revalidation.repository.SnapshotRepository;
@@ -35,6 +36,7 @@ import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.*;
 import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.INVALID_RECOMMENDATION;
 import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.SUCCESS;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.*;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDate;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDateTime;
 
@@ -86,7 +88,7 @@ public class RecommendationServiceTest {
     private DeferralReason deferralSubReason;
 
     @Mock
-    private TraineeCoreDTO traineeCoreDTO;
+    private TraineeCoreDto traineeCoreDTO;
 
     private String firstName;
     private String lastName;
@@ -116,7 +118,7 @@ public class RecommendationServiceTest {
     private String gmcNumber1, gmcNumber2;
     private List<String> comments;
     private String recommendationId;
-    private List<DeferralReasonDTO> deferralReasons;
+    private List<DeferralReasonDto> deferralReasons;
 
     @Before
     public void setup() {
@@ -134,7 +136,7 @@ public class RecommendationServiceTest {
         currentGrade = faker.lorem().characters(5);
 
         deferralComment1 = faker.lorem().characters(20);
-        deferralDate1 = LocalDate.of(2018,03,15);
+        deferralDate1 = LocalDate.of(2018, 03, 15);
         deferralResaon1 = "1";
         deferralSubResaon1 = "4";
         revalidatonType1 = faker.options().option(RecommendationType.class).name();
@@ -146,7 +148,7 @@ public class RecommendationServiceTest {
         gmcRecommendationId1 = faker.number().digits(10);
 
         deferralComment2 = faker.lorem().characters(20);
-        deferralDate2 = LocalDate.of(2018,03,15);
+        deferralDate2 = LocalDate.of(2018, 03, 15);
         deferralResaon2 = "2";
         deferralSubResaon2 = null;
         revalidatonType2 = faker.options().option(RecommendationType.class).name();
@@ -161,7 +163,7 @@ public class RecommendationServiceTest {
         gmcNumber2 = faker.number().digits(7);
         comments = List.of(faker.lorem().sentence(3), faker.lorem().sentence(3), faker.lorem().sentence(7));
         recommendationId = faker.lorem().characters(10);
-        deferralReasons = List.of(new DeferralReasonDTO("1", "evidence", List.of()), new DeferralReasonDTO("2", "ongoing", List.of()));
+        deferralReasons = List.of(new DeferralReasonDto("1", "evidence", List.of()), new DeferralReasonDto("2", "ongoing", List.of()));
     }
 
     @Test
@@ -252,9 +254,9 @@ public class RecommendationServiceTest {
 
     @Test
     public void shouldSaveRevalidateRecommendationInDraftState() {
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcNumber1)
-                .recommendationType(RecommendationType.REVALIDATE.name())
+                .recommendationType(REVALIDATE.name())
                 .comments(comments)
                 .build();
 
@@ -268,9 +270,9 @@ public class RecommendationServiceTest {
 
     @Test
     public void shouldSaveNonEngagementRecommendationInDraftState() {
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcNumber1)
-                .recommendationType(RecommendationType.NON_ENGAGEMENT.name())
+                .recommendationType(NON_ENGAGEMENT.name())
                 .comments(comments)
                 .build();
 
@@ -285,9 +287,9 @@ public class RecommendationServiceTest {
     @Test
     public void shouldSaveDeferRecommendationInDraftState() {
         final var deferralDate = LocalDate.now().plusDays(90);
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcNumber1)
-                .recommendationType(RecommendationType.DEFER.name())
+                .recommendationType(DEFER.name())
                 .deferralDate(deferralDate)
                 .deferralReason(deferralResaon1)
                 .deferralSubReason(deferralSubResaon1)
@@ -307,9 +309,9 @@ public class RecommendationServiceTest {
     @Test(expected = InvalidDeferralDateException.class)
     public void shouldThrowExceptionWhenDeferralDateWithin60DaysOfSubmissionDate() {
         final var deferralDate = submissionDate.plusDays(59);
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcNumber1)
-                .recommendationType(RecommendationType.DEFER.name())
+                .recommendationType(DEFER.name())
                 .deferralDate(deferralDate)
                 .deferralReason(deferralResaon1)
                 .deferralSubReason(deferralSubResaon1)
@@ -329,9 +331,9 @@ public class RecommendationServiceTest {
     @Test(expected = InvalidDeferralDateException.class)
     public void shouldThrowExceptionWhenDeferralDateMoreThen365DaysOfSubmissionDate() {
         final var deferralDate = submissionDate.plusDays(366);
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcNumber1)
-                .recommendationType(RecommendationType.DEFER.name())
+                .recommendationType(DEFER.name())
                 .deferralDate(deferralDate)
                 .deferralReason(deferralResaon1)
                 .deferralSubReason(deferralSubResaon1)
@@ -366,6 +368,78 @@ public class RecommendationServiceTest {
         when(gmcClientService.submitToGmc(doctorsForDB, recommendation)).thenReturn(buildRecommendationV2Response(INVALID_RECOMMENDATION.getCode()));
         recommendationService.submitRecommendation(recommendationId, gmcNumber1);
         verify(recommendationRepository, times(0)).save(recommendation);
+    }
+
+    @Test
+    public void shouldUpdateRevalidateRecommendationInDraftState() {
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcNumber1)
+                .recommendationId(recommendationId)
+                .recommendationType(REVALIDATE.name())
+                .comments(comments)
+                .build();
+
+        when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.of(buildRecommendation()));
+        when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
+        when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
+
+        recommendationService.updateRecommendation(recordDTO);
+
+        verify(recommendationRepository).save(anyObject());
+    }
+
+    @Test
+    public void shouldUpdateNonEngagementRecommendationInDraftState() {
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcNumber1)
+                .recommendationId(recommendationId)
+                .recommendationType(NON_ENGAGEMENT.name())
+                .comments(comments)
+                .build();
+
+        when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.of(buildRecommendation()));
+        when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
+        when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
+
+        recommendationService.updateRecommendation(recordDTO);
+
+        verify(recommendationRepository).save(anyObject());
+    }
+
+    @Test
+    public void shouldUpdateDeferRecommendationInDraftState() {
+        final var deferralDate = LocalDate.now().plusDays(90);
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcNumber1)
+                .recommendationId(recommendationId)
+                .recommendationType(DEFER.name())
+                .deferralDate(deferralDate)
+                .deferralReason(deferralResaon1)
+                .deferralSubReason(deferralSubResaon1)
+                .comments(comments)
+                .build();
+
+        when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.of(buildRecommendation()));
+        when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
+        when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
+        when(deferralReasonService.getDeferralReasonByCode(deferralResaon1)).thenReturn(deferralReason);
+        when(deferralReason.getSubReasonByCode(deferralSubResaon1)).thenReturn(deferralSubReason);
+
+        recommendationService.updateRecommendation(recordDTO);
+
+        verify(recommendationRepository).save(anyObject());
+    }
+
+    @Test(expected = InvalidRecommendationIdException.class)
+    public void shouldThrowExceptionWhenInvalidRecommendationIdProvidedForUpdate() {
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcNumber1)
+                .recommendationId(recommendationId)
+                .recommendationType(REVALIDATE.name())
+                .comments(comments)
+                .build();
+
+        recommendationService.updateRecommendation(recordDTO);
     }
 
     private DoctorsForDB buildDoctorForDB(final String gmcId) {
@@ -410,7 +484,7 @@ public class RecommendationServiceTest {
         return Recommendation.builder()
                 .id(recommendationId)
                 .gmcNumber(gmcNumber1)
-                .recommendationType(RecommendationType.REVALIDATE)
+                .recommendationType(REVALIDATE)
                 .build();
     }
- }
+}

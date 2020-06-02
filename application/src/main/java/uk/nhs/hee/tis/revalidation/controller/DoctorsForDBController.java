@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDTO;
-import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
+import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDto;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
 import java.util.List;
@@ -45,15 +45,15 @@ public class DoctorsForDBController {
     @Autowired
     private DoctorsForDBService doctorsForDBService;
 
-    @ApiOperation(value = "All trainee doctors information", notes = "It will return all the information about trainee doctors", response = TraineeSummaryDTO.class)
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Trainee gmc all doctors data", response = TraineeSummaryDTO.class)})
+    @ApiOperation(value = "All trainee doctors information", notes = "It will return all the information about trainee doctors", response = TraineeSummaryDto.class)
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Trainee gmc all doctors data", response = TraineeSummaryDto.class)})
     @GetMapping
-    public ResponseEntity<TraineeSummaryDTO> getTraineeDoctorsInformation(@RequestParam(name = SORT_COLUMN, defaultValue = SUBMISSION_DATE, required = false) final String sortColumn,
+    public ResponseEntity<TraineeSummaryDto> getTraineeDoctorsInformation(@RequestParam(name = SORT_COLUMN, defaultValue = SUBMISSION_DATE, required = false) final String sortColumn,
                                                                           @RequestParam(name = SORT_ORDER, defaultValue = DESC, required = false) final String sortOrder,
                                                                           @RequestParam(name = UNDER_NOTICE, defaultValue = UNDER_NOTICE_VALUE, required = false) final boolean underNotice,
                                                                           @RequestParam(name = PAGE_NUMBER, defaultValue = PAGE_NUMBER_VALUE, required = false) final int pageNumber,
                                                                           @RequestParam(name = SEARCH_QUERY, defaultValue = EMPTY_STRING, required = false) final String searchQuery) {
-        final var traineeRequestDTO = TraineeRequestDTO.builder()
+        final var traineeRequestDTO = TraineeRequestDto.builder()
                 .sortColumn(sortColumn)
                 .sortOrder(sortOrder)
                 .underNotice(underNotice)
@@ -68,7 +68,7 @@ public class DoctorsForDBController {
     }
 
     //TODO: find a better way like separate validator
-    private void validate(final TraineeRequestDTO requestDTO) {
+    private void validate(final TraineeRequestDto requestDTO) {
         if(!sortFields.contains(requestDTO.getSortColumn())) {
             log.warn("Invalid sort column name provided: {}, revert to default column: {}", requestDTO.getSortColumn(), SUBMISSION_DATE);
             requestDTO.setSortColumn(SUBMISSION_DATE);

@@ -4,8 +4,7 @@ import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public class DateUtilTest {
 
@@ -44,6 +43,16 @@ public class DateUtilTest {
         final String dateToFormat = null;
         final var localDateTime = DateUtil.formatDate(dateToFormat);
         assertNull(localDateTime);
+    }
+
+    @Test
+    public void shouldFormatDateToGmcFormat() {
+        final var dateToFormat = "2017-07-19";
+        final var localDateTime = DateUtil.formatDate(dateToFormat);
+
+        final var gmcDate = DateUtil.convertDateInGmcFormat(localDateTime);
+        assertNotNull(gmcDate);
+        assertThat(gmcDate, is("19/07/2017"));
     }
 
 }

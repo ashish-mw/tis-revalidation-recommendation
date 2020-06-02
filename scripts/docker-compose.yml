@@ -23,3 +23,10 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
+
+  GMCConnectMock:
+    container_name: gmcmock
+    image: gmcmock:latest
+    ports:
+      - '8090:8082'
+      - '4848:4848'

@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel(description = "List of trainee doctors with total count")
-public class TraineeDoctorDTO {
+public class TraineeSummaryDTO {
 
     private long countTotal;
     private long countUnderNotice;

@@ -14,13 +14,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown =  true)
-public class RecommendationDTO {
+public class TraineeRecommendationDTO {
 
     private String fullName;
     private String gmcNumber;
     private String programmeMembershipType;
     private String currentGrade;
     private LocalDate cctDate;
-    private List<RevalidationDTO> revalidations;
+    private String underNotice;
+    private List<TraineeRecommendationRecordDTO> revalidations;
+    private List<DeferralReasonDTO> deferralReasons;
 
 }

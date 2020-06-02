@@ -11,10 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDTO;
 import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDTO;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
-import uk.nhs.hee.tis.revalidation.entity.RevalidationStatus;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
@@ -62,7 +62,7 @@ public class DoctorsForDBServiceTest {
     private LocalDate addedDate1, addedDate2, addedDate3, addedDate4, addedDate5;
     private UnderNotice un1, un2, un3, un4, un5;
     private String sanction1, sanction2, sanction3, sanction4,sanction5;
-    private RevalidationStatus status1, status2, status3, status4,status5;
+    private RecommendationStatus status1, status2, status3, status4,status5;
     private LocalDate cctDate1, cctDate2, cctDate3, cctDate4, cctDate5;
     private String progName1, progName2, progName3, progName4, progName5;
     private String memType1, memType2, memType3, memType4, memType5;
@@ -110,7 +110,7 @@ public class DoctorsForDBServiceTest {
         when(page.getTotalPages()).thenReturn(1);
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
         when(repository.count()).thenReturn(5l);
-        final var requestDTO = RevalidationRequestDTO.builder()
+        final var requestDTO = TraineeRequestDTO.builder()
                 .sortOrder("desc")
                 .sortColumn("submissionDate")
                 .pageNumber(1)
@@ -212,7 +212,7 @@ public class DoctorsForDBServiceTest {
         when(page.getTotalPages()).thenReturn(1);
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
         when(repository.count()).thenReturn(5l);
-        final var requestDTO = RevalidationRequestDTO.builder()
+        final var requestDTO = TraineeRequestDTO.builder()
                 .sortOrder("desc")
                 .sortColumn("submissionDate")
                 .underNotice(true)
@@ -259,7 +259,7 @@ public class DoctorsForDBServiceTest {
         when(repository.findAll(pageableAndSortable,"")).thenReturn(page);
         when(page.get()).thenReturn(Stream.of());
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(0l);
-        final var requestDTO = RevalidationRequestDTO.builder()
+        final var requestDTO = TraineeRequestDTO.builder()
                 .sortOrder("desc")
                 .sortColumn("submissionDate")
                 .pageNumber(1)
@@ -295,7 +295,7 @@ public class DoctorsForDBServiceTest {
         when(page.getTotalElements()).thenReturn(2l);
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
         when(repository.count()).thenReturn(5l);
-        final var requestDTO = RevalidationRequestDTO.builder()
+        final var requestDTO = TraineeRequestDTO.builder()
                 .sortOrder("desc")
                 .sortColumn("submissionDate")
                 .pageNumber(1)
@@ -379,11 +379,11 @@ public class DoctorsForDBServiceTest {
         sanction4 = faker.lorem().characters(2);
         sanction5 = faker.lorem().characters(2);
 
-        status1 = RevalidationStatus.NOT_STARTED;
-        status2 = RevalidationStatus.NOT_STARTED;
-        status3 = RevalidationStatus.NOT_STARTED;
-        status4 = RevalidationStatus.NOT_STARTED;
-        status5 = RevalidationStatus.NOT_STARTED;
+        status1 = RecommendationStatus.NOT_STARTED;
+        status2 = RecommendationStatus.NOT_STARTED;
+        status3 = RecommendationStatus.NOT_STARTED;
+        status4 = RecommendationStatus.NOT_STARTED;
+        status5 = RecommendationStatus.NOT_STARTED;
 
         cctDate1 = now();
         cctDate2 = now();
@@ -409,10 +409,10 @@ public class DoctorsForDBServiceTest {
         grade4 = faker.lorem().characters(5);
         grade5 = faker.lorem().characters(5);
 
-        doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1, now());
-        doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2, now());
-        doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3, status3, now());
-        doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4, status4, now());
-        doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5, now());
+        doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1, now(),"HAA");
+        doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2, now(),"HAA");
+        doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3, status3, now(),"HAA");
+        doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4, status4, now(),"HAA");
+        doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5, now(),"HAA");
     }
 }

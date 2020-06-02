@@ -13,6 +13,7 @@ import uk.nhs.hee.tis.revalidation.dto.DoctorsForDBDTO;
 import java.time.LocalDate;
 
 import static java.time.LocalDate.now;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.NOT_STARTED;
 
 @Data
 @AllArgsConstructor
@@ -30,8 +31,9 @@ public class DoctorsForDB {
     private LocalDate dateAdded;
     private UnderNotice underNotice;
     private String sanction;
-    private RevalidationStatus doctorStatus;
+    private RecommendationStatus doctorStatus;
     private LocalDate lastUpdatedDate;
+    private String designatedBodyCode;
 
     public final static DoctorsForDB convert(final DoctorsForDBDTO doctorsForDBDTO) {
         return DoctorsForDB.builder()
@@ -42,7 +44,8 @@ public class DoctorsForDB {
                 .dateAdded(doctorsForDBDTO.getDateAdded())
                 .underNotice(UnderNotice.fromString(doctorsForDBDTO.getUnderNotice()))
                 .sanction(doctorsForDBDTO.getSanction())
-                .doctorStatus(RevalidationStatus.NOT_STARTED)
+                .doctorStatus(NOT_STARTED)
+                .designatedBodyCode(doctorsForDBDTO.getDesignatedBodyCode())
                 .lastUpdatedDate(now())
                 .build();
     }

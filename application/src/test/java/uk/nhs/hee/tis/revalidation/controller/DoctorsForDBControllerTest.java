@@ -10,10 +10,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
-import uk.nhs.hee.tis.revalidation.dto.TraineeDoctorDTO;
 import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDTO;
-import uk.nhs.hee.tis.revalidation.entity.RevalidationStatus;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDTO;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
@@ -51,7 +51,7 @@ public class DoctorsForDBControllerTest {
     private LocalDate dateAdded1, dateAdded2;
     private UnderNotice underNotice1, underNotice2;
     private String sanction1, sanction2;
-    private RevalidationStatus doctorStatus1, doctorStatus2;
+    private RecommendationStatus doctorStatus1, doctorStatus2;
 
     @Before
     public void setup() {
@@ -69,14 +69,14 @@ public class DoctorsForDBControllerTest {
         underNotice2 = UnderNotice.ON_HOLD;
         sanction1 = faker.lorem().characters(2);
         sanction2 = faker.lorem().characters(2);
-        doctorStatus1 = RevalidationStatus.STARTED;
-        doctorStatus2 = RevalidationStatus.SUBMITTED_TO_GMC;
+        doctorStatus1 = RecommendationStatus.STARTED;
+        doctorStatus2 = RecommendationStatus.SUBMITTED_TO_GMC;
     }
 
     @Test
     public void shouldReturnTraineeDoctorsInformation() throws Exception {
         final var gmcDoctorDTO = prepareGmcDoctor();
-        final var requestDTO = RevalidationRequestDTO.builder().sortOrder(ASC).sortColumn(SUBMISSION_DATE).searchQuery(EMPTY_STRING).build();
+        final var requestDTO = TraineeRequestDTO.builder().sortOrder(ASC).sortColumn(SUBMISSION_DATE).searchQuery(EMPTY_STRING).build();
         when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO)).thenReturn(gmcDoctorDTO);
         this.mockMvc.perform(get("/api/v1/doctors")
                 .param(SORT_ORDER, ASC)
@@ -91,7 +91,7 @@ public class DoctorsForDBControllerTest {
     @Test
     public void shouldReturnDataWhenSortOrderAndSortColumnAreEmpty() throws Exception {
         final var gmcDoctorDTO = prepareGmcDoctor();
-        final var requestDTO = RevalidationRequestDTO.builder().sortOrder(DESC).sortColumn(SUBMISSION_DATE)
+        final var requestDTO = TraineeRequestDTO.builder().sortOrder(DESC).sortColumn(SUBMISSION_DATE)
                 .searchQuery(EMPTY_STRING).build();
         when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO)).thenReturn(gmcDoctorDTO);
         this.mockMvc.perform(get("/api/v1/doctors")
@@ -104,7 +104,7 @@ public class DoctorsForDBControllerTest {
     @Test
     public void shouldReturnDataWhenSortOrderAndSortColumnAreInvalid() throws Exception {
         final var gmcDoctorDTO = prepareGmcDoctor();
-        final var requestDTO = RevalidationRequestDTO.builder().sortOrder(DESC).sortColumn(SUBMISSION_DATE)
+        final var requestDTO = TraineeRequestDTO.builder().sortOrder(DESC).sortColumn(SUBMISSION_DATE)
                 .searchQuery(EMPTY_STRING).build();
         when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO)).thenReturn(gmcDoctorDTO);
         this.mockMvc.perform(get(DOCTORS_API_URL)
@@ -117,7 +117,7 @@ public class DoctorsForDBControllerTest {
     @Test
     public void shouldReturnUnderNoticeTraineeDoctorsInformation() throws Exception {
         final var gmcDoctorDTO = prepareGmcDoctor();
-        final var requestDTO = RevalidationRequestDTO.builder()
+        final var requestDTO = TraineeRequestDTO.builder()
                 .sortOrder(ASC).sortColumn(SUBMISSION_DATE).underNotice(true).searchQuery(EMPTY_STRING).build();
         when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO)).thenReturn(gmcDoctorDTO);
         this.mockMvc.perform(get("/api/v1/doctors")
@@ -128,9 +128,9 @@ public class DoctorsForDBControllerTest {
                 .andExpect(content().json(mapper.writeValueAsString(gmcDoctorDTO)));
     }
 
-    private TraineeDoctorDTO prepareGmcDoctor() {
+    private TraineeSummaryDTO prepareGmcDoctor() {
         final var doctorsForDB = buildDoctorsForDBList();
-        return TraineeDoctorDTO.builder()
+        return TraineeSummaryDTO.builder()
                 .traineeInfo(doctorsForDB)
                 .countTotal(doctorsForDB.size())
                 .countUnderNotice(1l)

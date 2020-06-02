@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.nhs.hee.tis.revalidation.dto.*;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
-import uk.nhs.hee.tis.revalidation.entity.RevalidationStatus;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 import static java.util.stream.Collectors.toList;
@@ -32,7 +31,7 @@ public class DoctorsForDBService {
     @Autowired
     private TraineeCoreService traineeCoreService;
 
-    public TraineeDoctorDTO getAllTraineeDoctorDetails(final RevalidationRequestDTO requestDTO) {
+    public TraineeSummaryDTO getAllTraineeDoctorDetails(final TraineeRequestDTO requestDTO) {
         final var paginatedDoctors = getSortedAndFilteredDoctorsByPageNumber(requestDTO);
         final var doctorsList = paginatedDoctors.get().collect(toList());
         final var gmcIds = doctorsList.stream().map(doc -> doc.getGmcReferenceNumber()).collect(toList());
@@ -40,7 +39,7 @@ public class DoctorsForDBService {
         final var traineeDoctors = doctorsList.stream().map(d ->
                 convert(d, traineeCoreInfo.get(d.getGmcReferenceNumber()))).collect(toList());
 
-        return TraineeDoctorDTO.builder()
+        return TraineeSummaryDTO.builder()
                 .traineeInfo(traineeDoctors)
                 .countTotal(getCountAll())
                 .countUnderNotice(getCountUnderNotice())
@@ -78,7 +77,7 @@ public class DoctorsForDBService {
 
     }
 
-    private Page<DoctorsForDB> getSortedAndFilteredDoctorsByPageNumber(final RevalidationRequestDTO requestDTO) {
+    private Page<DoctorsForDB> getSortedAndFilteredDoctorsByPageNumber(final TraineeRequestDTO requestDTO) {
         final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
         final var pageableAndSortable = of(requestDTO.getPageNumber(), pageSize, by(direction, requestDTO.getSortColumn()));
         if (requestDTO.isUnderNotice()) {

@@ -22,4 +22,5 @@ public class DoctorsForDBDTO {
     private LocalDate dateAdded;
     private String underNotice;
     private String sanction;
+    private String designatedBodyCode;
 }

@@ -3,7 +3,7 @@ package uk.nhs.hee.tis.revalidation.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.nhs.hee.tis.revalidation.dto.DeferralReasonDTO;
+import uk.nhs.hee.tis.revalidation.dto.DeferralReasonDto;
 import uk.nhs.hee.tis.revalidation.entity.DeferralReason;
 import uk.nhs.hee.tis.revalidation.exception.InvalidDeferralReasonException;
 import uk.nhs.hee.tis.revalidation.repository.DeferralReasonRepository;
@@ -34,7 +34,7 @@ public class DeferralReasonService {
     }
 
     //get All deferral reasons
-    public List<DeferralReasonDTO> getAllDeferralReasons() {
+    public List<DeferralReasonDto> getAllDeferralReasons() {
         final var deferralReasons = deferralReasonRepository.findAll();
         return deferralReasons.stream().map(dr ->  {
             return convertToDTO(dr);
@@ -79,9 +79,9 @@ public class DeferralReasonService {
             return List.of();
     }
 
-    private DeferralReasonDTO convertToDTO(DeferralReason dr) {
-        return DeferralReasonDTO.builder().code(dr.getCode()).reason(dr.getReason())
-                .subReasons(dr.getDeferralSubReasons().stream().map(sub -> DeferralReasonDTO.builder().code(sub.getCode())
+    private DeferralReasonDto convertToDTO(DeferralReason dr) {
+        return DeferralReasonDto.builder().code(dr.getCode()).reason(dr.getReason())
+                .subReasons(dr.getDeferralSubReasons().stream().map(sub -> DeferralReasonDto.builder().code(sub.getCode())
                         .reason(sub.getReason()).build()).collect(toList())).build();
     }
 }

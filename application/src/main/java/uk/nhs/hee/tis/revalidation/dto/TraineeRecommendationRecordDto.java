@@ -1,6 +1,7 @@
 package uk.nhs.hee.tis.revalidation.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,13 +16,14 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @JsonIgnoreProperties(ignoreUnknown =  true)
-public class TraineeRecommendationRecordDTO {
+@ApiModel(description = "Trainee recommendation information for current and legacy recommendations")
+public class TraineeRecommendationRecordDto {
 
     private String gmcNumber;
     private String recommendationId;
     private String gmcOutcome;
     private String recommendationType;
-    private LocalDateTime gmcSubmissionDate;
+    private LocalDate gmcSubmissionDate;
     private LocalDate actualSubmissionDate;
     private String gmcRevalidationId;
     private String recommendationStatus;

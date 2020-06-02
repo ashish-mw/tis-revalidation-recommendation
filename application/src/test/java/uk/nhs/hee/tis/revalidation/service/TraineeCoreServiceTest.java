@@ -12,7 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
-import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDto;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -43,7 +43,7 @@ public class TraineeCoreServiceTest {
     private String programmeMembershipType1, programmeMembershipType2;
     private String programmeName1, programmeName2;
     private String currentGrade1, currentGrade2;
-    private TraineeCoreDTO trainee1, trainee2;
+    private TraineeCoreDto trainee1, trainee2;
 
     @Before
     public void setup() {
@@ -54,7 +54,7 @@ public class TraineeCoreServiceTest {
     @Test
     public void shouldFetchTraineeInformationFromTcs() {
         final var url = String.format("%s/%s", API_REVALIDATION, gmcId1);
-        when(restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, TraineeCoreDTO>>() {
+        when(restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, TraineeCoreDto>>() {
         })).thenReturn(responseEntity);
         when(responseEntity.getBody()).thenReturn(Map.of(gmcId1, trainee1));
         final var traineeInformationFromCore = traineeCoreService.getTraineeInformationFromCore(of(gmcId1));
@@ -72,7 +72,7 @@ public class TraineeCoreServiceTest {
     @Test
     public void shouldFetchMultipleTraineeInformationFromTcs() {
         final var url = String.format("%s/%s,%s", API_REVALIDATION, gmcId1, gmcId2);
-        when(restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, TraineeCoreDTO>>() {
+        when(restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, TraineeCoreDto>>() {
         })).thenReturn(responseEntity);
         when(responseEntity.getBody()).thenReturn(Map.of(gmcId1, trainee1, gmcId2, trainee2));
         final var traineeInformationFromCore = traineeCoreService.getTraineeInformationFromCore(of(gmcId1, gmcId2));
@@ -98,7 +98,7 @@ public class TraineeCoreServiceTest {
     @Test
     public void shouldReturnEmptyWhenNoRecordFound() {
         final var url = String.format("%s/%s", API_REVALIDATION, gmcId1);
-        when(restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, TraineeCoreDTO>>() {
+        when(restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, TraineeCoreDto>>() {
         })).thenReturn(responseEntity);
         when(responseEntity.getBody()).thenReturn(Map.of());
         final var traineeInformationFromCore = traineeCoreService.getTraineeInformationFromCore(of(gmcId1));
@@ -121,8 +121,8 @@ public class TraineeCoreServiceTest {
         currentGrade1 = faker.lorem().characters(5);
         currentGrade2 = faker.lorem().characters(5);
 
-        trainee1 = new TraineeCoreDTO(gmcId1, cctDate1, programmeMembershipType1, programmeName1, currentGrade1);
-        trainee2 = new TraineeCoreDTO(gmcId2, cctDate2, programmeMembershipType2, programmeName2, currentGrade2);
+        trainee1 = new TraineeCoreDto(gmcId1, cctDate1, programmeMembershipType1, programmeName1, currentGrade1);
+        trainee2 = new TraineeCoreDto(gmcId2, cctDate2, programmeMembershipType2, programmeName2, currentGrade2);
     }
 
 }

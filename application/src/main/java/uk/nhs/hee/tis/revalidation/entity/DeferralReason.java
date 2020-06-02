@@ -25,7 +25,8 @@ public class DeferralReason {
     private List<DeferralReason> deferralSubReasons;
 
     public DeferralReason getSubReasonByCode(final String subReason) {
-        final var deferralSubReason = this.getDeferralSubReasons().stream().filter(sr -> subReason.equals(sr.getCode())).findFirst();
+        final var deferralSubReason = this.getDeferralSubReasons().stream()
+                .filter(sr -> subReason.equals(sr.getCode())).findFirst();
         return deferralSubReason.isPresent() ? deferralSubReason.get() : null;
     }
 

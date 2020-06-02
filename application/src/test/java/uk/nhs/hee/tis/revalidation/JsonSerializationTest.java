@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.nhs.hee.tis.revalidation.controller.DoctorsForDBController;
-import uk.nhs.hee.tis.revalidation.dto.DoctorsForDBDTO;
+import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
 import static java.time.LocalDate.of;
@@ -31,7 +31,7 @@ public class JsonSerializationTest {
     public void testDateSerialization() throws JsonProcessingException {
         assertThat(mapper, is(notNullValue()));
 
-        final var doctor = DoctorsForDBDTO.builder()
+        final var doctor = DoctorsForDbDto.builder()
                 .doctorFirstName("first")
                 .doctorLastName("last")
                 .gmcReferenceNumber("gmtRef")

@@ -3,14 +3,14 @@ package uk.nhs.hee.tis.revalidation.validator;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationType;
 
 public class TraineeRecommendationRecordDTOValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> aClass) {
-        return TraineeRecommendationRecordDTO.class.isAssignableFrom(aClass);
+        return TraineeRecommendationRecordDto.class.isAssignableFrom(aClass);
     }
 
     //validate TraineeRecommendationRecordDTO for the creation of new Recommendation
@@ -18,7 +18,7 @@ public class TraineeRecommendationRecordDTOValidator implements Validator {
     public void validate(Object target, Errors errors) {
 
         if (errors.getErrorCount() == 0) {
-            final var recordDTO = (TraineeRecommendationRecordDTO) target;
+            final var recordDTO = (TraineeRecommendationRecordDto) target;
             if (StringUtils.isEmpty(recordDTO.getGmcNumber())) {
                 errors.reject("GmcNumber","Gmc Number can't be empty or null");
             }

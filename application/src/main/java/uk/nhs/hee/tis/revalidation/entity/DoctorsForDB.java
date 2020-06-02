@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import uk.nhs.hee.tis.revalidation.dto.DoctorsForDBDTO;
+import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 
 import java.time.LocalDate;
 
@@ -35,7 +35,7 @@ public class DoctorsForDB {
     private LocalDate lastUpdatedDate;
     private String designatedBodyCode;
 
-    public final static DoctorsForDB convert(final DoctorsForDBDTO doctorsForDBDTO) {
+    public final static DoctorsForDB convert(final DoctorsForDbDto doctorsForDBDTO) {
         return DoctorsForDB.builder()
                 .gmcReferenceNumber(doctorsForDBDTO.getGmcReferenceNumber())
                 .doctorFirstName(doctorsForDBDTO.getDoctorFirstName())

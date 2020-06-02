@@ -6,6 +6,7 @@
     <modules>
         <module>application</module>
         <module>integration-tests</module>
+        <module>gmc-api</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

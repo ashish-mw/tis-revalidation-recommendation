@@ -46,7 +46,6 @@ public class GmcClientService {
 
     }
 
-    //TODO tests
     public TryRecommendationV2Response submitToGmc(final DoctorsForDB doctorForDB, final Recommendation recommendation) {
         final TryRecommendationV2 tryRecommendation = new TryRecommendationV2();
         final TryRecommendationV2Request request = new TryRecommendationV2Request();
@@ -68,7 +67,7 @@ public class GmcClientService {
         }
         request.setClientRequestID(recommendation.getId().toString());
         request.setInternalUser(INTERNAL_USER_ID); //TODO: find Internal User details
-        request.setInternalUserEmailAddress("blah@blah.com"); //TODO: find Internal User details
+        request.setInternalUserEmailAddress("info@admin.com"); //TODO: find Internal User details
         tryRecommendation.setRecReq(request);
         tryRecommendation.setUsername(gmcUserName);
         tryRecommendation.setPassword(gmcPassword);

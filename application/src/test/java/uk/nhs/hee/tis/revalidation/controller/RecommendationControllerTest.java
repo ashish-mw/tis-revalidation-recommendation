@@ -10,8 +10,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationDTO;
-import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationDto;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationType;
@@ -19,13 +19,11 @@ import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.service.RecommendationService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.lang.String.format;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.*;
@@ -68,7 +66,7 @@ public class RecommendationControllerTest {
     private String deferralComments = faker.lorem().sentence(5);
     private String recommendationType = faker.options().option(RecommendationType.class).name();
     private String gmcOutcome = faker.options().option(RecommendationGmcOutcome.class).name();
-    private LocalDateTime gmcSubmissionDate = LocalDateTime.now();
+    private LocalDate gmcSubmissionDate = LocalDate.now();
     private LocalDate actualSubmissionDate = LocalDate.now();
     private String admin = faker.name().fullName();
 
@@ -85,7 +83,7 @@ public class RecommendationControllerTest {
 
     @Test
     public void shouldSaveRevalidateRecommendation() throws Exception {
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcId)
                 .recommendationType(REVALIDATE.name())
                 .comments(List.of())
@@ -100,7 +98,7 @@ public class RecommendationControllerTest {
 
     @Test
     public void shouldSaveNonEngagementRecommendation() throws Exception {
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcId)
                 .recommendationType(NON_ENGAGEMENT.name())
                 .comments(List.of())
@@ -115,7 +113,7 @@ public class RecommendationControllerTest {
 
     @Test
     public void shouldSaveDeferRecommendation() throws Exception {
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcId)
                 .recommendationType(DEFER.name())
                 .deferralDate(deferralDate)
@@ -133,7 +131,7 @@ public class RecommendationControllerTest {
 
     @Test
     public void shouldThroughExceptionWhenGmcIdOrRecommendationTypeMissingInRecommendationRequest() throws Exception {
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber("")
                 .recommendationType("")
                 .comments(List.of())
@@ -150,7 +148,7 @@ public class RecommendationControllerTest {
 
     @Test
     public void shouldThroughExceptionWhenRecommendationIsDeferAndDateAndReasonAreMissingInRecommendationRequest() throws Exception {
-        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcId)
                 .recommendationType(DEFER.name())
                 .comments(List.of())
@@ -174,8 +172,59 @@ public class RecommendationControllerTest {
                 .andExpect(status().isOk());
     }
 
-    private TraineeRecommendationDTO prepareRecommendationDTO() {
-        return TraineeRecommendationDTO.builder()
+    @Test
+    public void shouldUpdateRevalidateRecommendation() throws Exception {
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcId)
+                .recommendationId(recommendationId)
+                .recommendationType(REVALIDATE.name())
+                .comments(List.of())
+                .build();
+
+        this.mockMvc.perform(put(RECOMMENDATION_API_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(recordDTO)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldUpdateDeferRecommendation() throws Exception {
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcId)
+                .recommendationId(recommendationId)
+                .recommendationType(DEFER.name())
+                .deferralDate(deferralDate)
+                .deferralReason(deferralReason)
+                .deferralSubReason(deferralSubReason)
+                .comments(List.of())
+                .build();
+
+        this.mockMvc.perform(put(RECOMMENDATION_API_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(recordDTO)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldFailToUpdateRevalidateRecommendationWhenNoRecommendationId() throws Exception {
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcId)
+                .recommendationType(REVALIDATE.name())
+                .comments(List.of())
+                .build();
+
+        this.mockMvc.perform(put(RECOMMENDATION_API_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(recordDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Recommendation Id should not be empty"));
+    }
+
+    private TraineeRecommendationDto prepareRecommendationDTO() {
+        return TraineeRecommendationDto.builder()
                 .fullName(firstName + " " + lastName)
                 .gmcNumber(gmcId)
                 .currentGrade(currentGrade)
@@ -185,8 +234,8 @@ public class RecommendationControllerTest {
                 .build();
     }
 
-    private TraineeRecommendationRecordDTO prepareRevalidationDTO() {
-        return TraineeRecommendationRecordDTO.builder()
+    private TraineeRecommendationRecordDto prepareRevalidationDTO() {
+        return TraineeRecommendationRecordDto.builder()
                 .deferralComment(deferralComments)
                 .deferralDate(deferralDate)
                 .deferralReason(deferralReason)

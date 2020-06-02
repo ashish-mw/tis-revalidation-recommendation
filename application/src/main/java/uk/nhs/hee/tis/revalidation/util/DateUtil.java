@@ -14,10 +14,11 @@ public class DateUtil {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter GMC_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public static LocalDateTime formatDateTime(final String date) {
+    public static LocalDate formatDateTime(final String date) {
         log.info("Parsing date time for given date: {}", date);
         if (!StringUtils.isEmpty(date)) {
-            return LocalDateTime.parse(date, DATE_TIME_FORMATTER);
+            final var localDateTime = LocalDateTime.parse(date, DATE_TIME_FORMATTER);
+            return LocalDate.of(localDateTime.getYear(), localDateTime.getMonth(), localDateTime.getDayOfMonth());
         }
 
         return null;

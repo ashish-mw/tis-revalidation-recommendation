@@ -6,7 +6,7 @@ import com.github.javafaker.Faker;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
@@ -28,7 +28,7 @@ public class BaseIT {
     public ObjectMapper objectMapper;
 
     protected DoctorsForDB doc1, doc2, doc3, doc4, doc5;
-    protected TraineeCoreDTO coreDTO1, coreDTO2, coreDTO3, coreDTO4, coreDTO5;
+    protected TraineeCoreDto coreDTO1, coreDTO2, coreDTO3, coreDTO4, coreDTO5;
     protected String gmcRef1, gmcRef2, gmcRef3, gmcRef4, gmcRef5;
     protected String fName1, fName2, fName3, fName4, fName5;
     protected String lName1, lName2, lName3, lName4, lName5;
@@ -128,15 +128,15 @@ public class BaseIT {
         doc4 = new DoctorsForDB(gmcRef4, fName4, lName4, subDate4, addedDate4, un4, sanction4, status4, now(), desBody4);
         doc5 = new DoctorsForDB(gmcRef5, fName5, lName5, subDate5, addedDate5, un5, sanction5, status5, now(), desBody5);
 
-        coreDTO1 = new TraineeCoreDTO(gmcRef1, cctDate1, memType1, progName1, grade1);
-        coreDTO2 = new TraineeCoreDTO(gmcRef2, cctDate2, memType2, progName2, grade2);
-        coreDTO3 = new TraineeCoreDTO(gmcRef3, cctDate3, memType3, progName3, grade3);
-        coreDTO4 = new TraineeCoreDTO(gmcRef4, cctDate4, memType4, progName4, grade4);
-        coreDTO5 = new TraineeCoreDTO(gmcRef5, cctDate5, memType5, progName5, grade5);
+        coreDTO1 = new TraineeCoreDto(gmcRef1, cctDate1, memType1, progName1, grade1);
+        coreDTO2 = new TraineeCoreDto(gmcRef2, cctDate2, memType2, progName2, grade2);
+        coreDTO3 = new TraineeCoreDto(gmcRef3, cctDate3, memType3, progName3, grade3);
+        coreDTO4 = new TraineeCoreDto(gmcRef4, cctDate4, memType4, progName4, grade4);
+        coreDTO5 = new TraineeCoreDto(gmcRef5, cctDate5, memType5, progName5, grade5);
     }
 
 
-    public void stubCoreRequest(final Map<String, TraineeCoreDTO> coreData) throws JsonProcessingException {
+    public void stubCoreRequest(final Map<String, TraineeCoreDto> coreData) throws JsonProcessingException {
         stubFor(get(urlPathMatching("/tcsmock/api/revalidation/.*"))
                 .willReturn(aResponse()
                         .withStatus(200)

@@ -172,17 +172,21 @@ public class RecommendationService {
         final var snapshots = snapshotRepository.findByGmcNumber(gmcId);
         final var recommendations = recommendationRepository.findByGmcNumber(gmcId);
         final var currentRecommendations = recommendations.stream().map(rec -> {
+            String gmcOutcome = null;
+            //only check outcome status, if request has been submitted to GMC
+            if (SUBMITTED_TO_GMC == rec.getRecommendationStatus()) {
+                gmcOutcome = checkRecommendationStatus(gmcId, rec.getGmcRevalidationId(),
+                        rec.getId(), doctorsForDB.getDesignatedBodyCode());
+            }
             return TraineeRecommendationRecordDto.builder()
                     .deferralDate(rec.getDeferralDate())
                     .deferralReason(rec.getDeferralReason())
                     .deferralSubReason(rec.getDeferralSubReason())
-                    .gmcOutcome(checkRecommendationStatus(gmcId, rec.getGmcRevalidationId(),
-                            rec.getId(), doctorsForDB.getDesignatedBodyCode()))
+                    .gmcOutcome(gmcOutcome)
                     .recommendationStatus(rec.getRecommendationStatus().name())
                     .recommendationType(rec.getRecommendationType().getType())
                     .gmcSubmissionDate(doctorsForDB.getSubmissionDate())
                     .actualSubmissionDate(rec.getActualSubmissionDate())
-                    .gmcOutcome(rec.getOutcome().getOutcome())
                     .admin(rec.getAdmin())
                     .build();
         }).collect(toList());
@@ -214,14 +218,14 @@ public class RecommendationService {
         final var gmdReturnCode = checkRecommendationStatusResult.getReturnCode();
         if (SUCCESS.getCode().equals(gmdReturnCode)) {
             final var status = checkRecommendationStatusResult.getStatus();
-            return RecommendationGmcOutcome.fromString(status).name();
+            return RecommendationGmcOutcome.fromString(status).getOutcome();
         } else {
             final var responseCode = fromCode(gmdReturnCode);
             log.error("Gmc recommendation check status request is failed for GmcId: {} and recommendationId: {} with Response: {}." +
                     " Recommendation will stay in Under Review state", gmcId, recommendationId, responseCode.getMessage());
         }
 
-        return UNDER_REVIEW.name();
+        return UNDER_REVIEW.getOutcome();
     }
 
     private String toUpperCase(final String code) {

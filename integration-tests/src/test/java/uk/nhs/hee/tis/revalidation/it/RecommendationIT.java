@@ -10,9 +10,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.nhs.hee.tis.revalidation.RevalidationApplication;
-import uk.nhs.hee.tis.revalidation.entity.*;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDTO;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationType;
+import uk.nhs.hee.tis.revalidation.entity.Snapshot;
+import uk.nhs.hee.tis.revalidation.entity.SnapshotRevalidation;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
+import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
 import uk.nhs.hee.tis.revalidation.repository.SnapshotRepository;
+import uk.nhs.hee.tis.revalidation.service.DeferralReasonService;
 import uk.nhs.hee.tis.revalidation.service.RecommendationService;
 
 import java.util.List;
@@ -22,7 +28,9 @@ import static java.util.Map.of;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.*;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.*;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDate;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDateTime;
 
@@ -42,9 +50,16 @@ public class RecommendationIT extends BaseIT {
     @Autowired
     private SnapshotRepository snapshotRepository;
 
+    @Autowired
+    private RecommendationRepository recommendationRepository;
+
+    @Autowired
+    private DeferralReasonService deferralReasonService;
+
     private String proposedOutcomeCode1, proposedOutcomeCode2;
     private String deferralDate1, deferralDate2;
     private String deferralReason1, deferralReason2;
+    private String deferralSubReason1, deferralSubReason2;
     private String deferralComment1, deferralComment2;
     private String revalidationStatusCode1, revalidationStatusCode2;
     private String gmcSubmissionDateTime1, gmcSubmissionDateTime2;
@@ -64,6 +79,7 @@ public class RecommendationIT extends BaseIT {
     public void setup() {
         doctorsForDBRepository.deleteAll();
         snapshotRepository.deleteAll();
+        recommendationRepository.deleteAll();
         setupData();
         setupSnapshotData();
      }
@@ -85,24 +101,24 @@ public class RecommendationIT extends BaseIT {
         assertThat(recommendation.getRevalidations(), hasSize(2));
         var revalidationDTO = recommendation.getRevalidations().get(0);
         assertThat(revalidationDTO.getDeferralComment(), is(deferralComment1));
-        assertThat(revalidationDTO.getDeferralDate(), is(deferralDate1));
+        assertThat(revalidationDTO.getDeferralDate(), is(formatDate(deferralDate1)));
         assertThat(revalidationDTO.getDeferralReason(), is(deferralReason1));
         assertThat(revalidationDTO.getAdmin(), is(admin1));
         assertThat(revalidationDTO.getActualSubmissionDate(), is(formatDate(submissionDate1)));
         assertThat(revalidationDTO.getGmcSubmissionDate(), is(formatDateTime(gmcSubmissionDateTime1)));
-        assertThat(revalidationDTO.getRevalidationStatus(), is(revalidationStatusCode1));
-        assertThat(revalidationDTO.getRevalidationType(), is(proposedOutcomeCode1));
+        assertThat(revalidationDTO.getRecommendationStatus(), is(revalidationStatusCode1));
+        assertThat(revalidationDTO.getRecommendationType(), is(proposedOutcomeCode1));
         assertThat(revalidationDTO.getGmcOutcome(), is(gmcOutcomeCode1));
 
         revalidationDTO = recommendation.getRevalidations().get(1);
         assertThat(revalidationDTO.getDeferralComment(), is(deferralComment2));
-        assertThat(revalidationDTO.getDeferralDate(), is(deferralDate2));
+        assertThat(revalidationDTO.getDeferralDate(), is(formatDate(deferralDate2)));
         assertThat(revalidationDTO.getDeferralReason(), is(deferralReason2));
         assertThat(revalidationDTO.getAdmin(), is(admin2));
         assertThat(revalidationDTO.getActualSubmissionDate(), is(formatDate(submissionDate2)));
         assertThat(revalidationDTO.getGmcSubmissionDate(), is(formatDateTime(gmcSubmissionDateTime2)));
-        assertThat(revalidationDTO.getRevalidationStatus(), is(revalidationStatusCode2));
-        assertThat(revalidationDTO.getRevalidationType(), is(proposedOutcomeCode2));
+        assertThat(revalidationDTO.getRecommendationStatus(), is(revalidationStatusCode2));
+        assertThat(revalidationDTO.getRecommendationType(), is(proposedOutcomeCode2));
         assertThat(revalidationDTO.getGmcOutcome(), is(gmcOutcomeCode2));
     }
 
@@ -148,31 +164,136 @@ public class RecommendationIT extends BaseIT {
         assertThat(recommendation.getCurrentGrade(), is(nullValue()));
     }
 
-    public void setupSnapshotData() {
-        proposedOutcomeCode1 = faker.options().option(RevalidationType.class).name();
+    @Test
+    public void shouldSaveRecommendationOfTypeRevalidate() {
+        doctorsForDBRepository.saveAll(List.of(doc1));
+        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+                .gmcNumber(gmcRef1)
+                .recommendationType(REVALIDATE.name())
+                .comments(List.of("recommendation comments"))
+                .build();
+
+        final var recommendation = recommendationService.saveRecommendation(recordDTO);
+        final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
+        final var savedRecommendation = recommendationById.get();
+        assertNotNull(savedRecommendation);
+        assertThat(savedRecommendation.getGmcNumber(), is(gmcRef1));
+        assertThat(savedRecommendation.getRecommendationType(), is(REVALIDATE));
+        assertThat(savedRecommendation.getGmcSubmissionDate(), is(subDate1));
+    }
+
+    @Test
+    public void shouldSaveRecommendationOfTypeNonEngagement() {
+        doctorsForDBRepository.saveAll(List.of(doc2));
+        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+                .gmcNumber(gmcRef2)
+                .recommendationType(NON_ENGAGEMENT.name())
+                .comments(List.of("recommendation comments"))
+                .build();
+
+        final var recommendation = recommendationService.saveRecommendation(recordDTO);
+        final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
+        final var savedRecommendation = recommendationById.get();
+        assertNotNull(savedRecommendation);
+        assertThat(savedRecommendation.getGmcNumber(), is(gmcRef2));
+        assertThat(savedRecommendation.getRecommendationType(), is(NON_ENGAGEMENT));
+        assertThat(savedRecommendation.getGmcSubmissionDate(), is(subDate2));
+    }
+
+    @Test
+    public void shouldSaveRecommendationOfTypeDefer() {
+        doctorsForDBRepository.saveAll(List.of(doc2));
+        final var deferralDate = subDate2.plusDays(70);
+        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+                .gmcNumber(gmcRef2)
+                .recommendationType(DEFER.name())
+                .deferralDate(deferralDate)
+                .deferralReason(deferralReason1)
+                .deferralSubReason(deferralSubReason1)
+                .comments(List.of("recommendation comments"))
+                .build();
+
+        final var recommendation = recommendationService.saveRecommendation(recordDTO);
+        final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
+        final var savedRecommendation = recommendationById.get();
+        assertNotNull(savedRecommendation);
+        assertThat(savedRecommendation.getGmcNumber(), is(gmcRef2));
+        assertThat(savedRecommendation.getRecommendationType(), is(DEFER));
+        assertThat(savedRecommendation.getDeferralDate(), is(deferralDate));
+        assertThat(savedRecommendation.getDeferralReason(), is(deferralReason1));
+        assertThat(savedRecommendation.getDeferralSubReason(), is(deferralSubReason1));
+        assertThat(savedRecommendation.getGmcSubmissionDate(), is(subDate2));
+    }
+
+    @Test
+    public void shouldSubmitRevalidateRecommendation() {
+        doctorsForDBRepository.saveAll(List.of(doc1));
+        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+                .gmcNumber(gmcRef1)
+                .recommendationType(REVALIDATE.name())
+                .comments(List.of("recommendation comments"))
+                .build();
+
+        final var recommendation = recommendationService.saveRecommendation(recordDTO);
+
+        final var submitRecommendation = recommendationService.submitRecommendation(recommendation.getId(), gmcRef1);
+        assertTrue(submitRecommendation);
+        //check if status is changes
+        final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
+        assertTrue(recommendationById.isPresent());
+        assertThat(recommendationById.get().getRecommendationStatus(), is(RecommendationStatus.SUBMITTED_TO_GMC));
+    }
+
+    @Test
+    public void shouldSubmitDeferRecommendation() {
+        doctorsForDBRepository.saveAll(List.of(doc1));
+        final var deferralReasonByCode = deferralReasonService.getDeferralReasonByCode("1");
+        final var recordDTO = TraineeRecommendationRecordDTO.builder()
+                .gmcNumber(gmcRef1)
+                .recommendationType(DEFER.name())
+                .comments(List.of("recommendation comments"))
+                .deferralReason(deferralReasonByCode.getCode())
+                .deferralSubReason(deferralReasonByCode.getDeferralSubReasons().get(0).getCode())
+                .deferralDate(subDate1.plusDays(70))
+                .build();
+
+        final var recommendation = recommendationService.saveRecommendation(recordDTO);
+
+        final var submitRecommendation = recommendationService.submitRecommendation(recommendation.getId(), gmcRef1);
+        assertTrue(submitRecommendation);
+        //check if status is changes
+        final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
+        assertTrue(recommendationById.isPresent());
+        assertThat(recommendationById.get().getRecommendationStatus(), is(RecommendationStatus.SUBMITTED_TO_GMC));
+    }
+
+    private void setupSnapshotData() {
+        proposedOutcomeCode1 = faker.options().option(RecommendationType.class).name();
         deferralDate1 = "2018-03-15";
-        deferralReason1 = faker.options().option(DeferralReason.class).name();
+        deferralReason1 = "1";
+        deferralSubReason1 = "1";
         deferralComment1 = faker.lorem().sentence(5);
-        revalidationStatusCode1 = faker.options().option(RevalidationStatus.class).name();
+        revalidationStatusCode1 = faker.options().option(RecommendationStatus.class).name();
         gmcSubmissionDateTime1 = "2018-03-15 12:00:00";
         gmcSubmissionReturnCode1 = "0";
         gmcRecommendationId1 = faker.idNumber().toString();
-        gmcOutcomeCode1 = RevalidationGmcOutcome.APPROVED.name();
+        gmcOutcomeCode1 = getGmcOutCome(gmcRef1);
         gmcStatusCheckDateTime1 = "2018-03-15";
         admin1 = faker.name().fullName();
         submissionDate1 = "2018-03-15";
         recommendationSubmitter1 = admin1;
         dateAdded1 = "2018-04-15";
 
-        proposedOutcomeCode2 = faker.options().option(RevalidationType.class).name();
+        proposedOutcomeCode2 = faker.options().option(RecommendationType.class).name();
         deferralDate2 = "2018-03-15";
-        deferralReason2 = faker.options().option(DeferralReason.class).name();
+        deferralReason2 = "2";
+        deferralSubReason2 = null;
         deferralComment2 = faker.lorem().sentence(5);
-        revalidationStatusCode2 = faker.options().option(RevalidationStatus.class).name();
+        revalidationStatusCode2 = faker.options().option(RecommendationStatus.class).name();
         gmcSubmissionDateTime2 = "2018-03-15 12:00:00";
         gmcSubmissionReturnCode2 = "0";
         gmcRecommendationId2 = faker.idNumber().toString();
-        gmcOutcomeCode2 = RevalidationGmcOutcome.APPROVED.name();
+        gmcOutcomeCode2 = getGmcOutCome(gmcRef1);
         gmcStatusCheckDateTime2 = "2018-03-15";
         admin2 = faker.name().fullName();
         submissionDate2 = "2018-03-15";
@@ -195,5 +316,18 @@ public class RecommendationIT extends BaseIT {
 
     private String fullName(final String fName, final String lName) {
         return String.format("%s %s", fName, lName);
+    }
+
+    //GMC Mock has this logic to randomly return the gmc outcome status so using the same assumptions here.
+    private String getGmcOutCome(final String gmcReferenceNumber) {
+        final String lastDigit = gmcReferenceNumber.substring(gmcReferenceNumber.length() - 1);
+
+        if (lastDigit.matches("[012]")) {
+            return UNDER_REVIEW.name();
+        } else if (lastDigit.matches("[345]")) {
+            return REJECTED.name();
+        } else {
+            return APPROVED.name();
+        }
     }
 }

@@ -1,6 +1,6 @@
 package uk.nhs.hee.tis.revalidation.entity;
 
-public enum RevalidationStatus {
+public enum RecommendationStatus {
 
     NOT_STARTED,
     STARTED,

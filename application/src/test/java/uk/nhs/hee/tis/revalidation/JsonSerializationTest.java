@@ -42,7 +42,7 @@ public class JsonSerializationTest {
 
         final var json = mapper.writeValueAsString(doctor);
 
-        assertThat(json,is("{\"gmcReferenceNumber\":\"gmtRef\",\"doctorFirstName\":\"first\",\"doctorLastName\":\"last\",\"submissionDate\":\"2020-03-31\",\"dateAdded\":\"2020-04-02\",\"underNotice\":\"under notice\",\"sanction\":\"sanction\"}"));
+        assertThat(json,is("{\"gmcReferenceNumber\":\"gmtRef\",\"doctorFirstName\":\"first\",\"doctorLastName\":\"last\",\"submissionDate\":\"2020-03-31\",\"dateAdded\":\"2020-04-02\",\"underNotice\":\"under notice\",\"sanction\":\"sanction\",\"designatedBodyCode\":null}"));
     }
 
 }

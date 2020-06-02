@@ -54,3 +54,8 @@ app:
     exchange: ${EXCHANGE:gmc-connect-exchange}
     queue: ${QUEUE:gmc-doctors-queue}
     routingKey: ${ROUTING_KEY:uk.nhs.hee}
+
+  gmc:
+    url: ${GMC_CONNECT_URL:http://localhost:8090/GMCConnectMock2020/GMCWebServices}
+    gmcUsername: ${GMC_USER_NAME:guest}
+    gmcPassword: ${GMC_PASSWORD:guest}

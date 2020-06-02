@@ -1,24 +1,32 @@
 package uk.nhs.hee.tis.revalidation.entity;
 
-public enum DeferralReason {
-  BELOW_1_YEAR_TO_CCT("1"),
-  SICK_CARERS_LEAVE("1"),
-  PARENTAL_LEAVE("1"),
-  OUT_OF_CLINICAL_TRAINING("1"),
-  INSUFFICIENT_EVIDENCE("1"),
-  EXAM_FAILURE("1"),
-  BELOW_5_YEARS_FULL_REG("1"),
-  OTHER("1"),
-  ONGOING_PROCESS("2");
+import io.swagger.annotations.ApiModel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-  private String gmcCode;
+import java.util.List;
+import java.util.Optional;
 
-  DeferralReason(String gmcCode) {
-    this.gmcCode = gmcCode;
-  }
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Document(collection = "deferralReason")
+@ApiModel(description = "Recommendation's deferral reason")
+public class DeferralReason {
 
-  public String getGmcCode() {
-    return gmcCode;
-  }
+    @Id
+    private String code;
+    private String reason;
+    private List<DeferralReason> deferralSubReasons;
+
+    public DeferralReason getSubReasonByCode(final String subReason) {
+        final var deferralSubReason = this.getDeferralSubReasons().stream().filter(sr -> subReason.equals(sr.getCode())).findFirst();
+        return deferralSubReason.isPresent() ? deferralSubReason.get() : null;
+    }
 
 }

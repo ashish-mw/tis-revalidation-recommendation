@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RevalidationRequestDTO {
+public class TraineeRequestDTO {
     private String sortColumn;
     private String sortOrder;
     private boolean underNotice;

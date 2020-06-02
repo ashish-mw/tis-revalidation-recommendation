@@ -10,7 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.nhs.hee.tis.revalidation.RevalidationApplication;
-import uk.nhs.hee.tis.revalidation.dto.RevalidationRequestDTO;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDTO;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
@@ -48,7 +48,7 @@ public class DoctorsSearchIT extends BaseIT {
         stubCoreRequest(coreData);
 
 
-        final var requestDTO = RevalidationRequestDTO.builder()
+        final var requestDTO = TraineeRequestDTO.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .searchQuery(doc3.getGmcReferenceNumber())
@@ -81,7 +81,7 @@ public class DoctorsSearchIT extends BaseIT {
         stubCoreRequest(coreData);
 
 
-        final var requestDTO = RevalidationRequestDTO.builder()
+        final var requestDTO = TraineeRequestDTO.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .searchQuery(doc2.getDoctorFirstName())
@@ -113,7 +113,7 @@ public class DoctorsSearchIT extends BaseIT {
         final var coreData = of(gmcRef5, coreDTO5);
         stubCoreRequest(coreData);
 
-        final var requestDTO = RevalidationRequestDTO.builder()
+        final var requestDTO = TraineeRequestDTO.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .searchQuery(doc5.getDoctorLastName())
@@ -148,7 +148,7 @@ public class DoctorsSearchIT extends BaseIT {
         final var coreData = of(gmcRef2, coreDTO2, gmcRef4, coreDTO4);
         stubCoreRequest(coreData);
 
-        final var requestDTO = RevalidationRequestDTO.builder()
+        final var requestDTO = TraineeRequestDTO.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .searchQuery("smith")
@@ -200,7 +200,7 @@ public class DoctorsSearchIT extends BaseIT {
         final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef4, coreDTO4, gmcRef5, coreDTO5);
         stubCoreRequest(coreData);
 
-        final var requestDTO = RevalidationRequestDTO.builder()
+        final var requestDTO = TraineeRequestDTO.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .searchQuery("aqa")
@@ -292,7 +292,7 @@ public class DoctorsSearchIT extends BaseIT {
         final var coreData = of(this.gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef4, coreDTO4);
         stubCoreRequest(coreData);
 
-        final var requestDTO = RevalidationRequestDTO.builder()
+        final var requestDTO = TraineeRequestDTO.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .underNotice(true)
@@ -370,7 +370,7 @@ public class DoctorsSearchIT extends BaseIT {
         final var coreData = of(gmcRef2, coreDTO2, gmcRef4, coreDTO4);
         stubCoreRequest(coreData);
 
-        final var requestDTO = RevalidationRequestDTO.builder()
+        final var requestDTO = TraineeRequestDTO.builder()
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .underNotice(true)

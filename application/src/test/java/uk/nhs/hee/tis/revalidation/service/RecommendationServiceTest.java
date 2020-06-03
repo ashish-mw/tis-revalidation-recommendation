@@ -105,7 +105,6 @@ public class RecommendationServiceTest {
     private String designatedBodyCode;
     private RecommendationStatus status;
     private LocalDate cctDate;
-    private String programmeName;
     private String programmeMembershipType;
     private String currentGrade;
 
@@ -124,6 +123,7 @@ public class RecommendationServiceTest {
     private String gmcNumber1, gmcNumber2;
     private List<String> comments;
     private String recommendationId, newRecommendationId;
+    private String snapshotRevalidationId1, snapshotRevalidationId2;
     private List<DeferralReasonDto> deferralReasons;
 
     @Before
@@ -138,7 +138,6 @@ public class RecommendationServiceTest {
         sanction = faker.lorem().characters(2);
         designatedBodyCode = faker.lorem().characters(7);
         cctDate = LocalDate.now();
-        programmeName = faker.lorem().sentence(3);
         programmeMembershipType = faker.lorem().characters(10);
         currentGrade = faker.lorem().characters(5);
 
@@ -153,6 +152,7 @@ public class RecommendationServiceTest {
         acutalSubmissionDate1 = "2018-03-15";
         admin1 = faker.funnyName().name();
         gmcRecommendationId1 = faker.number().digits(10);
+        snapshotRevalidationId1 = faker.number().digits(10);
 
         deferralComment2 = faker.lorem().characters(20);
         deferralDate2 = LocalDate.of(2018, 03, 15);
@@ -165,6 +165,7 @@ public class RecommendationServiceTest {
         acutalSubmissionDate2 = "2018-03-15";
         admin2 = faker.funnyName().name();
         gmcRecommendationId2 = faker.number().digits(10);
+        snapshotRevalidationId2 = faker.number().digits(10);
 
         gmcNumber1 = faker.number().digits(7);
         gmcNumber2 = faker.number().digits(7);
@@ -200,6 +201,7 @@ public class RecommendationServiceTest {
         when(snapshotRevalidation1.getGmcSubmissionDateTime()).thenReturn(gmcSubmissionDate1);
         when(snapshotRevalidation1.getSubmissionDate()).thenReturn(acutalSubmissionDate1);
         when(snapshotRevalidation1.getGmcRecommendationId()).thenReturn(gmcRecommendationId1);
+        when(snapshotRevalidation1.getId()).thenReturn(snapshotRevalidationId1);
 
         when(snapshot2.getRevalidation()).thenReturn(snapshotRevalidation2);
         when(snapshotRevalidation2.getAdmin()).thenReturn(admin2);
@@ -211,6 +213,7 @@ public class RecommendationServiceTest {
         when(snapshotRevalidation2.getGmcSubmissionDateTime()).thenReturn(gmcSubmissionDate2);
         when(snapshotRevalidation2.getSubmissionDate()).thenReturn(acutalSubmissionDate2);
         when(snapshotRevalidation2.getGmcRecommendationId()).thenReturn(gmcRecommendationId2);
+        when(snapshotRevalidation2.getId()).thenReturn(snapshotRevalidationId2);
 
         final var recommendation = recommendationService.getTraineeInfo(gmcId);
         assertThat(recommendation.getGmcNumber(), is(gmcId));
@@ -233,6 +236,7 @@ public class RecommendationServiceTest {
         assertThat(revalidationDTO.getRecommendationStatus(), is(revalidationStatus1));
         assertThat(revalidationDTO.getGmcSubmissionDate(), is(formatDateTime(gmcSubmissionDate1)));
         assertThat(revalidationDTO.getActualSubmissionDate(), is(formatDate(acutalSubmissionDate1)));
+        assertThat(revalidationDTO.getRecommendationId(), is(snapshotRevalidationId1));
 
         revalidationDTO = recommendation.getRevalidations().get(1);
         assertThat(revalidationDTO.getGmcNumber(), is(gmcId));
@@ -245,6 +249,7 @@ public class RecommendationServiceTest {
         assertThat(revalidationDTO.getRecommendationStatus(), is(revalidationStatus2));
         assertThat(revalidationDTO.getGmcSubmissionDate(), is(formatDateTime(gmcSubmissionDate2)));
         assertThat(revalidationDTO.getActualSubmissionDate(), is(formatDate(acutalSubmissionDate2)));
+        assertThat(revalidationDTO.getRecommendationId(), is(snapshotRevalidationId2));
 
         revalidationDTO = recommendation.getRevalidations().get(2);
         assertNull(revalidationDTO.getGmcOutcome());
@@ -254,6 +259,7 @@ public class RecommendationServiceTest {
         assertThat(revalidationDTO.getGmcSubmissionDate(), is(submissionDate));
         assertThat(revalidationDTO.getActualSubmissionDate(), is(actualSubmissionDate));
         assertThat(revalidationDTO.getRecommendationId(), is(recommendationId));
+        assertThat(revalidationDTO.getComments(), is(comments));
     }
 
     @Test
@@ -312,6 +318,7 @@ public class RecommendationServiceTest {
         assertThat(revalidationDTO.getRecommendationStatus(), is(SUBMITTED_TO_GMC.name()));
         assertThat(revalidationDTO.getGmcSubmissionDate(), is(submissionDate));
         assertThat(revalidationDTO.getActualSubmissionDate(), is(actualSubmissionDate));
+        assertThat(revalidationDTO.getComments(), is(comments));
     }
 
     @Test
@@ -571,6 +578,7 @@ public class RecommendationServiceTest {
                 .gmcRevalidationId(gmcRecommendationId2)
                 .gmcSubmissionDate(submissionDate)
                 .actualSubmissionDate(actualSubmissionDate)
+                .comments(comments)
                 .build();
     }
 }

@@ -223,6 +223,7 @@ public class RecommendationServiceTest {
 
         assertThat(recommendation.getRevalidations(), hasSize(3));
         var revalidationDTO = recommendation.getRevalidations().get(0);
+        assertThat(revalidationDTO.getGmcNumber(), is(gmcId));
         assertThat(revalidationDTO.getDeferralReason(), is(deferralResaon1));
         assertThat(revalidationDTO.getDeferralDate(), is(deferralDate1));
         assertThat(revalidationDTO.getDeferralComment(), is(deferralComment1));
@@ -234,6 +235,7 @@ public class RecommendationServiceTest {
         assertThat(revalidationDTO.getActualSubmissionDate(), is(formatDate(acutalSubmissionDate1)));
 
         revalidationDTO = recommendation.getRevalidations().get(1);
+        assertThat(revalidationDTO.getGmcNumber(), is(gmcId));
         assertThat(revalidationDTO.getDeferralReason(), is(deferralResaon2));
         assertThat(revalidationDTO.getDeferralDate(), is(deferralDate2));
         assertThat(revalidationDTO.getDeferralComment(), is(deferralComment2));
@@ -251,6 +253,7 @@ public class RecommendationServiceTest {
         assertThat(revalidationDTO.getRecommendationStatus(), is(status.name()));
         assertThat(revalidationDTO.getGmcSubmissionDate(), is(submissionDate));
         assertThat(revalidationDTO.getActualSubmissionDate(), is(actualSubmissionDate));
+        assertThat(revalidationDTO.getRecommendationId(), is(recommendationId));
     }
 
     @Test

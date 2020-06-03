@@ -30,7 +30,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.*;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.*;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.READY_TO_REVIEW;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.SUBMITTED_TO_GMC;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.*;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDate;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDateTime;
@@ -357,11 +358,11 @@ public class RecommendationIT extends BaseIT {
         final String lastDigit = gmcReferenceNumber.substring(gmcReferenceNumber.length() - 1);
 
         if (lastDigit.matches("[012]")) {
-            return UNDER_REVIEW.name();
+            return UNDER_REVIEW.getOutcome();
         } else if (lastDigit.matches("[345]")) {
-            return REJECTED.name();
+            return REJECTED.getOutcome();
         } else {
-            return APPROVED.name();
+            return APPROVED.getOutcome();
         }
     }
 }

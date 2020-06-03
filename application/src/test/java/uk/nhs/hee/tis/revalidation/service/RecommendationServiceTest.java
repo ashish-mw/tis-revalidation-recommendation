@@ -1,5 +1,7 @@
 package uk.nhs.hee.tis.revalidation.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,11 +33,14 @@ import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.*;
 import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.INVALID_RECOMMENDATION;
 import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.SUCCESS;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.NOT_STARTED;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.SUBMITTED_TO_GMC;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.*;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDate;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDateTime;
@@ -93,6 +98,7 @@ public class RecommendationServiceTest {
     private String firstName;
     private String lastName;
     private LocalDate submissionDate;
+    private LocalDate actualSubmissionDate;
     private LocalDate dateAdded;
     private UnderNotice underNotice;
     private String sanction;
@@ -117,15 +123,16 @@ public class RecommendationServiceTest {
 
     private String gmcNumber1, gmcNumber2;
     private List<String> comments;
-    private String recommendationId;
+    private String recommendationId, newRecommendationId;
     private List<DeferralReasonDto> deferralReasons;
 
     @Before
     public void setup() {
         firstName = faker.name().firstName();
         lastName = faker.name().lastName();
-        status = RecommendationStatus.NOT_STARTED;
+        status = NOT_STARTED;
         submissionDate = LocalDate.now();
+        actualSubmissionDate = LocalDate.now();
         dateAdded = LocalDate.now();
         underNotice = faker.options().option(UnderNotice.class);
         sanction = faker.lorem().characters(2);
@@ -141,7 +148,7 @@ public class RecommendationServiceTest {
         deferralSubResaon1 = "4";
         revalidatonType1 = faker.options().option(RecommendationType.class).name();
         revalidationStatus1 = faker.options().option(RecommendationStatus.class).name();
-        gmcOutcome1 = RecommendationGmcOutcome.APPROVED.name();
+        gmcOutcome1 = RecommendationGmcOutcome.APPROVED.getOutcome();
         gmcSubmissionDate1 = "2018-03-15 12:00:00";
         acutalSubmissionDate1 = "2018-03-15";
         admin1 = faker.funnyName().name();
@@ -153,7 +160,7 @@ public class RecommendationServiceTest {
         deferralSubResaon2 = null;
         revalidatonType2 = faker.options().option(RecommendationType.class).name();
         revalidationStatus2 = faker.options().option(RecommendationStatus.class).name();
-        gmcOutcome2 = RecommendationGmcOutcome.APPROVED.name();
+        gmcOutcome2 = RecommendationGmcOutcome.APPROVED.getOutcome();
         gmcSubmissionDate2 = "2018-03-15 12:00:00";
         acutalSubmissionDate2 = "2018-03-15";
         admin2 = faker.funnyName().name();
@@ -163,6 +170,7 @@ public class RecommendationServiceTest {
         gmcNumber2 = faker.number().digits(7);
         comments = List.of(faker.lorem().sentence(3), faker.lorem().sentence(3), faker.lorem().sentence(7));
         recommendationId = faker.lorem().characters(10);
+        newRecommendationId = faker.lorem().characters(10);
         deferralReasons = List.of(new DeferralReasonDto("1", "evidence", List.of()), new DeferralReasonDto("2", "ongoing", List.of()));
     }
 
@@ -172,6 +180,7 @@ public class RecommendationServiceTest {
         when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(buildDoctorForDB(gmcId)));
         when(traineeCoreService.getTraineeInformationFromCore(List.of(gmcId))).thenReturn(Map.of(gmcId, traineeCoreDTO));
         when(snapshotRepository.findByGmcNumber(gmcId)).thenReturn(List.of(snapshot1, snapshot2));
+        when(recommendationRepository.findByGmcNumber(gmcId)).thenReturn(List.of(buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE)));
         when(gmcClientService.checkRecommendationStatus(gmcId, gmcRecommendationId1, gmcId, designatedBodyCode))
                 .thenReturn(buildCheckStatusResponse("0", "Approved"));
         when(gmcClientService.checkRecommendationStatus(gmcId, gmcRecommendationId2, gmcId, designatedBodyCode))
@@ -212,7 +221,7 @@ public class RecommendationServiceTest {
         assertThat(recommendation.getCurrentGrade(), is(currentGrade));
         assertThat(recommendation.getDeferralReasons(), hasSize(2));
 
-        assertThat(recommendation.getRevalidations(), hasSize(2));
+        assertThat(recommendation.getRevalidations(), hasSize(3));
         var revalidationDTO = recommendation.getRevalidations().get(0);
         assertThat(revalidationDTO.getDeferralReason(), is(deferralResaon1));
         assertThat(revalidationDTO.getDeferralDate(), is(deferralDate1));
@@ -235,6 +244,71 @@ public class RecommendationServiceTest {
         assertThat(revalidationDTO.getGmcSubmissionDate(), is(formatDateTime(gmcSubmissionDate2)));
         assertThat(revalidationDTO.getActualSubmissionDate(), is(formatDate(acutalSubmissionDate2)));
 
+        revalidationDTO = recommendation.getRevalidations().get(2);
+        assertNull(revalidationDTO.getGmcOutcome());
+        assertThat(revalidationDTO.getAdmin(), is(admin1));
+        assertThat(revalidationDTO.getRecommendationType(), is(REVALIDATE.getType()));
+        assertThat(revalidationDTO.getRecommendationStatus(), is(status.name()));
+        assertThat(revalidationDTO.getGmcSubmissionDate(), is(submissionDate));
+        assertThat(revalidationDTO.getActualSubmissionDate(), is(actualSubmissionDate));
+    }
+
+    @Test
+    public void shouldReturnCurrentRecommendationWhichAreSubmittedToGMC() throws ParseException {
+        final var gmcId = faker.number().digits(7);
+        when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(buildDoctorForDB(gmcId)));
+        when(traineeCoreService.getTraineeInformationFromCore(List.of(gmcId))).thenReturn(Map.of(gmcId, traineeCoreDTO));
+        when(snapshotRepository.findByGmcNumber(gmcId)).thenReturn(List.of(snapshot1));
+        when(recommendationRepository.findByGmcNumber(gmcId)).thenReturn(List.of(buildRecommendation(gmcId, newRecommendationId,
+                SUBMITTED_TO_GMC, REVALIDATE)));
+        when(gmcClientService.checkRecommendationStatus(gmcId, gmcRecommendationId1, gmcId, designatedBodyCode))
+                .thenReturn(buildCheckStatusResponse("0", "Approved"));
+        when(gmcClientService.checkRecommendationStatus(gmcId, gmcRecommendationId2, newRecommendationId, designatedBodyCode))
+                .thenReturn(buildCheckStatusResponse("0", "Under Review"));
+        when(deferralReasonService.getAllDeferralReasons()).thenReturn(deferralReasons);
+        when(traineeCoreDTO.getCctDate()).thenReturn(cctDate);
+        when(traineeCoreDTO.getProgrammeMembershipType()).thenReturn(programmeMembershipType);
+        when(traineeCoreDTO.getCurrentGrade()).thenReturn(currentGrade);
+
+        when(snapshot1.getRevalidation()).thenReturn(snapshotRevalidation1);
+        when(snapshotRevalidation1.getAdmin()).thenReturn(admin1);
+        when(snapshotRevalidation1.getDeferralComment()).thenReturn(deferralComment1);
+        when(snapshotRevalidation1.getDeferralReason()).thenReturn(deferralResaon1);
+        when(snapshotRevalidation1.getDeferralDate()).thenReturn(deferralDate1.toString());
+        when(snapshotRevalidation1.getRevalidationStatusCode()).thenReturn(revalidationStatus1);
+        when(snapshotRevalidation1.getProposedOutcomeCode()).thenReturn(revalidatonType1);
+        when(snapshotRevalidation1.getGmcSubmissionDateTime()).thenReturn(gmcSubmissionDate1);
+        when(snapshotRevalidation1.getSubmissionDate()).thenReturn(acutalSubmissionDate1);
+        when(snapshotRevalidation1.getGmcRecommendationId()).thenReturn(gmcRecommendationId1);
+
+        final var recommendation = recommendationService.getTraineeInfo(gmcId);
+        assertThat(recommendation.getGmcNumber(), is(gmcId));
+        assertThat(recommendation.getFullName(), is(getFullName(firstName, lastName)));
+        assertThat(recommendation.getUnderNotice(), is(underNotice.value()));
+        assertThat(recommendation.getCctDate(), is(cctDate));
+        assertThat(recommendation.getProgrammeMembershipType(), is(programmeMembershipType));
+        assertThat(recommendation.getCurrentGrade(), is(currentGrade));
+        assertThat(recommendation.getDeferralReasons(), hasSize(2));
+
+        assertThat(recommendation.getRevalidations(), hasSize(2));
+        var revalidationDTO = recommendation.getRevalidations().get(0);
+        assertThat(revalidationDTO.getDeferralReason(), is(deferralResaon1));
+        assertThat(revalidationDTO.getDeferralDate(), is(deferralDate1));
+        assertThat(revalidationDTO.getDeferralComment(), is(deferralComment1));
+        assertThat(revalidationDTO.getAdmin(), is(admin1));
+        assertThat(revalidationDTO.getGmcOutcome(), is(gmcOutcome1));
+        assertThat(revalidationDTO.getRecommendationType(), is(revalidatonType1));
+        assertThat(revalidationDTO.getRecommendationStatus(), is(revalidationStatus1));
+        assertThat(revalidationDTO.getGmcSubmissionDate(), is(formatDateTime(gmcSubmissionDate1)));
+        assertThat(revalidationDTO.getActualSubmissionDate(), is(formatDate(acutalSubmissionDate1)));
+
+        revalidationDTO = recommendation.getRevalidations().get(1);
+        assertThat(revalidationDTO.getGmcOutcome(), is(RecommendationGmcOutcome.UNDER_REVIEW.getOutcome()));
+        assertThat(revalidationDTO.getAdmin(), is(admin1));
+        assertThat(revalidationDTO.getRecommendationType(), is(REVALIDATE.getType()));
+        assertThat(revalidationDTO.getRecommendationStatus(), is(SUBMITTED_TO_GMC.name()));
+        assertThat(revalidationDTO.getGmcSubmissionDate(), is(submissionDate));
+        assertThat(revalidationDTO.getActualSubmissionDate(), is(actualSubmissionDate));
     }
 
     @Test
@@ -253,12 +327,15 @@ public class RecommendationServiceTest {
     }
 
     @Test
-    public void shouldSaveRevalidateRecommendationInDraftState() {
+    public void shouldSaveRevalidateRecommendationInDraftState() throws JsonProcessingException {
         final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcNumber1)
                 .recommendationType(REVALIDATE.name())
                 .comments(comments)
                 .build();
+
+        final var s = new ObjectMapper().writeValueAsString(recordDTO);
+        System.out.println(s);
 
         when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
         when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
@@ -352,7 +429,7 @@ public class RecommendationServiceTest {
 
     @Test
     public void shouldSubmitRecommendation() {
-        final var recommendation = buildRecommendation();
+        final var recommendation = buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE);
         when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
         when(recommendationRepository.findByIdAndGmcNumber(recommendationId, gmcNumber1)).thenReturn(recommendation);
         when(gmcClientService.submitToGmc(doctorsForDB, recommendation)).thenReturn(buildRecommendationV2Response(SUCCESS.getCode()));
@@ -362,7 +439,7 @@ public class RecommendationServiceTest {
 
     @Test
     public void shouldNotUpdateRecommendationWhenSubmitFail() {
-        final var recommendation = buildRecommendation();
+        final var recommendation = buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE);
         when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
         when(recommendationRepository.findByIdAndGmcNumber(recommendationId, gmcNumber1)).thenReturn(recommendation);
         when(gmcClientService.submitToGmc(doctorsForDB, recommendation)).thenReturn(buildRecommendationV2Response(INVALID_RECOMMENDATION.getCode()));
@@ -379,7 +456,7 @@ public class RecommendationServiceTest {
                 .comments(comments)
                 .build();
 
-        when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.of(buildRecommendation()));
+        when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.of(buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE)));
         when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
         when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
 
@@ -397,7 +474,7 @@ public class RecommendationServiceTest {
                 .comments(comments)
                 .build();
 
-        when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.of(buildRecommendation()));
+        when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.of(buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE)));
         when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
         when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
 
@@ -419,7 +496,7 @@ public class RecommendationServiceTest {
                 .comments(comments)
                 .build();
 
-        when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.of(buildRecommendation()));
+        when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.of(buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE)));
         when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
         when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
         when(deferralReasonService.getDeferralReasonByCode(deferralResaon1)).thenReturn(deferralReason);
@@ -480,11 +557,17 @@ public class RecommendationServiceTest {
         return tryRecommendationV2Response;
     }
 
-    private Recommendation buildRecommendation() {
+    private Recommendation buildRecommendation(final String gmcId, final String recommendationId,
+                                               final RecommendationStatus status, final RecommendationType recommendationType) {
         return Recommendation.builder()
                 .id(recommendationId)
-                .gmcNumber(gmcNumber1)
-                .recommendationType(REVALIDATE)
+                .gmcNumber(gmcId)
+                .recommendationStatus(status)
+                .recommendationType(recommendationType)
+                .admin(admin1)
+                .gmcRevalidationId(gmcRecommendationId2)
+                .gmcSubmissionDate(submissionDate)
+                .actualSubmissionDate(actualSubmissionDate)
                 .build();
     }
 }

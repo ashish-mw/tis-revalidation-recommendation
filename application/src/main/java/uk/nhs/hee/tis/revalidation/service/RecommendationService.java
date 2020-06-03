@@ -179,6 +179,8 @@ public class RecommendationService {
                         rec.getId(), doctorsForDB.getDesignatedBodyCode());
             }
             return TraineeRecommendationRecordDto.builder()
+                    .gmcNumber(gmcId)
+                    .recommendationId(rec.getId())
                     .deferralDate(rec.getDeferralDate())
                     .deferralReason(rec.getDeferralReason())
                     .deferralSubReason(rec.getDeferralSubReason())
@@ -194,6 +196,7 @@ public class RecommendationService {
         final var snapshotRecommendations = snapshots.stream().map(snapshot -> {
             final var revalidation = snapshot.getRevalidation();
             return TraineeRecommendationRecordDto.builder()
+                    .gmcNumber(gmcId)
                     .deferralDate(formatDate(revalidation.getDeferralDate()))
                     .deferralReason(revalidation.getDeferralReason())
                     .deferralComment(revalidation.getDeferralComment())

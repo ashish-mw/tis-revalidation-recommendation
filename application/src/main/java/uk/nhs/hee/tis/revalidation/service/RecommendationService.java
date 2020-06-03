@@ -134,6 +134,7 @@ public class RecommendationService {
     }
 
     public boolean submitRecommendation(final String recommendationId, final String gmcNumber) {
+        log.info("submitting request to gmc for recommendation: {} and gmcNumber: {}", recommendationId, gmcNumber);
         final var doctorsForDB = doctorsForDBRepository.findById(gmcNumber);
         final var recommendation = findRecommendationByIdAndGmcNumber(recommendationId, gmcNumber);
 

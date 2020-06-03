@@ -86,7 +86,7 @@ public class RecommendationController {
     public ResponseEntity submitRecommendation(@PathVariable("gmcId") final String gmcNumber,
                                                @PathVariable("recommendationId") final String recommendationId) {
 
-        service.submitRecommendation(gmcNumber, recommendationId);
+        service.submitRecommendation(recommendationId, gmcNumber);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

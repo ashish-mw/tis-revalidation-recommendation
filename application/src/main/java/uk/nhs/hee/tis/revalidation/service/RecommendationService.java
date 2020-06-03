@@ -191,12 +191,14 @@ public class RecommendationService {
                     .gmcSubmissionDate(doctorsForDB.getSubmissionDate())
                     .actualSubmissionDate(rec.getActualSubmissionDate())
                     .admin(rec.getAdmin())
+                    .comments(rec.getComments())
                     .build();
         }).collect(toList());
 
         final var snapshotRecommendations = snapshots.stream().map(snapshot -> {
             final var revalidation = snapshot.getRevalidation();
             return TraineeRecommendationRecordDto.builder()
+                    .recommendationId(revalidation.getId())
                     .gmcNumber(gmcId)
                     .deferralDate(formatDate(revalidation.getDeferralDate()))
                     .deferralReason(revalidation.getDeferralReason())

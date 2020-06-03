@@ -73,6 +73,7 @@ public class RecommendationIT extends BaseIT {
     private String submissionDate1, submissionDate2;
     private String recommendationSubmitter1, recommendationSubmitter2;
     private String dateAdded1, dateAdded2;
+    private String snapshotRevalidationId1, snapshotRevalidationId2;
 
     private Snapshot snapshot1, snapshot2;
     private SnapshotRevalidation snapshotRevalidation1, snapshotRevalidation2;
@@ -111,6 +112,7 @@ public class RecommendationIT extends BaseIT {
         assertThat(revalidationDTO.getRecommendationStatus(), is(revalidationStatusCode1));
         assertThat(revalidationDTO.getRecommendationType(), is(proposedOutcomeCode1));
         assertThat(revalidationDTO.getGmcOutcome(), is(gmcOutcomeCode1));
+        assertThat(revalidationDTO.getRecommendationId(), is(snapshotRevalidationId1));
 
         revalidationDTO = recommendation.getRevalidations().get(1);
         assertThat(revalidationDTO.getDeferralComment(), is(deferralComment2));
@@ -122,6 +124,7 @@ public class RecommendationIT extends BaseIT {
         assertThat(revalidationDTO.getRecommendationStatus(), is(revalidationStatusCode2));
         assertThat(revalidationDTO.getRecommendationType(), is(proposedOutcomeCode2));
         assertThat(revalidationDTO.getGmcOutcome(), is(gmcOutcomeCode2));
+        assertThat(revalidationDTO.getRecommendationId(), is(snapshotRevalidationId2));
     }
 
     @Test
@@ -318,6 +321,7 @@ public class RecommendationIT extends BaseIT {
         submissionDate1 = "2018-03-15";
         recommendationSubmitter1 = admin1;
         dateAdded1 = "2018-04-15";
+        snapshotRevalidationId1 = faker.number().digits(10);
 
         proposedOutcomeCode2 = faker.options().option(RecommendationType.class).name();
         deferralDate2 = "2018-03-15";
@@ -334,12 +338,13 @@ public class RecommendationIT extends BaseIT {
         submissionDate2 = "2018-03-15";
         recommendationSubmitter2 = admin1;
         dateAdded2 = "2018-04-15";
+        snapshotRevalidationId2 = faker.number().digits(10);
 
-        snapshotRevalidation1 = new SnapshotRevalidation(proposedOutcomeCode1, deferralDate1, deferralReason1, deferralComment1,
+        snapshotRevalidation1 = new SnapshotRevalidation(snapshotRevalidationId1, proposedOutcomeCode1, deferralDate1, deferralReason1, deferralComment1,
                 revalidationStatusCode1, gmcSubmissionDateTime1, gmcSubmissionReturnCode1, gmcRecommendationId1, gmcOutcomeCode1,
                 gmcStatusCheckDateTime1, admin1, submissionDate1, recommendationSubmitter1, dateAdded1);
 
-        snapshotRevalidation2 = new SnapshotRevalidation(proposedOutcomeCode2, deferralDate2, deferralReason2, deferralComment2,
+        snapshotRevalidation2 = new SnapshotRevalidation(snapshotRevalidationId2, proposedOutcomeCode2, deferralDate2, deferralReason2, deferralComment2,
                 revalidationStatusCode2, gmcSubmissionDateTime2, gmcSubmissionReturnCode2, gmcRecommendationId2, gmcOutcomeCode2,
                 gmcStatusCheckDateTime2, admin2, submissionDate2, recommendationSubmitter2, dateAdded2);
 

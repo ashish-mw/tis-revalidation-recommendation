@@ -9,7 +9,11 @@ import org.springframework.ws.soap.client.core.SoapActionCallback;
 import uk.nhs.hee.tis.gmc.client.generated.*;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.Recommendation;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 
+import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.SUCCESS;
+import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.fromCode;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.UNDER_REVIEW;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.DEFER;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.convertDateInGmcFormat;
 
@@ -31,19 +35,32 @@ public class GmcClientService {
     @Value("${app.gmc.gmcPassword}")
     private String gmcPassword;
 
-    public CheckRecommendationStatusResponse checkRecommendationStatus(final String gmcNumber,
-                                                                       final String gmcRecommendationId,
-                                                                       final String recommendationId,
-                                                                       final String designatedBody) {
+    public String checkRecommendationStatus(final String gmcNumber,
+                                            final String gmcRecommendationId,
+                                            final String recommendationId,
+                                            final String designatedBody) {
 
 
         final var checkRecommendationStatus =
                 buildCheckRecommendationStatusRequest(gmcNumber, gmcRecommendationId, recommendationId, designatedBody);
         log.info("GMC Connect Url {}", gmcConnectUrl);
-        return (CheckRecommendationStatusResponse) webServiceTemplate
+        final var checkRecommendationStatusResponse = (CheckRecommendationStatusResponse) webServiceTemplate
                 .marshalSendAndReceive(gmcConnectUrl, checkRecommendationStatus,
                         new SoapActionCallback(gmcConnectUrl));
 
+
+        final var checkRecommendationStatusResult = checkRecommendationStatusResponse.getCheckRecommendationStatusResult();
+        final var gmdReturnCode = checkRecommendationStatusResult.getReturnCode();
+        if (SUCCESS.getCode().equals(gmdReturnCode)) {
+            final var status = checkRecommendationStatusResult.getStatus();
+            return RecommendationGmcOutcome.fromString(status).getOutcome();
+        } else {
+            final var responseCode = fromCode(gmdReturnCode);
+            log.error("Gmc recommendation check status request is failed for GmcId: {} and recommendationId: {} with Response: {}." +
+                    " Recommendation will stay in Under Review state", gmcNumber, recommendationId, responseCode.getMessage());
+        }
+
+        return UNDER_REVIEW.getOutcome();
     }
 
     public TryRecommendationV2Response submitToGmc(final DoctorsForDB doctorForDB, final Recommendation recommendation) {

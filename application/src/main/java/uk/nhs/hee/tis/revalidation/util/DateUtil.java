@@ -10,15 +10,14 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 public class DateUtil {
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter GMC_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public static LocalDate formatDateTime(final String date) {
         log.info("Parsing date time for given date: {}", date);
         if (!StringUtils.isEmpty(date)) {
-            final var localDateTime = LocalDateTime.parse(date, DATE_TIME_FORMATTER);
-            return LocalDate.of(localDateTime.getYear(), localDateTime.getMonth(), localDateTime.getDayOfMonth());
+            final var dateWithoutTime = date.contains(" ") ? date.substring(0, date.indexOf(" ")) : date;
+            return formatDate(dateWithoutTime);
         }
 
         return null;
@@ -31,6 +30,10 @@ public class DateUtil {
         }
 
         return null;
+    }
+
+    public static String parseDate(final LocalDate date) {
+        return date != null ? date.toString() : null;
     }
 
     public static String convertDateInGmcFormat(final LocalDate date) {

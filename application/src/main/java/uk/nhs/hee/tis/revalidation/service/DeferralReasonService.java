@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.revalidation.dto.DeferralReasonDto;
 import uk.nhs.hee.tis.revalidation.entity.DeferralReason;
-import uk.nhs.hee.tis.revalidation.exception.InvalidDeferralReasonException;
+import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DeferralReasonRepository;
 
 import javax.annotation.PostConstruct;
@@ -45,7 +45,7 @@ public class DeferralReasonService {
     public DeferralReason getDeferralReasonByCode(final String reasonCode) {
         final var deferralReason = deferralReasonRepository.findById(reasonCode);
         if (deferralReason.isEmpty()) {
-            throw new InvalidDeferralReasonException("Deferral Reason code is invalid");
+            throw new RecommendationException("Deferral Reason code is invalid");
         }
         return deferralReason.get();
     }

@@ -246,20 +246,37 @@ public class RecommendationIT extends BaseIT {
         //check if status is changes
         final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
         assertTrue(recommendationById.isPresent());
-        assertThat(recommendationById.get().getRecommendationStatus(), is(SUBMITTED_TO_GMC));
+        final var savedRecommendation = recommendationById.get();
+        assertThat(savedRecommendation.getRecommendationStatus(), is(SUBMITTED_TO_GMC));
+        //check if recommendation is store in snapshot
+        final var snapshotRecommendationList = snapshotRepository.findByGmcNumber(gmcRef1);
+        final var snapshotRecommendation = snapshotRecommendationList.stream().filter(ss -> ss.getRevalidation().getId().equals(recommendation.getId())).findFirst();
+        assertTrue(snapshotRecommendation.isPresent());
+        final var snapshot = snapshotRecommendation.get();
+        assertThat(snapshot.getGmcNumber(), is(gmcRef1));
+        assertThat(snapshot.getRevalidation().getId(), is(savedRecommendation.getId()));
+        assertThat(snapshot.getRevalidation().getProposedOutcomeCode(), is(REVALIDATE.getType()));
+        assertThat(snapshot.getRevalidation().getDeferralDate(), is(nullValue()));
+        assertThat(snapshot.getRevalidation().getDeferralReason(), is(nullValue()));
+        assertThat(snapshot.getRevalidation().getGmcOutcomeCode(), is(savedRecommendation.getOutcome().getOutcome()));
+        assertThat(snapshot.getRevalidation().getSubmissionDate(), is(savedRecommendation.getActualSubmissionDate().toString()));
+        assertThat(snapshot.getRevalidation().getGmcSubmissionDateTime(), is(savedRecommendation.getGmcSubmissionDate().toString()));
+        assertThat(snapshot.getRevalidation().getRevalidationStatusCode(), is(savedRecommendation.getRecommendationStatus().name()));
     }
 
     @Test
     public void shouldSubmitDeferRecommendation() {
         doctorsForDBRepository.saveAll(List.of(doc1));
         final var deferralReasonByCode = deferralReasonService.getDeferralReasonByCode("1");
+        final var deferralSubReason = deferralReasonByCode.getDeferralSubReasons().get(0);
+        final var deferralDate = subDate1.plusDays(70);
         final var recordDTO = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcRef1)
                 .recommendationType(DEFER.name())
                 .comments(List.of("recommendation comments"))
                 .deferralReason(deferralReasonByCode.getCode())
-                .deferralSubReason(deferralReasonByCode.getDeferralSubReasons().get(0).getCode())
-                .deferralDate(subDate1.plusDays(70))
+                .deferralSubReason(deferralSubReason.getCode())
+                .deferralDate(deferralDate)
                 .build();
 
         final var recommendation = recommendationService.saveRecommendation(recordDTO);
@@ -269,7 +286,24 @@ public class RecommendationIT extends BaseIT {
         //check if status is changes
         final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
         assertTrue(recommendationById.isPresent());
-        assertThat(recommendationById.get().getRecommendationStatus(), is(SUBMITTED_TO_GMC));
+        final var savedRecommendation = recommendationById.get();
+        assertThat(savedRecommendation.getRecommendationStatus(), is(SUBMITTED_TO_GMC));
+        assertNotNull(savedRecommendation.getOutcome());
+        //check if recommendation is store in snapshot
+        final var snapshotRecommendationList = snapshotRepository.findByGmcNumber(gmcRef1);
+        final var snapshotRecommendation = snapshotRecommendationList.stream().filter(ss -> ss.getRevalidation().getId().equals(recommendation.getId())).findFirst();
+        assertTrue(snapshotRecommendation.isPresent());
+        final var snapshot = snapshotRecommendation.get();
+        assertThat(snapshot.getGmcNumber(), is(gmcRef1));
+        assertThat(snapshot.getRevalidation().getId(), is(savedRecommendation.getId()));
+        assertThat(snapshot.getRevalidation().getProposedOutcomeCode(), is(DEFER.getType()));
+        assertThat(snapshot.getRevalidation().getDeferralDate(), is(deferralDate.toString()));
+        assertThat(snapshot.getRevalidation().getDeferralReason(), is(deferralReasonByCode.getReason()));
+        assertThat(snapshot.getRevalidation().getDeferralSubReason(), is(deferralSubReason.getReason()));
+        assertThat(snapshot.getRevalidation().getGmcOutcomeCode(), is(savedRecommendation.getOutcome().getOutcome()));
+        assertThat(snapshot.getRevalidation().getSubmissionDate(), is(savedRecommendation.getActualSubmissionDate().toString()));
+        assertThat(snapshot.getRevalidation().getGmcSubmissionDateTime(), is(savedRecommendation.getGmcSubmissionDate().toString()));
+        assertThat(snapshot.getRevalidation().getRevalidationStatusCode(), is(savedRecommendation.getRecommendationStatus().name()));
     }
 
     @Test
@@ -306,7 +340,7 @@ public class RecommendationIT extends BaseIT {
     }
 
     private void setupSnapshotData() {
-        proposedOutcomeCode1 = faker.options().option(RecommendationType.class).name();
+        proposedOutcomeCode1 = faker.options().option(RecommendationType.class).getType();
         deferralDate1 = "2018-03-15";
         deferralReason1 = "1";
         deferralSubReason1 = "1";
@@ -323,7 +357,7 @@ public class RecommendationIT extends BaseIT {
         dateAdded1 = "2018-04-15";
         snapshotRevalidationId1 = faker.number().digits(10);
 
-        proposedOutcomeCode2 = faker.options().option(RecommendationType.class).name();
+        proposedOutcomeCode2 = faker.options().option(RecommendationType.class).getType();
         deferralDate2 = "2018-03-15";
         deferralReason2 = "2";
         deferralSubReason2 = null;
@@ -340,13 +374,13 @@ public class RecommendationIT extends BaseIT {
         dateAdded2 = "2018-04-15";
         snapshotRevalidationId2 = faker.number().digits(10);
 
-        snapshotRevalidation1 = new SnapshotRevalidation(snapshotRevalidationId1, proposedOutcomeCode1, deferralDate1, deferralReason1, deferralComment1,
-                revalidationStatusCode1, gmcSubmissionDateTime1, gmcSubmissionReturnCode1, gmcRecommendationId1, gmcOutcomeCode1,
-                gmcStatusCheckDateTime1, admin1, submissionDate1, recommendationSubmitter1, dateAdded1);
+        snapshotRevalidation1 = new SnapshotRevalidation(snapshotRevalidationId1, proposedOutcomeCode1, deferralDate1, deferralReason1, deferralSubReason1,
+                deferralComment1, revalidationStatusCode1, gmcSubmissionDateTime1, gmcSubmissionReturnCode1, gmcRecommendationId1, gmcOutcomeCode1,
+                gmcStatusCheckDateTime1, admin1, submissionDate1, recommendationSubmitter1, dateAdded1, List.of());
 
-        snapshotRevalidation2 = new SnapshotRevalidation(snapshotRevalidationId2, proposedOutcomeCode2, deferralDate2, deferralReason2, deferralComment2,
-                revalidationStatusCode2, gmcSubmissionDateTime2, gmcSubmissionReturnCode2, gmcRecommendationId2, gmcOutcomeCode2,
-                gmcStatusCheckDateTime2, admin2, submissionDate2, recommendationSubmitter2, dateAdded2);
+        snapshotRevalidation2 = new SnapshotRevalidation(snapshotRevalidationId2, proposedOutcomeCode2, deferralDate2, deferralReason2, deferralSubReason2,
+                deferralComment2, revalidationStatusCode2, gmcSubmissionDateTime2, gmcSubmissionReturnCode2, gmcRecommendationId2, gmcOutcomeCode2,
+                gmcStatusCheckDateTime2, admin2, submissionDate2, recommendationSubmitter2, dateAdded2, List.of());
 
         snapshot1 = new Snapshot(UUID.randomUUID().toString(), null, null, null, gmcRef1, snapshotRevalidation1);
         snapshot2 = new Snapshot(UUID.randomUUID().toString(), null, null, null, gmcRef1, snapshotRevalidation2);

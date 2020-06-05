@@ -84,6 +84,8 @@ public class RecommendationService {
 
     //save a new recommendation
     public Recommendation saveRecommendation(final TraineeRecommendationRecordDto recordDTO) {
+        isAllowedToCreateNewRecommendation(recordDTO.getGmcNumber(), recordDTO.getRecommendationId());
+
         final var doctorsForDB = doctorsForDBRepository.findById(recordDTO.getGmcNumber());
         final var submissionDate = doctorsForDB.get().getSubmissionDate();
 
@@ -117,7 +119,7 @@ public class RecommendationService {
                         .gmcSubmissionDate(submissionDate)
                         .build();
             } else {
-                throw new RecommendationException(format("Deferral date is invalid, should be in between of 60 and 365 days of Gmc Submission Date: %s",submissionDate));
+                throw new RecommendationException(format("Deferral date is invalid, should be in between of 60 and 365 days of Gmc Submission Date: %s", submissionDate));
             }
         }
 
@@ -214,6 +216,25 @@ public class RecommendationService {
         final var existingRecommendation = recommendationRepository.findById(recommendationId);
         if (existingRecommendation.isEmpty()) {
             throw new RecommendationException("No recommendation record found against given recommendationId");
+        }
+    }
+
+    //if recommendation for trainee is already in draft state, admin are not allowed to create a new one but allow to update
+    //if recommendation for trainee is Submitted to gmc but still in Under Review state, admin are not allowed to create a new one.
+    private void isAllowedToCreateNewRecommendation(final String gmcNumber, final String recommendationId) {
+        final var recommendations = recommendationRepository.findByGmcNumber(gmcNumber);
+        final var recommendation = recommendations.stream().filter(r -> {
+            if (r.getId().equals(recommendationId)) { //check if the request is for update
+                return false;
+            }
+            if (SUBMITTED_TO_GMC != r.getRecommendationStatus() || UNDER_REVIEW == r.getOutcome()) {
+                return true;
+            }
+            return false;
+        }).findFirst();
+
+        if (recommendation.isPresent()) {
+            throw new RecommendationException("Trainee already have an recommendation in draft state or waiting for approval from GMC.");
         }
     }
 }

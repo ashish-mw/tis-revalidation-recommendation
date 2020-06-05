@@ -1,7 +1,6 @@
 package uk.nhs.hee.tis.revalidation.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,8 +34,8 @@ import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.*;
 import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.INVALID_RECOMMENDATION;
 import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.SUCCESS;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.NOT_STARTED;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.SUBMITTED_TO_GMC;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.*;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.*;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.*;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDate;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDateTime;
@@ -137,7 +136,7 @@ public class RecommendationServiceTest {
         deferralSubResaon1 = "4";
         revalidatonType1 = faker.options().option(RecommendationType.class).name();
         revalidationStatus1 = faker.options().option(RecommendationStatus.class).name();
-        gmcOutcome1 = RecommendationGmcOutcome.APPROVED.getOutcome();
+        gmcOutcome1 = APPROVED.getOutcome();
         gmcSubmissionDate1 = "2018-03-15 12:00:00";
         acutalSubmissionDate1 = "2018-03-15";
         admin1 = faker.funnyName().name();
@@ -150,7 +149,7 @@ public class RecommendationServiceTest {
         deferralSubResaon2 = null;
         revalidatonType2 = faker.options().option(RecommendationType.class).name();
         revalidationStatus2 = faker.options().option(RecommendationStatus.class).name();
-        gmcOutcome2 = RecommendationGmcOutcome.APPROVED.getOutcome();
+        gmcOutcome2 = APPROVED.getOutcome();
         gmcSubmissionDate2 = "2018-03-15 12:00:00";
         acutalSubmissionDate2 = "2018-03-15";
         admin2 = faker.funnyName().name();
@@ -294,7 +293,7 @@ public class RecommendationServiceTest {
 
         assertThat(recommendation.getRevalidations(), hasSize(2));
         var revalidationDTO = recommendation.getRevalidations().get(0);
-        assertThat(revalidationDTO.getGmcOutcome(), is(RecommendationGmcOutcome.UNDER_REVIEW.getOutcome()));
+        assertThat(revalidationDTO.getGmcOutcome(), is(UNDER_REVIEW.getOutcome()));
         assertThat(revalidationDTO.getAdmin(), is(admin1));
         assertThat(revalidationDTO.getRecommendationType(), is(REVALIDATE.name()));
         assertThat(revalidationDTO.getRecommendationStatus(), is(SUBMITTED_TO_GMC.name()));
@@ -338,9 +337,6 @@ public class RecommendationServiceTest {
                 .recommendationType(REVALIDATE.name())
                 .comments(comments)
                 .build();
-
-        final var s = new ObjectMapper().writeValueAsString(recordDTO);
-        System.out.println(s);
 
         when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
         when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
@@ -461,7 +457,9 @@ public class RecommendationServiceTest {
                 .comments(comments)
                 .build();
 
-        when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.of(buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE)));
+        final var recommendation = buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE);
+        when(recommendationRepository.findByGmcNumber(gmcNumber1)).thenReturn(List.of(recommendation));
+        when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.of(recommendation));
         when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
         when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
 
@@ -522,6 +520,55 @@ public class RecommendationServiceTest {
                 .build();
 
         recommendationService.updateRecommendation(recordDTO);
+    }
+
+
+    @Test
+    public void shouldAllwedSaveRecommendationWhenOneAlreadyInSubmittedAndRejectedState() {
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcNumber1)
+                .recommendationType(REVALIDATE.name())
+                .comments(comments)
+                .build();
+
+        when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
+        when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
+        final var draftRecommendation1 = Recommendation.builder().id(recommendationId).gmcNumber(gmcNumber1)
+                .recommendationStatus(SUBMITTED_TO_GMC).outcome(REJECTED).build();
+        when(recommendationRepository.findByGmcNumber(gmcNumber1)).thenReturn(List.of(draftRecommendation1));
+
+        recommendationService.saveRecommendation(recordDTO);
+
+        verify(recommendationRepository).save(anyObject());
+    }
+
+    @Test (expected = RecommendationException.class)
+    public void shouldNotSaveRecommendationWhenOneAlreadyInDraft() throws JsonProcessingException {
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcNumber1)
+                .recommendationType(REVALIDATE.name())
+                .comments(comments)
+                .build();
+
+        final var draftRecommendation1 = Recommendation.builder().id(recommendationId).gmcNumber(gmcNumber1).recommendationStatus(READY_TO_REVIEW).build();
+        when(recommendationRepository.findByGmcNumber(gmcNumber1)).thenReturn(List.of(draftRecommendation1));
+
+        recommendationService.saveRecommendation(recordDTO);
+    }
+
+    @Test (expected = RecommendationException.class)
+    public void shouldNotSaveRecommendationWhenStatusIsSubmittedButStillUnderReview() throws JsonProcessingException {
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcNumber1)
+                .recommendationType(REVALIDATE.name())
+                .comments(comments)
+                .build();
+
+        final var draftRecommendation1 = Recommendation.builder().id(recommendationId).gmcNumber(gmcNumber1)
+                .recommendationStatus(SUBMITTED_TO_GMC).outcome(UNDER_REVIEW).build();
+        when(recommendationRepository.findByGmcNumber(gmcNumber1)).thenReturn(List.of(draftRecommendation1));
+
+        recommendationService.saveRecommendation(recordDTO);
     }
 
     private DoctorsForDB buildDoctorForDB(final String gmcId) {

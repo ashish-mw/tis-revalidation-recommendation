@@ -19,6 +19,16 @@ public class DateUtilTest {
     }
 
     @Test
+    public void shouldFormatDateTimeWithoutTime() {
+        final var dateToFormat = "2017-07-19";
+        final var localDateTime = DateUtil.formatDateTime(dateToFormat);
+        assertThat(localDateTime, is(notNullValue()));
+        assertThat(localDateTime.getYear(), is(2017));
+        assertThat(localDateTime.getMonthValue(), is(07));
+        assertThat(localDateTime.getDayOfMonth(), is(19));
+    }
+
+    @Test
     public void shouldFormatDate() {
         final var dateToFormat = "2017-07-19";
         final var localDate = DateUtil.formatDate(dateToFormat);

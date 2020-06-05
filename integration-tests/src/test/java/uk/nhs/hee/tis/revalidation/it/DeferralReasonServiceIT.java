@@ -9,7 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.nhs.hee.tis.revalidation.RevalidationApplication;
-import uk.nhs.hee.tis.revalidation.exception.InvalidDeferralReasonException;
+import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.service.DeferralReasonService;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -59,7 +59,7 @@ public class DeferralReasonServiceIT {
         assertThat(allDeferralReasons, hasSize(2));
     }
 
-    @Test(expected = InvalidDeferralReasonException.class)
+    @Test(expected = RecommendationException.class)
     public void shouldThrowExceptionWhenDeferralCodeIsInvalid() {
         final var allDeferralReasons = service.getDeferralReasonByCode("6");
     }

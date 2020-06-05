@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,6 +16,7 @@ public class SnapshotRevalidation {
     private String proposedOutcomeCode;
     private String deferralDate;
     private String deferralReason;
+    private String deferralSubReason;
     private String deferralComment;
     private String revalidationStatusCode;
     private String gmcSubmissionDateTime;
@@ -25,4 +28,5 @@ public class SnapshotRevalidation {
     private String submissionDate;
     private String recommendationSubmitter;
     private String dateAdded;
+    private List<String> comments;
 }

@@ -4,9 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
-import uk.nhs.hee.tis.revalidation.entity.*;
+import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
+import uk.nhs.hee.tis.revalidation.entity.Recommendation;
+import uk.nhs.hee.tis.revalidation.entity.Snapshot;
+import uk.nhs.hee.tis.revalidation.entity.SnapshotRevalidation;
 import uk.nhs.hee.tis.revalidation.repository.SnapshotRepository;
 
 import java.util.List;
@@ -70,7 +72,7 @@ public class SnapshotService {
                     .gmcOutcome(gmcClientService.checkRecommendationStatus(gmcId, snapshotRecommendation.getGmcRecommendationId(),
                             snapshotRecommendation.getId(), doctorsForDB.getDesignatedBodyCode()))
                     .recommendationStatus(toUpperCase(snapshotRecommendation.getRevalidationStatusCode()))
-                    .recommendationType(getRecommendationType(snapshotRecommendation.getProposedOutcomeCode()))
+                    .recommendationType(toUpperCase(snapshotRecommendation.getProposedOutcomeCode()))
                     .gmcSubmissionDate(formatDateTime(snapshotRecommendation.getGmcSubmissionDateTime()))
                     .actualSubmissionDate(formatDate(snapshotRecommendation.getSubmissionDate()))
                     .admin(snapshotRecommendation.getAdmin())
@@ -85,13 +87,6 @@ public class SnapshotService {
     private String getDeferralSubReasonByCode(final String reasonCode, final String subCode) {
         return isEmpty(reasonCode) && isEmpty(subCode) ? null :
                 deferralReasonService.getDeferralSubReasonByReasonCodeAndReasonSubCode(reasonCode, subCode).getReason();
-    }
-
-    private String getRecommendationType(final String type) {
-        if (!StringUtils.isEmpty(type)) {
-            return RecommendationType.fromType(type).name();
-        }
-        return null;
     }
 
     private String toUpperCase(final String code) {

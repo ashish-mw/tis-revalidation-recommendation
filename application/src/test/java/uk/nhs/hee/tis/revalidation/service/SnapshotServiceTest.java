@@ -123,7 +123,7 @@ public class SnapshotServiceTest {
         when(snapshotRevalidation1.getDeferralReason()).thenReturn(deferralReason);
         when(snapshotRevalidation1.getDeferralSubReason()).thenReturn(deferralSubReason);
         when(snapshotRevalidation1.getRevalidationStatusCode()).thenReturn(recommendationStatus.name());
-        when(snapshotRevalidation1.getProposedOutcomeCode()).thenReturn(recommendationType.getType());
+        when(snapshotRevalidation1.getProposedOutcomeCode()).thenReturn(recommendationType.name());
         when(snapshotRevalidation1.getSubmissionDate()).thenReturn(actualSubmissionDate.toString());
         when(snapshotRevalidation1.getGmcSubmissionDateTime()).thenReturn(gmcSubmissionDate.toString());
         when(snapshotRevalidation1.getAdmin()).thenReturn(admin);

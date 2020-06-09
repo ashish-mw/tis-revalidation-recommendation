@@ -37,7 +37,7 @@ public class SnapshotService {
                 .gmcNumber(recommendation.getGmcNumber())
                 .revalidation(SnapshotRevalidation.builder()
                         .id(recommendation.getId())
-                        .proposedOutcomeCode(recommendation.getRecommendationType().getType())
+                        .proposedOutcomeCode(recommendation.getRecommendationType().name())
                         .gmcOutcomeCode(recommendation.getOutcome().getOutcome())
                         .gmcRecommendationId(recommendation.getGmcRevalidationId())
                         .deferralDate(parseDate(recommendation.getDeferralDate()))

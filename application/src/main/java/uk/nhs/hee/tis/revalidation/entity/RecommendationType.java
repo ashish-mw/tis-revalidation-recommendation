@@ -15,17 +15,4 @@ public enum RecommendationType {
     public String getCode() {
         return this.code;
     }
-
-    public String getType() {
-        return this.type;
-    }
-
-    public static RecommendationType fromType(final String type) {
-        for (final RecommendationType recommendationType : RecommendationType.values()) {
-            if (recommendationType.getType().equals(type)) {
-                return recommendationType;
-            }
-        }
-        return null;
-    }
 }

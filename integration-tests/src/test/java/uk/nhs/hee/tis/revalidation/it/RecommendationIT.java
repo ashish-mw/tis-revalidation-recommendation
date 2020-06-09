@@ -15,6 +15,7 @@ import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationType;
 import uk.nhs.hee.tis.revalidation.entity.Snapshot;
 import uk.nhs.hee.tis.revalidation.entity.SnapshotRevalidation;
+import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
 import uk.nhs.hee.tis.revalidation.repository.SnapshotRepository;
@@ -255,7 +256,7 @@ public class RecommendationIT extends BaseIT {
         final var snapshot = snapshotRecommendation.get();
         assertThat(snapshot.getGmcNumber(), is(gmcRef1));
         assertThat(snapshot.getRevalidation().getId(), is(savedRecommendation.getId()));
-        assertThat(snapshot.getRevalidation().getProposedOutcomeCode(), is(REVALIDATE.getType()));
+        assertThat(snapshot.getRevalidation().getProposedOutcomeCode(), is(REVALIDATE.name()));
         assertThat(snapshot.getRevalidation().getDeferralDate(), is(nullValue()));
         assertThat(snapshot.getRevalidation().getDeferralReason(), is(nullValue()));
         assertThat(snapshot.getRevalidation().getGmcOutcomeCode(), is(savedRecommendation.getOutcome().getOutcome()));
@@ -296,7 +297,7 @@ public class RecommendationIT extends BaseIT {
         final var snapshot = snapshotRecommendation.get();
         assertThat(snapshot.getGmcNumber(), is(gmcRef1));
         assertThat(snapshot.getRevalidation().getId(), is(savedRecommendation.getId()));
-        assertThat(snapshot.getRevalidation().getProposedOutcomeCode(), is(DEFER.getType()));
+        assertThat(snapshot.getRevalidation().getProposedOutcomeCode(), is(DEFER.name()));
         assertThat(snapshot.getRevalidation().getDeferralDate(), is(deferralDate.toString()));
         assertThat(snapshot.getRevalidation().getDeferralReason(), is(deferralReasonByCode.getReason()));
         assertThat(snapshot.getRevalidation().getDeferralSubReason(), is(deferralSubReason.getReason()));
@@ -336,11 +337,36 @@ public class RecommendationIT extends BaseIT {
         assertThat(updatedRecommendation.getGmcSubmissionDate(), is(subDate1));
         assertThat(updatedRecommendation.getRecommendationStatus(), is(READY_TO_REVIEW));
         assertThat(updatedRecommendation.getComments(), is(List.of("recommendation comments", "new comments")));
+    }
+
+    @Test (expected = RecommendationException.class)
+    public void shouldNotAllowToCreateRecommendationWhenOneAlreadyInDraft() {
+        doctorsForDBRepository.saveAll(List.of(doc1));
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcRef1)
+                .recommendationType(REVALIDATE.name())
+                .comments(List.of("recommendation comments"))
+                .build();
+        final var savedRecommendation = recommendationService.saveRecommendation(recordDTO);
+        assertNotNull(savedRecommendation);
+        assertThat(savedRecommendation.getGmcNumber(), is(gmcRef1));
+        assertThat(savedRecommendation.getRecommendationType(), is(REVALIDATE));
+        assertThat(savedRecommendation.getGmcSubmissionDate(), is(subDate1));
+        assertThat(savedRecommendation.getRecommendationStatus(), is(READY_TO_REVIEW));
+        assertThat(savedRecommendation.getComments(), is(List.of("recommendation comments")));
+
+        final var newRecortDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcRef1)
+                .recommendationType(REVALIDATE.name())
+                .comments(List.of("recommendation comments", "new comments"))
+                .build();
+
+        final var updatedRecommendation = recommendationService.saveRecommendation(newRecortDTO);
 
     }
 
     private void setupSnapshotData() {
-        proposedOutcomeCode1 = faker.options().option(RecommendationType.class).getType();
+        proposedOutcomeCode1 = faker.options().option(RecommendationType.class).name();
         deferralDate1 = "2018-03-15";
         deferralReason1 = "1";
         deferralSubReason1 = "1";
@@ -357,7 +383,7 @@ public class RecommendationIT extends BaseIT {
         dateAdded1 = "2018-04-15";
         snapshotRevalidationId1 = faker.number().digits(10);
 
-        proposedOutcomeCode2 = faker.options().option(RecommendationType.class).getType();
+        proposedOutcomeCode2 = faker.options().option(RecommendationType.class).name();
         deferralDate2 = "2018-03-15";
         deferralReason2 = "2";
         deferralSubReason2 = null;

@@ -68,7 +68,7 @@ public class GmcClientServiceTest {
         final var checkRecommendationStatusResponse = gmcClientService.checkRecommendationStatus(gmcId, gmcRecommendationId, recommendationId, designatedBodyCode);
 
         assertNotNull(checkRecommendationStatusResponse);
-        assertThat(checkRecommendationStatusResponse, is(APPROVED.getOutcome()));
+        assertThat(checkRecommendationStatusResponse, is(APPROVED));
     }
 
     @Test
@@ -83,7 +83,7 @@ public class GmcClientServiceTest {
                 checkRecommendationStatus(gmcId, gmcRecommendationId, recommendationId, designatedBodyCode);
 
         assertNotNull(checkRecommendationStatusResponse);
-        assertThat(checkRecommendationStatusResponse, is(UNDER_REVIEW.getOutcome()));
+        assertThat(checkRecommendationStatusResponse, is(UNDER_REVIEW));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class GmcClientServiceTest {
                 checkRecommendationStatus(gmcId, gmcRecommendationId, recommendationId, designatedBodyCode);
 
         assertNotNull(checkRecommendationStatusResponse);
-        assertThat(checkRecommendationStatusResponse, is(UNDER_REVIEW.getOutcome()));
+        assertThat(checkRecommendationStatusResponse, is(UNDER_REVIEW));
 
     }
 
@@ -116,7 +116,7 @@ public class GmcClientServiceTest {
                 checkRecommendationStatus(gmcId, gmcRecommendationId, recommendationId, designatedBodyCode);
 
         assertNotNull(checkRecommendationStatusResponse);
-        assertThat(checkRecommendationStatusResponse, is(UNDER_REVIEW.getOutcome()));
+        assertThat(checkRecommendationStatusResponse, is(UNDER_REVIEW));
     }
 
     @Test
@@ -132,7 +132,7 @@ public class GmcClientServiceTest {
                 checkRecommendationStatus(gmcId, gmcRecommendationId, recommendationId, designatedBodyCode);
 
         assertNotNull(checkRecommendationStatusResponse);
-        assertThat(checkRecommendationStatusResponse, is(UNDER_REVIEW.getOutcome()));
+        assertThat(checkRecommendationStatusResponse, is(UNDER_REVIEW));
     }
 
     @Test
@@ -148,6 +148,6 @@ public class GmcClientServiceTest {
                 checkRecommendationStatus(gmcId, gmcRecommendationId, recommendationId, designatedBodyCode);
 
         assertNotNull(checkRecommendationStatusResponse);
-        assertThat(checkRecommendationStatusResponse, is(UNDER_REVIEW.getOutcome()));
+        assertThat(checkRecommendationStatusResponse, is(UNDER_REVIEW));
     }
 }

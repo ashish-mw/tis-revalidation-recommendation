@@ -3,6 +3,7 @@ package uk.nhs.hee.tis.revalidation.repository;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import uk.nhs.hee.tis.revalidation.entity.Recommendation;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 
 import java.util.List;
 
@@ -12,4 +13,6 @@ public interface RecommendationRepository extends MongoRepository<Recommendation
     Recommendation findByIdAndGmcNumber(final String id, final String gmcNumber);
 
     List<Recommendation> findByGmcNumber(final String gmcNumber);
+
+    List<Recommendation> findByGmcNumberAndOutcome(final String gmcNumber, final RecommendationGmcOutcome gmcOutcome);
 }

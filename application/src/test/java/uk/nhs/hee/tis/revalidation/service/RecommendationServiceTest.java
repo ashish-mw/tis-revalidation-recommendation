@@ -28,7 +28,6 @@ import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.*;
@@ -171,7 +170,7 @@ public class RecommendationServiceTest {
         when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
         when(traineeCoreService.getTraineeInformationFromCore(List.of(gmcId))).thenReturn(Map.of(gmcId, traineeCoreDTO));
         when(snapshotService.getSnapshotRecommendations(doctorsForDB)).thenReturn(List.of(snapshot1, snapshot2));
-        when(recommendationRepository.findByGmcNumber(gmcId)).thenReturn(List.of(buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE)));
+        when(recommendationRepository.findByGmcNumberAndOutcome(gmcId, UNDER_REVIEW)).thenReturn(List.of(buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE)));
         when(deferralReasonService.getAllDeferralReasons()).thenReturn(deferralReasons);
         when(traineeCoreDTO.getCctDate()).thenReturn(cctDate);
         when(traineeCoreDTO.getProgrammeMembershipType()).thenReturn(programmeMembershipType);
@@ -214,7 +213,7 @@ public class RecommendationServiceTest {
 
         assertThat(recommendation.getRevalidations(), hasSize(3));
         var revalidationDTO = recommendation.getRevalidations().get(0);
-        assertNull(revalidationDTO.getGmcOutcome());
+        assertThat(revalidationDTO.getGmcOutcome(), is(UNDER_REVIEW.getOutcome()));
         assertThat(revalidationDTO.getAdmin(), is(admin1));
         assertThat(revalidationDTO.getRecommendationType(), is(REVALIDATE.name()));
         assertThat(revalidationDTO.getRecommendationStatus(), is(status.name()));
@@ -261,10 +260,8 @@ public class RecommendationServiceTest {
         when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
         when(traineeCoreService.getTraineeInformationFromCore(List.of(gmcId))).thenReturn(Map.of(gmcId, traineeCoreDTO));
         when(snapshotService.getSnapshotRecommendations(doctorsForDB)).thenReturn(List.of(snapshot1));
-        when(recommendationRepository.findByGmcNumber(gmcId)).thenReturn(List.of(buildRecommendation(gmcId, newRecommendationId,
+        when(recommendationRepository.findByGmcNumberAndOutcome(gmcId, UNDER_REVIEW)).thenReturn(List.of(buildRecommendation(gmcId, newRecommendationId,
                 SUBMITTED_TO_GMC, REVALIDATE)));
-        when(gmcClientService.checkRecommendationStatus(gmcId, gmcRecommendationId2, newRecommendationId, designatedBodyCode))
-                .thenReturn("Under Review");
         when(deferralReasonService.getAllDeferralReasons()).thenReturn(deferralReasons);
         when(traineeCoreDTO.getCctDate()).thenReturn(cctDate);
         when(traineeCoreDTO.getProgrammeMembershipType()).thenReturn(programmeMembershipType);
@@ -522,7 +519,6 @@ public class RecommendationServiceTest {
         recommendationService.updateRecommendation(recordDTO);
     }
 
-
     @Test
     public void shouldAllwedSaveRecommendationWhenOneAlreadyInSubmittedAndRejectedState() {
         final var recordDTO = TraineeRecommendationRecordDto.builder()
@@ -610,6 +606,7 @@ public class RecommendationServiceTest {
                 .gmcRevalidationId(gmcRecommendationId2)
                 .gmcSubmissionDate(submissionDate)
                 .actualSubmissionDate(actualSubmissionDate)
+                .outcome(UNDER_REVIEW)
                 .comments(comments)
                 .build();
     }

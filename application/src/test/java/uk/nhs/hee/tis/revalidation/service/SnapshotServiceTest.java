@@ -128,7 +128,7 @@ public class SnapshotServiceTest {
         when(snapshotRevalidation1.getGmcSubmissionDateTime()).thenReturn(gmcSubmissionDate.toString());
         when(snapshotRevalidation1.getAdmin()).thenReturn(admin);
         when(gmcClientService.checkRecommendationStatus(gmcNumber, gmcRevalidationId,
-                id, designatedBody)).thenReturn(outcome.getOutcome());
+                id, designatedBody)).thenReturn(outcome);
 
         final var snapshotRecommendations = snapshotService.getSnapshotRecommendations(doctorsForDB);
         assertThat(snapshotRecommendations, hasSize(1));

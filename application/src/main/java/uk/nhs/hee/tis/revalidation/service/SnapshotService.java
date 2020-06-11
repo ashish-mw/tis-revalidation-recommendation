@@ -70,7 +70,7 @@ public class SnapshotService {
                     .deferralSubReason(snapshotRecommendation.getDeferralSubReason())
                     .deferralComment(snapshotRecommendation.getDeferralComment())
                     .gmcOutcome(gmcClientService.checkRecommendationStatus(gmcId, snapshotRecommendation.getGmcRecommendationId(),
-                            snapshotRecommendation.getId(), doctorsForDB.getDesignatedBodyCode()))
+                            snapshotRecommendation.getId(), doctorsForDB.getDesignatedBodyCode()).getOutcome())
                     .recommendationStatus(toUpperCase(snapshotRecommendation.getRevalidationStatusCode()))
                     .recommendationType(toUpperCase(snapshotRecommendation.getProposedOutcomeCode()))
                     .gmcSubmissionDate(formatDateTime(snapshotRecommendation.getGmcSubmissionDateTime()))

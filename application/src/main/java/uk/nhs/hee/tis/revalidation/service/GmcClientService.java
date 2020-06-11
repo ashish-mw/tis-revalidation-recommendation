@@ -35,7 +35,7 @@ public class GmcClientService {
     @Value("${app.gmc.gmcPassword}")
     private String gmcPassword;
 
-    public String checkRecommendationStatus(final String gmcNumber,
+    public RecommendationGmcOutcome checkRecommendationStatus(final String gmcNumber,
                                             final String gmcRecommendationId,
                                             final String recommendationId,
                                             final String designatedBody) {
@@ -53,14 +53,14 @@ public class GmcClientService {
         final var gmdReturnCode = checkRecommendationStatusResult.getReturnCode();
         if (SUCCESS.getCode().equals(gmdReturnCode)) {
             final var status = checkRecommendationStatusResult.getStatus();
-            return RecommendationGmcOutcome.fromString(status).getOutcome();
+            return RecommendationGmcOutcome.fromString(status);
         } else {
             final var responseCode = fromCode(gmdReturnCode);
             log.error("Gmc recommendation check status request is failed for GmcId: {} and recommendationId: {} with Response: {}." +
                     " Recommendation will stay in Under Review state", gmcNumber, recommendationId, responseCode.getMessage());
         }
 
-        return UNDER_REVIEW.getOutcome();
+        return UNDER_REVIEW;
     }
 
     public TryRecommendationV2Response submitToGmc(final DoctorsForDB doctorForDB, final Recommendation recommendation) {

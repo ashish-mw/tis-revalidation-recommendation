@@ -15,7 +15,6 @@ import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.List.of;
@@ -136,7 +135,7 @@ public class RecommendationService {
     public boolean submitRecommendation(final String recommendationId, final String gmcNumber) {
         log.info("submitting request to gmc for recommendation: {} and gmcNumber: {}", recommendationId, gmcNumber);
         final var doctorsForDB = doctorsForDBRepository.findById(gmcNumber);
-        final var recommendation = findRecommendationByIdAndGmcNumber(recommendationId, gmcNumber);
+        final var recommendation = recommendationRepository.findByIdAndGmcNumber(recommendationId, gmcNumber);
 
         final var doctor = doctorsForDB.get();
         final var tryRecommendationV2Response = gmcClientService.submitToGmc(doctor, recommendation);
@@ -149,7 +148,6 @@ public class RecommendationService {
                 recommendation.setActualSubmissionDate(doctor.getSubmissionDate());
                 recommendation.setGmcRevalidationId(tryRecommendationV2Result.getRecommendationID());
                 recommendationRepository.save(recommendation);
-                snapshotService.saveRecommendationToSnapshot(recommendation);
                 return true;
             } else {
                 final var responseCode = fromCode(returnCode);
@@ -161,33 +159,19 @@ public class RecommendationService {
         return false;
     }
 
-    public Recommendation findRecommendationByIdAndGmcNumber(final String recommendationId, final String gmcNumber) {
-        return recommendationRepository.findByIdAndGmcNumber(recommendationId, gmcNumber);
-    }
-
-    public Optional<Recommendation> findRecommendationById(final String recommendationId) {
-        return recommendationRepository.findById(recommendationId);
-    }
-
     private List<TraineeRecommendationRecordDto> getCurrentAndLegacyRecommendation(final DoctorsForDB doctorsForDB) {
         final var gmcId = doctorsForDB.getGmcReferenceNumber();
         log.info("Fetching snapshot record for GmcId: {}", gmcId);
 
-        final var recommendations = recommendationRepository.findByGmcNumber(gmcId);
+        final var recommendations = recommendationRepository.findByGmcNumberAndOutcome(gmcId, UNDER_REVIEW);
         final var currentRecommendations = recommendations.stream().map(rec -> {
-            String gmcOutcome = null;
-            //only check outcome status, if request has been submitted to GMC
-            if (SUBMITTED_TO_GMC == rec.getRecommendationStatus()) {
-                gmcOutcome = gmcClientService.checkRecommendationStatus(gmcId, rec.getGmcRevalidationId(),
-                        rec.getId(), doctorsForDB.getDesignatedBodyCode());
-            }
             return TraineeRecommendationRecordDto.builder()
                     .gmcNumber(gmcId)
                     .recommendationId(rec.getId())
                     .deferralDate(rec.getDeferralDate())
                     .deferralReason(rec.getDeferralReason())
                     .deferralSubReason(rec.getDeferralSubReason())
-                    .gmcOutcome(gmcOutcome)
+                    .gmcOutcome(rec.getOutcome().getOutcome())
                     .recommendationStatus(rec.getRecommendationStatus().name())
                     .recommendationType(rec.getRecommendationType().name())
                     .gmcSubmissionDate(doctorsForDB.getSubmissionDate())

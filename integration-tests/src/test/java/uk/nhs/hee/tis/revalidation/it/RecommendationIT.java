@@ -180,7 +180,7 @@ public class RecommendationIT extends BaseIT {
                 .build();
 
         final var recommendation = recommendationService.saveRecommendation(recordDTO);
-        final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
+        final var recommendationById = recommendationRepository.findById(recommendation.getId());
         final var savedRecommendation = recommendationById.get();
         assertNotNull(savedRecommendation);
         assertThat(savedRecommendation.getGmcNumber(), is(gmcRef1));
@@ -198,7 +198,7 @@ public class RecommendationIT extends BaseIT {
                 .build();
 
         final var recommendation = recommendationService.saveRecommendation(recordDTO);
-        final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
+        final var recommendationById = recommendationRepository.findById(recommendation.getId());
         final var savedRecommendation = recommendationById.get();
         assertNotNull(savedRecommendation);
         assertThat(savedRecommendation.getGmcNumber(), is(gmcRef2));
@@ -220,7 +220,7 @@ public class RecommendationIT extends BaseIT {
                 .build();
 
         final var recommendation = recommendationService.saveRecommendation(recordDTO);
-        final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
+        final var recommendationById = recommendationRepository.findById(recommendation.getId());
         final var savedRecommendation = recommendationById.get();
         assertNotNull(savedRecommendation);
         assertThat(savedRecommendation.getGmcNumber(), is(gmcRef2));
@@ -245,24 +245,10 @@ public class RecommendationIT extends BaseIT {
         final var submitRecommendation = recommendationService.submitRecommendation(recommendation.getId(), gmcRef1);
         assertTrue(submitRecommendation);
         //check if status is changes
-        final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
+        final var recommendationById = recommendationRepository.findById(recommendation.getId());
         assertTrue(recommendationById.isPresent());
         final var savedRecommendation = recommendationById.get();
         assertThat(savedRecommendation.getRecommendationStatus(), is(SUBMITTED_TO_GMC));
-        //check if recommendation is store in snapshot
-        final var snapshotRecommendationList = snapshotRepository.findByGmcNumber(gmcRef1);
-        final var snapshotRecommendation = snapshotRecommendationList.stream().filter(ss -> ss.getRevalidation().getId().equals(recommendation.getId())).findFirst();
-        assertTrue(snapshotRecommendation.isPresent());
-        final var snapshot = snapshotRecommendation.get();
-        assertThat(snapshot.getGmcNumber(), is(gmcRef1));
-        assertThat(snapshot.getRevalidation().getId(), is(savedRecommendation.getId()));
-        assertThat(snapshot.getRevalidation().getProposedOutcomeCode(), is(REVALIDATE.name()));
-        assertThat(snapshot.getRevalidation().getDeferralDate(), is(nullValue()));
-        assertThat(snapshot.getRevalidation().getDeferralReason(), is(nullValue()));
-        assertThat(snapshot.getRevalidation().getGmcOutcomeCode(), is(savedRecommendation.getOutcome().getOutcome()));
-        assertThat(snapshot.getRevalidation().getSubmissionDate(), is(savedRecommendation.getActualSubmissionDate().toString()));
-        assertThat(snapshot.getRevalidation().getGmcSubmissionDateTime(), is(savedRecommendation.getGmcSubmissionDate().toString()));
-        assertThat(snapshot.getRevalidation().getRevalidationStatusCode(), is(savedRecommendation.getRecommendationStatus().name()));
     }
 
     @Test
@@ -285,26 +271,11 @@ public class RecommendationIT extends BaseIT {
         final var submitRecommendation = recommendationService.submitRecommendation(recommendation.getId(), gmcRef1);
         assertTrue(submitRecommendation);
         //check if status is changes
-        final var recommendationById = recommendationService.findRecommendationById(recommendation.getId());
+        final var recommendationById = recommendationRepository.findById(recommendation.getId());
         assertTrue(recommendationById.isPresent());
         final var savedRecommendation = recommendationById.get();
         assertThat(savedRecommendation.getRecommendationStatus(), is(SUBMITTED_TO_GMC));
         assertNotNull(savedRecommendation.getOutcome());
-        //check if recommendation is store in snapshot
-        final var snapshotRecommendationList = snapshotRepository.findByGmcNumber(gmcRef1);
-        final var snapshotRecommendation = snapshotRecommendationList.stream().filter(ss -> ss.getRevalidation().getId().equals(recommendation.getId())).findFirst();
-        assertTrue(snapshotRecommendation.isPresent());
-        final var snapshot = snapshotRecommendation.get();
-        assertThat(snapshot.getGmcNumber(), is(gmcRef1));
-        assertThat(snapshot.getRevalidation().getId(), is(savedRecommendation.getId()));
-        assertThat(snapshot.getRevalidation().getProposedOutcomeCode(), is(DEFER.name()));
-        assertThat(snapshot.getRevalidation().getDeferralDate(), is(deferralDate.toString()));
-        assertThat(snapshot.getRevalidation().getDeferralReason(), is(deferralReasonByCode.getReason()));
-        assertThat(snapshot.getRevalidation().getDeferralSubReason(), is(deferralSubReason.getReason()));
-        assertThat(snapshot.getRevalidation().getGmcOutcomeCode(), is(savedRecommendation.getOutcome().getOutcome()));
-        assertThat(snapshot.getRevalidation().getSubmissionDate(), is(savedRecommendation.getActualSubmissionDate().toString()));
-        assertThat(snapshot.getRevalidation().getGmcSubmissionDateTime(), is(savedRecommendation.getGmcSubmissionDate().toString()));
-        assertThat(snapshot.getRevalidation().getRevalidationStatusCode(), is(savedRecommendation.getRecommendationStatus().name()));
     }
 
     @Test

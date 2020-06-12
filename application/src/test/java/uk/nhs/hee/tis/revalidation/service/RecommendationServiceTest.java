@@ -170,7 +170,7 @@ public class RecommendationServiceTest {
         when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
         when(traineeCoreService.getTraineeInformationFromCore(List.of(gmcId))).thenReturn(Map.of(gmcId, traineeCoreDTO));
         when(snapshotService.getSnapshotRecommendations(doctorsForDB)).thenReturn(List.of(snapshot1, snapshot2));
-        when(recommendationRepository.findByGmcNumberAndOutcome(gmcId, UNDER_REVIEW)).thenReturn(List.of(buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE)));
+        when(recommendationRepository.findByGmcNumber(gmcId)).thenReturn(List.of(buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE)));
         when(deferralReasonService.getAllDeferralReasons()).thenReturn(deferralReasons);
         when(traineeCoreDTO.getCctDate()).thenReturn(cctDate);
         when(traineeCoreDTO.getProgrammeMembershipType()).thenReturn(programmeMembershipType);
@@ -260,7 +260,7 @@ public class RecommendationServiceTest {
         when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
         when(traineeCoreService.getTraineeInformationFromCore(List.of(gmcId))).thenReturn(Map.of(gmcId, traineeCoreDTO));
         when(snapshotService.getSnapshotRecommendations(doctorsForDB)).thenReturn(List.of(snapshot1));
-        when(recommendationRepository.findByGmcNumberAndOutcome(gmcId, UNDER_REVIEW)).thenReturn(List.of(buildRecommendation(gmcId, newRecommendationId,
+        when(recommendationRepository.findByGmcNumber(gmcId)).thenReturn(List.of(buildRecommendation(gmcId, newRecommendationId,
                 SUBMITTED_TO_GMC, REVALIDATE)));
         when(deferralReasonService.getAllDeferralReasons()).thenReturn(deferralReasons);
         when(traineeCoreDTO.getCctDate()).thenReturn(cctDate);

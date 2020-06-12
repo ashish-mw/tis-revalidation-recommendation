@@ -1,5 +1,6 @@
 package uk.nhs.hee.tis.revalidation.it;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +28,7 @@ import java.util.UUID;
 
 import static java.util.Map.of;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -168,6 +170,40 @@ public class RecommendationIT extends BaseIT {
         assertThat(recommendation.getCctDate(), is(nullValue()));
         assertThat(recommendation.getProgrammeMembershipType(), is(nullValue()));
         assertThat(recommendation.getCurrentGrade(), is(nullValue()));
+    }
+
+    @Test
+    public void shouldGetTraineeListOfRecommendation() throws JsonProcessingException {
+        doctorsForDBRepository.saveAll(List.of(doc3));
+        final var coreData = of(gmcRef3, coreDTO2);
+        stubCoreRequest(coreData);
+        final var recordDTO1 = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcRef3)
+                .recommendationType(REVALIDATE.name())
+                .comments(List.of("recommendation without outcome"))
+                .build();
+
+        final var recordDTO3 = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcRef3)
+                .recommendationType(REVALIDATE.name())
+                .recommendationStatus(SUBMITTED_TO_GMC.name())
+                .gmcOutcome(APPROVED.getOutcome())
+                .comments(List.of("recommendation with approve outcome"))
+                .build();
+
+
+        var recommendation = recommendationService.saveRecommendation(recordDTO3);
+        recommendationService.submitRecommendation(recommendation.getId(), gmcRef3);
+        recommendation = recommendationRepository.findById(recommendation.getId()).get();
+        recommendation.setOutcome(APPROVED);
+        recommendationRepository.save(recommendation);
+        recommendationService.saveRecommendation(recordDTO1);
+        final var recommendations = recommendationService.getTraineeInfo(gmcRef3);
+        assertThat(recommendations.getRevalidations(), hasSize(1));
+        final var traineeRecommendationRecordDto = recommendations.getRevalidations().get(0);
+        assertThat(traineeRecommendationRecordDto.getRecommendationType(), is(REVALIDATE.name()));
+        assertThat(traineeRecommendationRecordDto.getGmcOutcome(), is(nullValue()));
+        assertThat(traineeRecommendationRecordDto.getComments(), contains("recommendation without outcome"));
     }
 
     @Test
@@ -333,6 +369,33 @@ public class RecommendationIT extends BaseIT {
                 .build();
 
         final var updatedRecommendation = recommendationService.saveRecommendation(newRecortDTO);
+
+    }
+
+    @Test (expected = RecommendationException.class)
+    public void shouldNotAllowToCreateRecommendationWhenSubmitToGmcButStillUnderReview() {
+        doctorsForDBRepository.saveAll(List.of(doc1));
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcRef1)
+                .recommendationType(REVALIDATE.name())
+                .comments(List.of("recommendation comments"))
+                .build();
+        var savedRecommendation = recommendationService.saveRecommendation(recordDTO);
+        assertNotNull(savedRecommendation);
+        assertThat(savedRecommendation.getGmcNumber(), is(gmcRef1));
+        assertThat(savedRecommendation.getRecommendationType(), is(REVALIDATE));
+        assertThat(savedRecommendation.getGmcSubmissionDate(), is(subDate1));
+        assertThat(savedRecommendation.getRecommendationStatus(), is(READY_TO_REVIEW));
+        assertThat(savedRecommendation.getComments(), is(List.of("recommendation comments")));
+        recommendationService.submitRecommendation(savedRecommendation.getId(), gmcRef1);
+
+        final var newRecortDTO = TraineeRecommendationRecordDto.builder()
+                .gmcNumber(gmcRef1)
+                .recommendationType(REVALIDATE.name())
+                .comments(List.of("recommendation comments", "new comments"))
+                .build();
+
+        recommendationService.saveRecommendation(newRecortDTO);
 
     }
 

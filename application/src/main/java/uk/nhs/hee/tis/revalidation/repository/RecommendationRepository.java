@@ -7,12 +7,17 @@ import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 
 import java.util.List;
 
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.*;
+
 @Repository
 public interface RecommendationRepository extends MongoRepository<Recommendation, String> {
 
     Recommendation findByIdAndGmcNumber(final String id, final String gmcNumber);
 
-    List<Recommendation> findByGmcNumber(final String gmcNumber);
+    //get recommendation which can be update, APPROVED and REJECTED recommendation cannot be update and will be fetch from snapshot
+    default List<Recommendation> findByGmcNumber(final String gmcNumber) {
+        return findAllByGmcNumberAndOutcomeNotIn(gmcNumber, APPROVED, REJECTED);
+    }
 
-    List<Recommendation> findByGmcNumberAndOutcome(final String gmcNumber, final RecommendationGmcOutcome gmcOutcome);
+    List<Recommendation> findAllByGmcNumberAndOutcomeNotIn(final String gmcNumber, final RecommendationGmcOutcome... outcome);
 }

@@ -8,6 +8,7 @@ import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.Recommendation;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationType;
 import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
@@ -15,6 +16,7 @@ import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.List.of;
@@ -163,15 +165,15 @@ public class RecommendationService {
         final var gmcId = doctorsForDB.getGmcReferenceNumber();
         log.info("Fetching snapshot record for GmcId: {}", gmcId);
 
-        final var recommendations = recommendationRepository.findByGmcNumberAndOutcome(gmcId, UNDER_REVIEW);
+        final var recommendations = recommendationRepository.findByGmcNumber(gmcId);
         final var currentRecommendations = recommendations.stream().map(rec -> {
             return TraineeRecommendationRecordDto.builder()
                     .gmcNumber(gmcId)
                     .recommendationId(rec.getId())
                     .deferralDate(rec.getDeferralDate())
-                    .deferralReason(rec.getDeferralReason())
+                        .deferralReason(rec.getDeferralReason())
                     .deferralSubReason(rec.getDeferralSubReason())
-                    .gmcOutcome(rec.getOutcome().getOutcome())
+                    .gmcOutcome(getOutcome(rec.getOutcome()))
                     .recommendationStatus(rec.getRecommendationStatus().name())
                     .recommendationType(rec.getRecommendationType().name())
                     .gmcSubmissionDate(doctorsForDB.getSubmissionDate())
@@ -184,6 +186,10 @@ public class RecommendationService {
         final var snapshotRecommendations = snapshotService.getSnapshotRecommendations(doctorsForDB);
         currentRecommendations.addAll(snapshotRecommendations);
         return currentRecommendations;
+    }
+
+    private String getOutcome(RecommendationGmcOutcome outcome) {
+        return Objects.nonNull(outcome) ? outcome.getOutcome() : null;
     }
 
     //Deferral date should be atleast after 60 days from submission date and max up to 365 days from submission date

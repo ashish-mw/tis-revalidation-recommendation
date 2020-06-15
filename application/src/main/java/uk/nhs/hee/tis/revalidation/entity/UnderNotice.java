@@ -15,8 +15,8 @@ public enum UnderNotice {
     }
 
     public static UnderNotice fromString(final String value) {
-        for (final UnderNotice underNotice : UnderNotice.values()) {
-            if (underNotice.notice.equals(value)) {
+        for (final UnderNotice underNotice : values()) {
+            if (underNotice.notice.equalsIgnoreCase(value)) {
                 return underNotice;
             }
         }

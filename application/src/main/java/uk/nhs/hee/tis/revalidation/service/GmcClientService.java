@@ -36,28 +36,30 @@ public class GmcClientService {
     private String gmcPassword;
 
     public RecommendationGmcOutcome checkRecommendationStatus(final String gmcNumber,
-                                            final String gmcRecommendationId,
-                                            final String recommendationId,
-                                            final String designatedBody) {
-
+                                                              final String gmcRecommendationId,
+                                                              final String recommendationId,
+                                                              final String designatedBody) {
 
         final var checkRecommendationStatus =
                 buildCheckRecommendationStatusRequest(gmcNumber, gmcRecommendationId, recommendationId, designatedBody);
         log.info("GMC Connect Url {}", gmcConnectUrl);
-        final var checkRecommendationStatusResponse = (CheckRecommendationStatusResponse) webServiceTemplate
-                .marshalSendAndReceive(gmcConnectUrl, checkRecommendationStatus,
-                        new SoapActionCallback(gmcConnectUrl));
+        try {
+            final var checkRecommendationStatusResponse = (CheckRecommendationStatusResponse) webServiceTemplate
+                    .marshalSendAndReceive(gmcConnectUrl, checkRecommendationStatus,
+                            new SoapActionCallback(gmcConnectUrl));
 
-
-        final var checkRecommendationStatusResult = checkRecommendationStatusResponse.getCheckRecommendationStatusResult();
-        final var gmdReturnCode = checkRecommendationStatusResult.getReturnCode();
-        if (SUCCESS.getCode().equals(gmdReturnCode)) {
-            final var status = checkRecommendationStatusResult.getStatus();
-            return RecommendationGmcOutcome.fromString(status);
-        } else {
-            final var responseCode = fromCode(gmdReturnCode);
-            log.error("Gmc recommendation check status request is failed for GmcId: {} and recommendationId: {} with Response: {}." +
-                    " Recommendation will stay in Under Review state", gmcNumber, recommendationId, responseCode.getMessage());
+            final var checkRecommendationStatusResult = checkRecommendationStatusResponse.getCheckRecommendationStatusResult();
+            final var gmdReturnCode = checkRecommendationStatusResult.getReturnCode();
+            if (SUCCESS.getCode().equals(gmdReturnCode)) {
+                final var status = checkRecommendationStatusResult.getStatus();
+                return RecommendationGmcOutcome.fromString(status);
+            } else {
+                final var responseCode = fromCode(gmdReturnCode);
+                log.error("Gmc recommendation check status request is failed for GmcId: {} and recommendationId: {} with Response: {}." +
+                        " Recommendation will stay in Under Review state", gmcNumber, recommendationId, responseCode.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("Failed to check status with GMC", e);
         }
 
         return UNDER_REVIEW;
@@ -90,9 +92,15 @@ public class GmcClientService {
         tryRecommendation.setPassword(gmcPassword);
 
         log.info("GMC Connect Url {}", gmcConnectUrl);
-        return (TryRecommendationV2Response) webServiceTemplate
-                .marshalSendAndReceive(gmcConnectUrl, tryRecommendation,
-                        new SoapActionCallback(gmcConnectUrl));
+        try {
+            final var tryRecommendationV2Response = (TryRecommendationV2Response) webServiceTemplate
+                    .marshalSendAndReceive(gmcConnectUrl, tryRecommendation,
+                            new SoapActionCallback(gmcConnectUrl));
+            return tryRecommendationV2Response;
+        } catch (Exception e) {
+            log.error("Failed to submit to GMC", e);
+        }
+        return new TryRecommendationV2Response();
     }
 
     private CheckRecommendationStatus buildCheckRecommendationStatusRequest(final String gmcNumber,

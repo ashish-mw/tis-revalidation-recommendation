@@ -33,6 +33,7 @@ public class SnapshotService {
     private GmcClientService gmcClientService;
 
     public Snapshot saveRecommendationToSnapshot(final Recommendation recommendation) {
+        log.info("Creating snapshot record for recommendation: {}, gmcId: {}", recommendation.getId(), recommendation.getGmcNumber());
         final var snapshot = Snapshot.builder()
                 .gmcNumber(recommendation.getGmcNumber())
                 .revalidation(SnapshotRevalidation.builder()
@@ -54,6 +55,7 @@ public class SnapshotService {
                         .build())
                 .build();
 
+        log.debug("Saving snapshot : {}", snapshot);
         return snapshotRepository.save(snapshot);
     }
 
@@ -75,6 +77,7 @@ public class SnapshotService {
                     .recommendationType(toUpperCase(snapshotRecommendation.getProposedOutcomeCode()))
                     .gmcSubmissionDate(formatDateTime(snapshotRecommendation.getGmcSubmissionDateTime()))
                     .actualSubmissionDate(formatDate(snapshotRecommendation.getSubmissionDate()))
+                    .comments(snapshotRecommendation.getComments())
                     .admin(snapshotRecommendation.getAdmin())
                     .build();
         }).collect(toList());

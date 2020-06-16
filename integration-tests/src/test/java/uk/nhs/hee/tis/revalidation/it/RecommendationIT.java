@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Map.of;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -174,35 +174,26 @@ public class RecommendationIT extends BaseIT {
 
     @Test
     public void shouldGetTraineeListOfRecommendation() throws JsonProcessingException {
-        doctorsForDBRepository.saveAll(List.of(doc3));
-        final var coreData = of(gmcRef3, coreDTO2);
+        snapshotRepository.deleteAll();
+        doctorsForDBRepository.saveAll(List.of(doc1));
+        final var coreData = of(gmcRef1, coreDTO1);
         stubCoreRequest(coreData);
         final var recordDTO1 = TraineeRecommendationRecordDto.builder()
-                .gmcNumber(gmcRef3)
+                .gmcNumber(gmcRef1)
                 .recommendationType(REVALIDATE.name())
                 .comments(List.of("recommendation without outcome"))
                 .build();
 
-        final var recordDTO3 = TraineeRecommendationRecordDto.builder()
-                .gmcNumber(gmcRef3)
-                .recommendationType(REVALIDATE.name())
-                .recommendationStatus(SUBMITTED_TO_GMC.name())
-                .gmcOutcome(APPROVED.getOutcome())
-                .comments(List.of("recommendation with approve outcome"))
-                .build();
 
+        var recommendation = recommendationService.saveRecommendation(recordDTO1);
+        recommendationService.submitRecommendation(recommendation.getId(), gmcRef1);
 
-        var recommendation = recommendationService.saveRecommendation(recordDTO3);
-        recommendationService.submitRecommendation(recommendation.getId(), gmcRef3);
-        recommendation = recommendationRepository.findById(recommendation.getId()).get();
-        recommendation.setOutcome(APPROVED);
-        recommendationRepository.save(recommendation);
-        recommendationService.saveRecommendation(recordDTO1);
-        final var recommendations = recommendationService.getTraineeInfo(gmcRef3);
+        final var recommendations = recommendationService.getTraineeInfo(gmcRef1);
         assertThat(recommendations.getRevalidations(), hasSize(1));
         final var traineeRecommendationRecordDto = recommendations.getRevalidations().get(0);
+        assertThat(traineeRecommendationRecordDto.getGmcNumber(), is(gmcRef1));
         assertThat(traineeRecommendationRecordDto.getRecommendationType(), is(REVALIDATE.name()));
-        assertThat(traineeRecommendationRecordDto.getGmcOutcome(), is(nullValue()));
+        assertThat(traineeRecommendationRecordDto.getGmcOutcome(), anyOf(equalTo(APPROVED.getOutcome()), equalTo(REJECTED.getOutcome())));
         assertThat(traineeRecommendationRecordDto.getComments(), contains("recommendation without outcome"));
     }
 

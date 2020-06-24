@@ -193,7 +193,7 @@ public class RecommendationIT extends BaseIT {
         final var traineeRecommendationRecordDto = recommendations.getRevalidations().get(0);
         assertThat(traineeRecommendationRecordDto.getGmcNumber(), is(gmcRef1));
         assertThat(traineeRecommendationRecordDto.getRecommendationType(), is(REVALIDATE.name()));
-        assertThat(traineeRecommendationRecordDto.getGmcOutcome(), anyOf(equalTo(APPROVED.getOutcome()), equalTo(REJECTED.getOutcome())));
+        assertThat(traineeRecommendationRecordDto.getGmcOutcome(), anyOf(equalTo(UNDER_REVIEW.getOutcome()), equalTo(APPROVED.getOutcome()), equalTo(REJECTED.getOutcome())));
         assertThat(traineeRecommendationRecordDto.getComments(), contains("recommendation without outcome"));
     }
 

@@ -71,7 +71,6 @@
         <dependency>
             <groupId>uk.nhs.hee.tis</groupId>
             <artifactId>gmc-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

@@ -19,6 +19,24 @@ jobs:
         with:
           java-version: 11
 
+      - name: update the AWS client
+        uses: chrislennon/action-aws-cli@v1.1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_MAVEN_USERNAME }}
+          aws-secret-access-key: ${{ secrets.AWS_MAVEN_PASSWORD }}
+          aws-region: eu-west-1
+
+      - name: Add CodeArtifact env var
+        run: echo "::set-env name=CODEARTIFACT_AUTH_TOKEN::$(aws codeartifact get-authorization-token --domain hee --domain-owner 430723991443 --query authorizationToken --output text
+      - name: maven-settings-xml-action
+        uses: whelk-io/maven-settings-xml-action@v4
+        with:
+          servers: '[{ "id": "hee--Health-Education-England", "username": "aws", "password": "${env.CODEARTIFACT_AUTH_TOKEN}" }]'
+          plugin_repositories: '[{ "id": "hee--Health-Education-England", "url": "https://hee-430723991443.d.codeartifact.eu-west-1.amazonaws.com/maven/Health-Education-England/" }]'
+
       - name: Build with Maven
         run: mvn clean install
 

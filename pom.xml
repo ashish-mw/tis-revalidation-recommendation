@@ -161,4 +161,12 @@
 
     </dependencyManagement>
 
+    <distributionManagement>
+        <repository>
+            <id>hee--Health-Education-England</id>
+            <name>hee--Health-Education-England</name>
+            <url>https://hee-430723991443.d.codeartifact.eu-west-1.amazonaws.com/maven/Health-Education-England/</url>
+        </repository>
+    </distributionManagement>
+
 </project>

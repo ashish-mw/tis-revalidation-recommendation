@@ -20,10 +20,12 @@ import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 import java.time.LocalDate;
 import java.util.List;
 
+import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static java.util.List.of;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.nhs.hee.tis.revalidation.controller.DoctorsForDBController.*;
@@ -33,6 +35,8 @@ import static uk.nhs.hee.tis.revalidation.controller.DoctorsForDBController.*;
 public class DoctorsForDBControllerTest {
 
     private static final String DOCTORS_API_URL = "/api/v1/doctors";
+    private static final String UPDATE_ADMIN = "/{gmcNumber}/admin/{adminEmail}";
+
     private final Faker faker = new Faker();
 
     @Autowired
@@ -52,6 +56,7 @@ public class DoctorsForDBControllerTest {
     private UnderNotice underNotice1, underNotice2;
     private String sanction1, sanction2;
     private RecommendationStatus doctorStatus1, doctorStatus2;
+    private String admin;
 
     @Before
     public void setup() {
@@ -71,6 +76,7 @@ public class DoctorsForDBControllerTest {
         sanction2 = faker.lorem().characters(2);
         doctorStatus1 = RecommendationStatus.STARTED;
         doctorStatus2 = RecommendationStatus.SUBMITTED_TO_GMC;
+        admin = faker.internet().emailAddress();
     }
 
     @Test
@@ -120,12 +126,19 @@ public class DoctorsForDBControllerTest {
         final var requestDTO = TraineeRequestDto.builder()
                 .sortOrder(ASC).sortColumn(SUBMISSION_DATE).underNotice(true).searchQuery(EMPTY_STRING).build();
         when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO)).thenReturn(gmcDoctorDTO);
-        this.mockMvc.perform(get("/api/v1/doctors")
+        this.mockMvc.perform(get(DOCTORS_API_URL)
                 .param(SORT_ORDER, ASC)
                 .param(SORT_COLUMN, SUBMISSION_DATE)
                 .param(UNDER_NOTICE, String.valueOf(true)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(gmcDoctorDTO)));
+    }
+
+    @Test
+    public void shouldUpdateAdminForTrainee() throws Exception {
+        final var url = format("%s/%s", DOCTORS_API_URL, UPDATE_ADMIN);
+        this.mockMvc.perform(post(url, gmcRef1, admin))
+                .andExpect(status().isOk());
     }
 
     private TraineeSummaryDto prepareGmcDoctor() {
@@ -161,5 +174,4 @@ public class DoctorsForDBControllerTest {
                 .build();
         return of(doctor1, doctor2);
     }
-
 }

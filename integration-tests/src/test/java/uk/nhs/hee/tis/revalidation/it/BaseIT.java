@@ -42,6 +42,7 @@ public class BaseIT {
     protected String progName1, progName2, progName3, progName4, progName5;
     protected String memType1, memType2, memType3, memType4, memType5;
     protected String grade1, grade2, grade3, grade4, grade5;
+    private String admin;
 
     protected void setupData() {
         gmcRef1 = faker.number().digits(7);
@@ -122,11 +123,13 @@ public class BaseIT {
         grade4 = faker.lorem().characters(5);
         grade5 = faker.lorem().characters(5);
 
-        doc1 = new DoctorsForDB(gmcRef1, fName1, lName1, subDate1, addedDate1, un1, sanction1, status1, now(), desBody1);
-        doc2 = new DoctorsForDB(gmcRef2, fName2, lName2, subDate2, addedDate2, un2, sanction2, status2, now(), desBody2);
-        doc3 = new DoctorsForDB(gmcRef3, fName3, lName3, subDate3, addedDate3, un3, sanction3, status3, now(), desBody3);
-        doc4 = new DoctorsForDB(gmcRef4, fName4, lName4, subDate4, addedDate4, un4, sanction4, status4, now(), desBody4);
-        doc5 = new DoctorsForDB(gmcRef5, fName5, lName5, subDate5, addedDate5, un5, sanction5, status5, now(), desBody5);
+        admin = faker.internet().emailAddress();
+
+        doc1 = new DoctorsForDB(gmcRef1, fName1, lName1, subDate1, addedDate1, un1, sanction1, status1, now(), desBody1, admin);
+        doc2 = new DoctorsForDB(gmcRef2, fName2, lName2, subDate2, addedDate2, un2, sanction2, status2, now(), desBody2, admin);
+        doc3 = new DoctorsForDB(gmcRef3, fName3, lName3, subDate3, addedDate3, un3, sanction3, status3, now(), desBody3, admin);
+        doc4 = new DoctorsForDB(gmcRef4, fName4, lName4, subDate4, addedDate4, un4, sanction4, status4, now(), desBody4, admin);
+        doc5 = new DoctorsForDB(gmcRef5, fName5, lName5, subDate5, addedDate5, un5, sanction5, status5, now(), desBody5, admin);
 
         coreDTO1 = new TraineeCoreDto(gmcRef1, cctDate1, memType1, progName1, grade1);
         coreDTO2 = new TraineeCoreDto(gmcRef2, cctDate2, memType2, progName2, grade2);

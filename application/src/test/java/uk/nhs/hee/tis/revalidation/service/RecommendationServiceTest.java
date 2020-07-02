@@ -138,7 +138,7 @@ public class RecommendationServiceTest {
         gmcOutcome1 = APPROVED.getOutcome();
         gmcSubmissionDate1 = "2018-03-15 12:00:00";
         acutalSubmissionDate1 = "2018-03-15";
-        admin1 = faker.funnyName().name();
+        admin1 = faker.internet().emailAddress();
         gmcRecommendationId1 = faker.number().digits(10);
         snapshotRevalidationId1 = faker.number().digits(10);
 
@@ -151,7 +151,7 @@ public class RecommendationServiceTest {
         gmcOutcome2 = APPROVED.getOutcome();
         gmcSubmissionDate2 = "2018-03-15 12:00:00";
         acutalSubmissionDate2 = "2018-03-15";
-        admin2 = faker.funnyName().name();
+        admin2 = faker.internet().emailAddress();
         gmcRecommendationId2 = faker.number().digits(10);
         snapshotRevalidationId2 = faker.number().digits(10);
 
@@ -398,6 +398,7 @@ public class RecommendationServiceTest {
                 .gmcNumber(gmcNumber1)
                 .recommendationType(REVALIDATE.name())
                 .comments(comments)
+                .admin(admin1)
                 .build();
 
         when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
@@ -414,6 +415,7 @@ public class RecommendationServiceTest {
                 .gmcNumber(gmcNumber1)
                 .recommendationType(NON_ENGAGEMENT.name())
                 .comments(comments)
+                .admin(admin1)
                 .build();
 
         when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
@@ -434,6 +436,7 @@ public class RecommendationServiceTest {
                 .deferralReason(deferralResaon1)
                 .deferralSubReason(deferralSubResaon1)
                 .comments(comments)
+                .admin(admin1)
                 .build();
 
         when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
@@ -643,6 +646,7 @@ public class RecommendationServiceTest {
                 .underNotice(underNotice)
                 .sanction(sanction)
                 .designatedBodyCode(designatedBodyCode)
+                .admin(admin1)
                 .build();
 
     }

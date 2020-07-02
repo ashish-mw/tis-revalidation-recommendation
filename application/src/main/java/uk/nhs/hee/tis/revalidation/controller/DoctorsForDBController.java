@@ -8,10 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDto;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
@@ -65,6 +62,16 @@ public class DoctorsForDBController {
 
         final var allTraineeDoctorDetails = doctorsForDBService.getAllTraineeDoctorDetails(traineeRequestDTO);
         return ResponseEntity.ok().body(allTraineeDoctorDetails);
+    }
+
+    @ApiOperation(value = "Update admin for trainee", notes = "It will update admin to recommend trainee", response = ResponseEntity.class)
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Trainee's admin has been updated", response = ResponseEntity.class)})
+    @PostMapping("/{gmcNumber}/admin/{adminEmail}")
+    public ResponseEntity updateAdmin(@PathVariable("gmcNumber") final String gmcNumber,
+                                      @PathVariable("adminEmail") final String adminEmail) {
+
+        doctorsForDBService.updateTraineeAdmin(gmcNumber, adminEmail);
+        return ResponseEntity.ok().build();
     }
 
     //TODO: find a better way like separate validator

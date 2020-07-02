@@ -88,7 +88,8 @@ public class RecommendationService {
         isAllowedToCreateNewRecommendation(recordDTO.getGmcNumber(), recordDTO.getRecommendationId());
 
         final var doctorsForDB = doctorsForDBRepository.findById(recordDTO.getGmcNumber());
-        final var submissionDate = doctorsForDB.get().getSubmissionDate();
+        final var doctor = doctorsForDB.get();
+        final var submissionDate = doctor.getSubmissionDate();
 
         final var recommendationType = RecommendationType.valueOf(recordDTO.getRecommendationType());
         Recommendation recommendation = null;
@@ -101,6 +102,7 @@ public class RecommendationService {
                     .recommendationStatus(READY_TO_REVIEW)
                     .comments(recordDTO.getComments())
                     .gmcSubmissionDate(submissionDate)
+                    .admin(doctor.getAdmin())
                     .build();
         } else {
             final var deferralDate = recordDTO.getDeferralDate();
@@ -118,6 +120,7 @@ public class RecommendationService {
                         .deferralReason(deferralReason.getCode())
                         .deferralSubReason(deferralSubReason.getCode())
                         .gmcSubmissionDate(submissionDate)
+                        .admin(doctor.getAdmin())
                         .build();
             } else {
                 throw new RecommendationException(format("Deferral date is invalid, should be in between of 60 and 365 days of Gmc Submission Date: %s", submissionDate));

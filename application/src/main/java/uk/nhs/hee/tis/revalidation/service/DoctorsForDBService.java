@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.nhs.hee.tis.revalidation.dto.*;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
+import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 import static java.util.stream.Collectors.toList;
@@ -49,8 +50,23 @@ public class DoctorsForDBService {
     }
 
     public void updateTrainee(final DoctorsForDbDto gmcDoctor) {
-        final DoctorsForDB doctorsForDB = DoctorsForDB.convert(gmcDoctor);
+        final var doctorsForDB = DoctorsForDB.convert(gmcDoctor);
+        final var doctor = doctorsRepository.findById(gmcDoctor.getGmcReferenceNumber());
+        if (doctor.isPresent()) {
+            doctorsForDB.setAdmin(doctor.get().getAdmin());
+        }
         doctorsRepository.save(doctorsForDB);
+    }
+
+    public void updateTraineeAdmin(final String gmcNumber, final String admin) {
+        final var doctor = doctorsRepository.findById(gmcNumber);
+        if (doctor.isPresent()) {
+            final var doctorsForDB = doctor.get();
+            doctorsForDB.setAdmin(admin);
+            doctorsRepository.save(doctorsForDB);
+        } else {
+            throw new RecommendationException("No trainee found to update");
+        }
     }
 
     private TraineeInfoDto convert(final DoctorsForDB doctorsForDB, final TraineeCoreDto traineeCoreDTO) {
@@ -63,7 +79,8 @@ public class DoctorsForDBService {
                 .underNotice(doctorsForDB.getUnderNotice().name())
                 .sanction(doctorsForDB.getSanction())
                 .doctorStatus(doctorsForDB.getDoctorStatus().name()) //TODO update with legacy statuses
-                .lastUpdatedDate(doctorsForDB.getLastUpdatedDate());
+                .lastUpdatedDate(doctorsForDB.getLastUpdatedDate())
+                .admin(doctorsForDB.getAdmin());
 
         if (traineeCoreDTO != null) {
             traineeInfoDTOBuilder

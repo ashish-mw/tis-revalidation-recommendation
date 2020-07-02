@@ -12,6 +12,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.nhs.hee.tis.revalidation.RevalidationApplication;
+import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
@@ -22,6 +23,7 @@ import java.util.List;
 import static java.time.LocalDate.now;
 import static java.util.Map.of;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -557,4 +559,44 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorDTO.getTotalPages(), is(3L));
     }
 
+    @Test
+    public void shouldUpdateAdminForTrainee() {
+        final var adminEmail = faker.internet().emailAddress();
+        repository.saveAll(List.of(doc1, doc2));
+        service.updateTraineeAdmin(gmcRef1, adminEmail);
+        final var doctorsForDB = repository.findById(gmcRef1);
+
+        assertThat(doctorsForDB.isPresent(), is(true));
+        assertThat(doctorsForDB.get().getAdmin(), is(adminEmail));
+    }
+
+    @Test
+    public void shouldRetainAdminValue() {
+        final var adminEmail = faker.internet().emailAddress();
+        final var doctorsForDbDto1 = DoctorsForDbDto.builder()
+                .gmcReferenceNumber(gmcRef1)
+                .doctorFirstName(fName1)
+                .doctorLastName(lName1)
+                .submissionDate(subDate1)
+                .underNotice(un1.value())
+                .dateAdded(addedDate1)
+                .sanction(sanction1)
+                .designatedBodyCode(desBody1)
+                .build();
+        service.updateTrainee(doctorsForDbDto1);
+        var doctorsForDB = repository.findById(gmcRef1).get();
+        assertThat(doctorsForDB.getGmcReferenceNumber(), is(gmcRef1));
+        assertThat(doctorsForDB.getAdmin(),  is(nullValue()));
+
+        service.updateTraineeAdmin(gmcRef1, adminEmail);
+
+        doctorsForDB = repository.findById(gmcRef1).get();
+        assertThat(doctorsForDB.getGmcReferenceNumber(), is(gmcRef1));
+        assertThat(doctorsForDB.getAdmin(),  is(adminEmail));
+
+        service.updateTrainee(doctorsForDbDto1);
+        doctorsForDB = repository.findById(gmcRef1).get();
+        assertThat(doctorsForDB.getGmcReferenceNumber(), is(gmcRef1));
+        assertThat(doctorsForDB.getAdmin(),  is(adminEmail));
+    }
 }

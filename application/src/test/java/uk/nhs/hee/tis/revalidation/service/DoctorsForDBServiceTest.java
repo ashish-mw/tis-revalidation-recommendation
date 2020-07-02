@@ -11,15 +11,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDto;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
+import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.time.LocalDate.now;
@@ -27,6 +29,7 @@ import static java.util.List.of;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.domain.Sort.by;
@@ -61,12 +64,14 @@ public class DoctorsForDBServiceTest {
     private LocalDate subDate1, subDate2, subDate3, subDate4, subDate5;
     private LocalDate addedDate1, addedDate2, addedDate3, addedDate4, addedDate5;
     private UnderNotice un1, un2, un3, un4, un5;
-    private String sanction1, sanction2, sanction3, sanction4,sanction5;
-    private RecommendationStatus status1, status2, status3, status4,status5;
+    private String sanction1, sanction2, sanction3, sanction4, sanction5;
+    private RecommendationStatus status1, status2, status3, status4, status5;
     private LocalDate cctDate1, cctDate2, cctDate3, cctDate4, cctDate5;
     private String progName1, progName2, progName3, progName4, progName5;
     private String memType1, memType2, memType3, memType4, memType5;
     private String grade1, grade2, grade3, grade4, grade5;
+    private String designatedBody;
+    private String admin;
 
     @Before
     public void setup() {
@@ -79,7 +84,7 @@ public class DoctorsForDBServiceTest {
 
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
         when(repository.findAll(pageableAndSortable, "")).thenReturn(page);
-        when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1,gmcRef2, gmcRef3, gmcRef4, gmcRef5)))
+        when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1, gmcRef2, gmcRef3, gmcRef4, gmcRef5)))
                 .thenReturn(Map.of(gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3, gmcRef4, coreDTO4, gmcRef5, coreDTO5));
         when(coreDTO1.getCctDate()).thenReturn(cctDate1);
         when(coreDTO1.getProgrammeName()).thenReturn(progName1);
@@ -195,8 +200,8 @@ public class DoctorsForDBServiceTest {
     public void shouldReturnListOfUnderNoticeDoctors() {
 
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
-        when(repository.findAllByUnderNoticeIn(pageableAndSortable, "",YES, ON_HOLD)).thenReturn(page);
-        when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1,gmcRef2)))
+        when(repository.findAllByUnderNoticeIn(pageableAndSortable, "", YES, ON_HOLD)).thenReturn(page);
+        when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1, gmcRef2)))
                 .thenReturn(Map.of(gmcRef1, coreDTO1, gmcRef2, coreDTO2));
         when(coreDTO1.getCctDate()).thenReturn(cctDate1);
         when(coreDTO1.getProgrammeName()).thenReturn(progName1);
@@ -256,7 +261,7 @@ public class DoctorsForDBServiceTest {
     @Test
     public void shouldReturnEmptyListOfDoctorsWhenNoRecordFound() {
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
-        when(repository.findAll(pageableAndSortable,"")).thenReturn(page);
+        when(repository.findAll(pageableAndSortable, "")).thenReturn(page);
         when(page.get()).thenReturn(Stream.of());
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(0l);
         final var requestDTO = TraineeRequestDto.builder()
@@ -278,7 +283,7 @@ public class DoctorsForDBServiceTest {
 
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
         when(repository.findAll(pageableAndSortable, "query")).thenReturn(page);
-        when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1,gmcRef4)))
+        when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1, gmcRef4)))
                 .thenReturn(Map.of(gmcRef1, coreDTO1, gmcRef4, coreDTO4));
         when(coreDTO1.getCctDate()).thenReturn(cctDate1);
         when(coreDTO1.getProgrammeName()).thenReturn(progName1);
@@ -334,6 +339,21 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName4));
         assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType4));
         assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade4));
+    }
+
+    @Test
+    public void shouldUpdateAdmin() {
+        final String newAdmin = faker.internet().emailAddress();
+        when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
+        doctorsForDBService.updateTraineeAdmin(gmcRef1, newAdmin);
+        verify(repository).save(doc1);
+    }
+
+    @Test(expected = RecommendationException.class)
+    public void shouldThrowExceptionWhenNoTraineeFound() {
+        final String newAdmin = faker.internet().emailAddress();
+        when(repository.findById(gmcRef1)).thenReturn(Optional.empty());
+        doctorsForDBService.updateTraineeAdmin(gmcRef1, newAdmin);
     }
 
     private void setupData() {
@@ -409,10 +429,13 @@ public class DoctorsForDBServiceTest {
         grade4 = faker.lorem().characters(5);
         grade5 = faker.lorem().characters(5);
 
-        doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1, now(),"HAA");
-        doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2, now(),"HAA");
-        doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3, status3, now(),"HAA");
-        doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4, status4, now(),"HAA");
-        doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5, now(),"HAA");
+        designatedBody = faker.lorem().characters(8);
+        admin = faker.internet().emailAddress();
+
+        doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1, now(), designatedBody, admin);
+        doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2, now(), designatedBody, admin);
+        doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3, status3, now(), designatedBody, admin);
+        doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4, status4, now(), designatedBody, admin);
+        doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5, now(), designatedBody, admin);
     }
 }

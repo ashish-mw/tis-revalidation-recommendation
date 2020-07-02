@@ -34,6 +34,7 @@ public class DoctorsForDB {
     private RecommendationStatus doctorStatus;
     private LocalDate lastUpdatedDate;
     private String designatedBodyCode;
+    private String admin;
 
     public final static DoctorsForDB convert(final DoctorsForDbDto doctorsForDBDTO) {
         return DoctorsForDB.builder()

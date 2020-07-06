@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.nhs.hee.tis.revalidation.dto.TraineeAdminUpdateDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDto;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
@@ -66,11 +67,10 @@ public class DoctorsForDBController {
 
     @ApiOperation(value = "Update admin for trainee", notes = "It will update admin to recommend trainee", response = ResponseEntity.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Trainee's admin has been updated", response = ResponseEntity.class)})
-    @PostMapping("/{gmcNumber}/admin/{adminEmail}")
-    public ResponseEntity updateAdmin(@PathVariable("gmcNumber") final String gmcNumber,
-                                      @PathVariable("adminEmail") final String adminEmail) {
+    @PostMapping("/assign-admin")
+    public ResponseEntity updateAdmin(@RequestBody final TraineeAdminUpdateDto traineeAdmins) {
 
-        doctorsForDBService.updateTraineeAdmin(gmcNumber, adminEmail);
+        doctorsForDBService.updateTraineeAdmin(traineeAdmins.getTraineeAdmins());
         return ResponseEntity.ok().build();
     }
 

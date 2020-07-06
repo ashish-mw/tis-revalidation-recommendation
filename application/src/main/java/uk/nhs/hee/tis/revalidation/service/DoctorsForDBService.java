@@ -7,12 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.nhs.hee.tis.revalidation.dto.*;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
-import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
-import java.time.LocalDate;
+import java.util.List;
 
-import static java.time.LocalDate.*;
+import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.data.domain.PageRequest.of;
 import static org.springframework.data.domain.Sort.Direction.ASC;
@@ -61,16 +60,16 @@ public class DoctorsForDBService {
         doctorsRepository.save(doctorsForDB);
     }
 
-    public void updateTraineeAdmin(final String gmcNumber, final String admin) {
-        final var doctor = doctorsRepository.findById(gmcNumber);
-        if (doctor.isPresent()) {
-            final var doctorsForDB = doctor.get();
-            doctorsForDB.setAdmin(admin);
-            doctorsForDB.setLastUpdatedDate(now());
-            doctorsRepository.save(doctorsForDB);
-        } else {
-            throw new RecommendationException("No trainee found to update");
-        }
+    public void updateTraineeAdmin(final List<TraineeAdminDto> traineeAdmins) {
+        traineeAdmins.stream().forEach(traineeAdmin -> {
+            final var doctor = doctorsRepository.findById(traineeAdmin.getGmcNumber());
+            if (doctor.isPresent()) {
+                final var doctorsForDB = doctor.get();
+                doctorsForDB.setAdmin(traineeAdmin.getAdmin());
+                doctorsForDB.setLastUpdatedDate(now());
+                doctorsRepository.save(doctorsForDB);
+            }
+        });
     }
 
     private TraineeInfoDto convert(final DoctorsForDB doctorsForDB, final TraineeCoreDto traineeCoreDTO) {

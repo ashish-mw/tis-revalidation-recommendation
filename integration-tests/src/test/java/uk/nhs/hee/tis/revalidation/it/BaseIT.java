@@ -42,7 +42,7 @@ public class BaseIT {
     protected String progName1, progName2, progName3, progName4, progName5;
     protected String memType1, memType2, memType3, memType4, memType5;
     protected String grade1, grade2, grade3, grade4, grade5;
-    private String admin;
+    protected String admin;
 
     protected void setupData() {
         gmcRef1 = faker.number().digits(7);

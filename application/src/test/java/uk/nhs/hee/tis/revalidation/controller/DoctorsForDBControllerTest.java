@@ -8,11 +8,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDto;
-import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
-import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDto;
+import uk.nhs.hee.tis.revalidation.dto.*;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
@@ -35,7 +34,7 @@ import static uk.nhs.hee.tis.revalidation.controller.DoctorsForDBController.*;
 public class DoctorsForDBControllerTest {
 
     private static final String DOCTORS_API_URL = "/api/v1/doctors";
-    private static final String UPDATE_ADMIN = "/{gmcNumber}/admin/{adminEmail}";
+    private static final String UPDATE_ADMIN = "/assign-admin";
 
     private final Faker faker = new Faker();
 
@@ -137,7 +136,13 @@ public class DoctorsForDBControllerTest {
     @Test
     public void shouldUpdateAdminForTrainee() throws Exception {
         final var url = format("%s/%s", DOCTORS_API_URL, UPDATE_ADMIN);
-        this.mockMvc.perform(post(url, gmcRef1, admin))
+        final var ta1 = TraineeAdminDto.builder().gmcNumber(gmcRef1).admin(admin).build();
+        final var ta2 = TraineeAdminDto.builder().gmcNumber(gmcRef2).admin(admin).build();
+        final var traineeAdminUpdateDto = TraineeAdminUpdateDto.builder().traineeAdmins(of(ta1, ta2)).build();
+        this.mockMvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(traineeAdminUpdateDto)))
                 .andExpect(status().isOk());
     }
 

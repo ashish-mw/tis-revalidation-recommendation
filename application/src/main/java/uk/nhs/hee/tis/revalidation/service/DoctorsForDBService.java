@@ -10,6 +10,9 @@ import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
+import java.time.LocalDate;
+
+import static java.time.LocalDate.*;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.data.domain.PageRequest.of;
 import static org.springframework.data.domain.Sort.Direction.ASC;
@@ -63,6 +66,7 @@ public class DoctorsForDBService {
         if (doctor.isPresent()) {
             final var doctorsForDB = doctor.get();
             doctorsForDB.setAdmin(admin);
+            doctorsForDB.setLastUpdatedDate(now());
             doctorsRepository.save(doctorsForDB);
         } else {
             throw new RecommendationException("No trainee found to update");

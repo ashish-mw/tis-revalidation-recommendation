@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.nhs.hee.tis.revalidation.dto.TraineeAdminDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
@@ -20,6 +21,7 @@ import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -29,8 +31,7 @@ import static java.util.List.of;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.domain.Sort.by;
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.ON_HOLD;
@@ -71,7 +72,7 @@ public class DoctorsForDBServiceTest {
     private String memType1, memType2, memType3, memType4, memType5;
     private String grade1, grade2, grade3, grade4, grade5;
     private String designatedBody;
-    private String admin;
+    private String admin1, admin2, admin3, admin4, admin5;
 
     @Before
     public void setup() {
@@ -343,18 +344,25 @@ public class DoctorsForDBServiceTest {
 
     @Test
     public void shouldUpdateAdmin() {
-        final String newAdmin = faker.internet().emailAddress();
+        final String newAdmin1 = faker.internet().emailAddress();
+        final String newAdmin2 = faker.internet().emailAddress();
+        final String newAdmin3 = faker.internet().emailAddress();
+        final String newAdmin4 = faker.internet().emailAddress();
+        final String newAdmin5 = faker.internet().emailAddress();
+        final var ta1 = TraineeAdminDto.builder().admin(newAdmin1).gmcNumber(gmcRef1).build();
+        final var ta2 = TraineeAdminDto.builder().admin(newAdmin2).gmcNumber(gmcRef2).build();
+        final var ta3 = TraineeAdminDto.builder().admin(newAdmin3).gmcNumber(gmcRef3).build();
+        final var ta4 = TraineeAdminDto.builder().admin(newAdmin4).gmcNumber(gmcRef4).build();
+        final var ta5 = TraineeAdminDto.builder().admin(newAdmin5).gmcNumber(gmcRef5).build();
         when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
-        doctorsForDBService.updateTraineeAdmin(gmcRef1, newAdmin);
-        verify(repository).save(doc1);
+        when(repository.findById(gmcRef2)).thenReturn(Optional.of(doc2));
+        when(repository.findById(gmcRef3)).thenReturn(Optional.of(doc3));
+        when(repository.findById(gmcRef4)).thenReturn(Optional.of(doc4));
+        when(repository.findById(gmcRef5)).thenReturn(Optional.of(doc5));
+        doctorsForDBService.updateTraineeAdmin(List.of(ta1, ta2, ta3, ta4, ta5));
+        verify(repository, times(5)).save(any());
     }
 
-    @Test(expected = RecommendationException.class)
-    public void shouldThrowExceptionWhenNoTraineeFound() {
-        final String newAdmin = faker.internet().emailAddress();
-        when(repository.findById(gmcRef1)).thenReturn(Optional.empty());
-        doctorsForDBService.updateTraineeAdmin(gmcRef1, newAdmin);
-    }
 
     private void setupData() {
         gmcRef1 = faker.number().digits(8);
@@ -430,12 +438,16 @@ public class DoctorsForDBServiceTest {
         grade5 = faker.lorem().characters(5);
 
         designatedBody = faker.lorem().characters(8);
-        admin = faker.internet().emailAddress();
+        admin1 = faker.internet().emailAddress();
+        admin2 = faker.internet().emailAddress();
+        admin3 = faker.internet().emailAddress();
+        admin4 = faker.internet().emailAddress();
+        admin5 = faker.internet().emailAddress();
 
-        doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1, now(), designatedBody, admin);
-        doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2, now(), designatedBody, admin);
-        doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3, status3, now(), designatedBody, admin);
-        doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4, status4, now(), designatedBody, admin);
-        doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5, now(), designatedBody, admin);
+        doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1, now(), designatedBody, admin1);
+        doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2, now(), designatedBody, admin2);
+        doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3, status3, now(), designatedBody, admin3);
+        doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4, status4, now(), designatedBody, admin4);
+        doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5, now(), designatedBody, admin5);
     }
 }

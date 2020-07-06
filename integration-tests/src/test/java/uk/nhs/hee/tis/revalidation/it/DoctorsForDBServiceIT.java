@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.nhs.hee.tis.revalidation.RevalidationApplication;
 import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
+import uk.nhs.hee.tis.revalidation.dto.TraineeAdminDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
@@ -561,13 +562,31 @@ public class DoctorsForDBServiceIT extends BaseIT {
 
     @Test
     public void shouldUpdateAdminForTrainee() {
-        final var adminEmail = faker.internet().emailAddress();
+        final var adminEmail1 = faker.internet().emailAddress();
+        final var adminEmail2 = faker.internet().emailAddress();
+        final var ta1 = TraineeAdminDto.builder().admin(adminEmail1).gmcNumber(gmcRef1).build();
+        final var ta2 = TraineeAdminDto.builder().admin(adminEmail2).gmcNumber(gmcRef2).build();
         repository.saveAll(List.of(doc1, doc2));
-        service.updateTraineeAdmin(gmcRef1, adminEmail);
-        final var doctorsForDB = repository.findById(gmcRef1);
+        service.updateTraineeAdmin(List.of(ta1, ta2));
+        var doctorsForDB = repository.findById(gmcRef1);
 
         assertThat(doctorsForDB.isPresent(), is(true));
-        assertThat(doctorsForDB.get().getAdmin(), is(adminEmail));
+        assertThat(doctorsForDB.get().getAdmin(), is(adminEmail1));
+
+        doctorsForDB = repository.findById(gmcRef2);
+
+        assertThat(doctorsForDB.isPresent(), is(true));
+        assertThat(doctorsForDB.get().getAdmin(), is(adminEmail2));
+    }
+
+    @Test
+    public void shouldKeepAdminForTraineeWhenNoChange() {
+        repository.saveAll(List.of(doc1, doc2));
+        service.updateTraineeAdmin(List.of());
+        var doctorsForDB = repository.findById(gmcRef1);
+
+        assertThat(doctorsForDB.isPresent(), is(true));
+        assertThat(doctorsForDB.get().getAdmin(), is(admin));
     }
 
     @Test
@@ -588,7 +607,8 @@ public class DoctorsForDBServiceIT extends BaseIT {
         assertThat(doctorsForDB.getGmcReferenceNumber(), is(gmcRef1));
         assertThat(doctorsForDB.getAdmin(),  is(nullValue()));
 
-        service.updateTraineeAdmin(gmcRef1, adminEmail);
+        final var ta1 = TraineeAdminDto.builder().admin(adminEmail).gmcNumber(gmcRef1).build();
+        service.updateTraineeAdmin(List.of(ta1));
 
         doctorsForDB = repository.findById(gmcRef1).get();
         assertThat(doctorsForDB.getGmcReferenceNumber(), is(gmcRef1));

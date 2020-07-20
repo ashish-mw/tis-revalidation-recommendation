@@ -8,6 +8,10 @@ Revalidation V2
 - Maven
 - Docker
 
+## TODO
+ - Provide `SENTRY_DSN` and `SENTRY_ENVIRONMENT` as environmental variables
+   during deployment and need to make the SENTRY_ENVIRONMENT dynamic in the future.
+
 # To Build
 
 mvn clean install

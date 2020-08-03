@@ -31,4 +31,5 @@ public class TraineeInfoDto {
     private String currentGrade;
     private String admin;
     private LocalDate lastUpdatedDate;
+    private String designatedBody;
 }

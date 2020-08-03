@@ -78,6 +78,7 @@ public class DoctorsForDBService {
                 .doctorFirstName(doctorsForDB.getDoctorFirstName())
                 .doctorLastName(doctorsForDB.getDoctorLastName())
                 .submissionDate(doctorsForDB.getSubmissionDate())
+                .designatedBody(doctorsForDB.getDesignatedBodyCode())
                 .dateAdded(doctorsForDB.getDateAdded())
                 .underNotice(doctorsForDB.getUnderNotice().name())
                 .sanction(doctorsForDB.getSanction())

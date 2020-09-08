@@ -201,7 +201,7 @@ public class DoctorsForDBServiceTest {
     public void shouldReturnListOfUnderNoticeDoctors() {
 
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
-        when(repository.findAllByUnderNoticeIn(pageableAndSortable, "", YES, ON_HOLD)).thenReturn(page);
+        when(repository.findByUnderNotice(pageableAndSortable, "", YES, ON_HOLD)).thenReturn(page);
         when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1, gmcRef2)))
                 .thenReturn(Map.of(gmcRef1, coreDTO1, gmcRef2, coreDTO2));
         when(coreDTO1.getCctDate()).thenReturn(cctDate1);

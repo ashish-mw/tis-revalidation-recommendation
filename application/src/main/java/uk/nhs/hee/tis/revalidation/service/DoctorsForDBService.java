@@ -102,7 +102,7 @@ public class DoctorsForDBService {
         final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
         final var pageableAndSortable = of(requestDTO.getPageNumber(), pageSize, by(direction, requestDTO.getSortColumn()));
         if (requestDTO.isUnderNotice()) {
-            return doctorsRepository.findAllByUnderNoticeIn(pageableAndSortable, requestDTO.getSearchQuery(), YES, ON_HOLD);
+            return doctorsRepository.findByUnderNotice(pageableAndSortable, requestDTO.getSearchQuery(), YES, ON_HOLD);
         }
 
         return doctorsRepository.findAll(pageableAndSortable, requestDTO.getSearchQuery());

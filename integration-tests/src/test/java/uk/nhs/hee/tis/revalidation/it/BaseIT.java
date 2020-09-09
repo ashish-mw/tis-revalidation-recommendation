@@ -87,9 +87,9 @@ public class BaseIT {
         sanction4 = faker.lorem().characters(2);
         sanction5 = faker.lorem().characters(2);
 
-        desBody1 = "1-AIIDVS";
-        desBody2 = "1-AIIDVS";
-        desBody3 = "1-AIIDVS";
+        desBody1 = "1-AIIDR8";
+        desBody2 = "1-AIIDR8";
+        desBody3 = "1-AIIDR8";
         desBody4 = "1-AIIDVS";
         desBody5 = "1-AIIDVS";
 

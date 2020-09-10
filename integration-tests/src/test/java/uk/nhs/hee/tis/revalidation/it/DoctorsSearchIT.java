@@ -52,6 +52,7 @@ public class DoctorsSearchIT extends BaseIT {
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .searchQuery(doc3.getGmcReferenceNumber())
+                .dbcs(List.of("1-AIIDR8", "1-AIIDVS"))
                 .build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCountTotal(), is(5L));
@@ -85,6 +86,7 @@ public class DoctorsSearchIT extends BaseIT {
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .searchQuery(doc2.getDoctorFirstName())
+                .dbcs(List.of("1-AIIDR8", "1-AIIDVS"))
                 .build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCountTotal(), is(5L));
@@ -117,6 +119,7 @@ public class DoctorsSearchIT extends BaseIT {
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .searchQuery(doc5.getDoctorLastName())
+                .dbcs(List.of("1-AIIDR8", "1-AIIDVS"))
                 .build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCountTotal(), is(5L));
@@ -152,6 +155,7 @@ public class DoctorsSearchIT extends BaseIT {
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .searchQuery("smith")
+                .dbcs(List.of("1-AIIDR8", "1-AIIDVS"))
                 .build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCountTotal(), is(5L));
@@ -204,6 +208,7 @@ public class DoctorsSearchIT extends BaseIT {
                 .sortColumn("submissionDate")
                 .sortOrder("desc")
                 .searchQuery("aqa")
+                .dbcs(List.of("1-AIIDR8", "1-AIIDVS"))
                 .build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCountTotal(), is(5L));
@@ -297,6 +302,7 @@ public class DoctorsSearchIT extends BaseIT {
                 .sortOrder("desc")
                 .underNotice(true)
                 .searchQuery("aqa")
+                .dbcs(List.of("1-AIIDR8", "1-AIIDVS"))
                 .build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCountTotal(), is(5L));
@@ -375,6 +381,7 @@ public class DoctorsSearchIT extends BaseIT {
                 .sortOrder("desc")
                 .underNotice(true)
                 .searchQuery("smith")
+                .dbcs(List.of("1-AIIDR8", "1-AIIDVS"))
                 .build();
         final var doctorDTO = service.getAllTraineeDoctorDetails(requestDTO);
         assertThat(doctorDTO.getCountTotal(), is(5L));

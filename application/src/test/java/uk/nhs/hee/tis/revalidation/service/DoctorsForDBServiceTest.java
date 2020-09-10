@@ -1,6 +1,8 @@
 package uk.nhs.hee.tis.revalidation.service;
 
 import com.github.javafaker.Faker;
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,7 +73,7 @@ public class DoctorsForDBServiceTest {
     private String progName1, progName2, progName3, progName4, progName5;
     private String memType1, memType2, memType3, memType4, memType5;
     private String grade1, grade2, grade3, grade4, grade5;
-    private String designatedBody;
+    private String designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5;
     private String admin1, admin2, admin3, admin4, admin5;
 
     @Before
@@ -84,7 +86,8 @@ public class DoctorsForDBServiceTest {
     public void shouldReturnListOfAllDoctors() {
 
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
-        when(repository.findAll(pageableAndSortable, "")).thenReturn(page);
+        List<String> dbcs = List.of(designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5);
+        when(repository.findAll(pageableAndSortable, "", dbcs)).thenReturn(page);
         when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1, gmcRef2, gmcRef3, gmcRef4, gmcRef5)))
                 .thenReturn(Map.of(gmcRef1, coreDTO1, gmcRef2, coreDTO2, gmcRef3, coreDTO3, gmcRef4, coreDTO4, gmcRef5, coreDTO5));
         when(coreDTO1.getCctDate()).thenReturn(cctDate1);
@@ -121,6 +124,7 @@ public class DoctorsForDBServiceTest {
                 .sortColumn("submissionDate")
                 .pageNumber(1)
                 .searchQuery("")
+                .dbcs(dbcs)
                 .build();
 
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
@@ -198,10 +202,57 @@ public class DoctorsForDBServiceTest {
     }
 
     @Test
+    public void shouldReturnListOfDoctorsAttachedToASpecificDbc() {
+
+        final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
+        List<String> dbcs = List.of(designatedBody1);
+        when(repository.findAll(pageableAndSortable, "", dbcs)).thenReturn(page);
+        when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1)))
+            .thenReturn(Map.of(gmcRef1, coreDTO1));
+        when(coreDTO1.getCctDate()).thenReturn(cctDate1);
+        when(coreDTO1.getProgrammeName()).thenReturn(progName1);
+        when(coreDTO1.getProgrammeMembershipType()).thenReturn(memType1);
+        when(coreDTO1.getCurrentGrade()).thenReturn(grade1);
+        when(page.get()).thenReturn(Stream.of(doc1));
+        when(page.getTotalPages()).thenReturn(1);
+        when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
+        when(repository.count()).thenReturn(5l);
+        final var requestDTO = TraineeRequestDto.builder()
+            .sortOrder("desc")
+            .sortColumn("submissionDate")
+            .pageNumber(1)
+            .searchQuery("")
+            .dbcs(dbcs)
+            .build();
+
+        final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
+
+        final var doctorsForDB = allDoctors.getTraineeInfo();
+        assertThat(allDoctors.getCountTotal(), is(5L));
+        assertThat(allDoctors.getCountUnderNotice(), is(2L));
+        assertThat(allDoctors.getTotalPages(), is(1L));
+        assertThat(doctorsForDB, hasSize(1));
+
+        assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef1));
+        assertThat(doctorsForDB.get(0).getDoctorFirstName(), is(fname1));
+        assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lname1));
+        assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate1));
+        assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate1));
+        assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1.name()));
+        assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
+        assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1.name()));
+        assertThat(doctorsForDB.get(0).getCctDate(), is(cctDate1));
+        assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName1));
+        assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType1));
+        assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade1));
+    }
+
+    @Test
     public void shouldReturnListOfUnderNoticeDoctors() {
 
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
-        when(repository.findAllByUnderNoticeIn(pageableAndSortable, "", YES, ON_HOLD)).thenReturn(page);
+        List<String> dbcs = List.of(designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5);
+        when(repository.findByUnderNotice(pageableAndSortable, "", dbcs, YES, ON_HOLD)).thenReturn(page);
         when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1, gmcRef2)))
                 .thenReturn(Map.of(gmcRef1, coreDTO1, gmcRef2, coreDTO2));
         when(coreDTO1.getCctDate()).thenReturn(cctDate1);
@@ -224,6 +275,7 @@ public class DoctorsForDBServiceTest {
                 .underNotice(true)
                 .pageNumber(1)
                 .searchQuery("")
+                .dbcs(dbcs)
                 .build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();
@@ -262,7 +314,8 @@ public class DoctorsForDBServiceTest {
     @Test
     public void shouldReturnEmptyListOfDoctorsWhenNoRecordFound() {
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
-        when(repository.findAll(pageableAndSortable, "")).thenReturn(page);
+        List<String> dbcs = List.of(designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5);
+        when(repository.findAll(pageableAndSortable, "", dbcs)).thenReturn(page);
         when(page.get()).thenReturn(Stream.of());
         when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(0l);
         final var requestDTO = TraineeRequestDto.builder()
@@ -270,6 +323,7 @@ public class DoctorsForDBServiceTest {
                 .sortColumn("submissionDate")
                 .pageNumber(1)
                 .searchQuery("")
+                .dbcs(dbcs)
                 .build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();
@@ -283,7 +337,8 @@ public class DoctorsForDBServiceTest {
     public void shouldReturnListOfAllDoctorsWhoMatchSearchQuery() {
 
         final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
-        when(repository.findAll(pageableAndSortable, "query")).thenReturn(page);
+        List<String> dbcs = List.of(designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5);
+        when(repository.findAll(pageableAndSortable, "query", dbcs)).thenReturn(page);
         when(traineeCoreService.getTraineeInformationFromCore(of(gmcRef1, gmcRef4)))
                 .thenReturn(Map.of(gmcRef1, coreDTO1, gmcRef4, coreDTO4));
         when(coreDTO1.getCctDate()).thenReturn(cctDate1);
@@ -306,6 +361,7 @@ public class DoctorsForDBServiceTest {
                 .sortColumn("submissionDate")
                 .pageNumber(1)
                 .searchQuery("query")
+                .dbcs(dbcs)
                 .build();
         final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
         final var doctorsForDB = allDoctors.getTraineeInfo();
@@ -327,6 +383,7 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(0).getProgrammeName(), is(progName1));
         assertThat(doctorsForDB.get(0).getProgrammeMembershipType(), is(memType1));
         assertThat(doctorsForDB.get(0).getCurrentGrade(), is(grade1));
+        assertThat(doctorsForDB.get(0).getDesignatedBody(), is(designatedBody1));
 
         assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef4));
         assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fname4));
@@ -340,6 +397,7 @@ public class DoctorsForDBServiceTest {
         assertThat(doctorsForDB.get(1).getProgrammeName(), is(progName4));
         assertThat(doctorsForDB.get(1).getProgrammeMembershipType(), is(memType4));
         assertThat(doctorsForDB.get(1).getCurrentGrade(), is(grade4));
+        assertThat(doctorsForDB.get(1).getDesignatedBody(), is(designatedBody4));
     }
 
     @Test
@@ -437,17 +495,22 @@ public class DoctorsForDBServiceTest {
         grade4 = faker.lorem().characters(5);
         grade5 = faker.lorem().characters(5);
 
-        designatedBody = faker.lorem().characters(8);
+        designatedBody1 = faker.lorem().characters(8);
+        designatedBody2 = faker.lorem().characters(8);
+        designatedBody3 = faker.lorem().characters(8);
+        designatedBody4 = faker.lorem().characters(8);
+        designatedBody5 = faker.lorem().characters(8);
+
         admin1 = faker.internet().emailAddress();
         admin2 = faker.internet().emailAddress();
         admin3 = faker.internet().emailAddress();
         admin4 = faker.internet().emailAddress();
         admin5 = faker.internet().emailAddress();
 
-        doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1, now(), designatedBody, admin1);
-        doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2, now(), designatedBody, admin2);
-        doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3, status3, now(), designatedBody, admin3);
-        doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4, status4, now(), designatedBody, admin4);
-        doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5, now(), designatedBody, admin5);
+        doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1, now(), designatedBody1, admin1);
+        doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2, now(), designatedBody2, admin2);
+        doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3, status3, now(), designatedBody3, admin3);
+        doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4, status4, now(), designatedBody4, admin4);
+        doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5, now(), designatedBody5, admin5);
     }
 }

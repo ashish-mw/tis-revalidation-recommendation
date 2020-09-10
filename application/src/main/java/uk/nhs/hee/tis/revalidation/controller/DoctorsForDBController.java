@@ -46,6 +46,9 @@ public class DoctorsForDBController {
   @Value("${app.validation.sort.order}")
   private List<String> sortOrder;
 
+  @Value("${app.gmc.designatedBodies}")
+  private List<String> designatedBodies;
+
   @Autowired
   private DoctorsForDBService doctorsForDBService;
 
@@ -101,7 +104,8 @@ public class DoctorsForDBController {
     }
 
     if (requestDTO.getDbcs() == null || requestDTO.getDbcs().isEmpty()) {
-      throw new RecommendationException("Designated body code should not be empty.");
+      log.warn("Designated body code should not be empty.");
+      requestDTO.setDbcs(designatedBodies);
     }
   }
 }

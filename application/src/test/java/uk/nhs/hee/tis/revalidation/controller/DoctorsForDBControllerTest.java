@@ -164,7 +164,7 @@ public class DoctorsForDBControllerTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenDbcIsEmpty() throws Exception {
+    public void shouldSetDbcsToAllWhenItsEmpty() throws Exception {
         final var gmcDoctorDTO = prepareGmcDoctor();
         final var requestDTO = TraineeRequestDto.builder()
             .sortOrder(ASC).sortColumn(SUBMISSION_DATE).underNotice(true).searchQuery(EMPTY_STRING)
@@ -174,7 +174,7 @@ public class DoctorsForDBControllerTest {
             .param(SORT_ORDER, ASC)
             .param(SORT_COLUMN, SUBMISSION_DATE)
             .param(UNDER_NOTICE, String.valueOf(true)))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isOk());
     }
 
 

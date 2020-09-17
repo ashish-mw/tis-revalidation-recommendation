@@ -27,6 +27,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static uk.nhs.hee.tis.revalidation.util.DateUtil.*;
 
 @Slf4j
 @RunWith(SpringRunner.class)
@@ -678,9 +679,9 @@ public class DoctorsForDBServiceIT extends BaseIT {
                 .gmcReferenceNumber(gmcRef1)
                 .doctorFirstName(fName1)
                 .doctorLastName(lName1)
-                .submissionDate(subDate1)
+                .submissionDate(convertDateInGmcFormat(subDate1))
                 .underNotice(un1.value())
-                .dateAdded(addedDate1)
+                .dateAdded(convertDateInGmcFormat(addedDate1))
                 .sanction(sanction1)
                 .designatedBodyCode(desBody1)
                 .build();

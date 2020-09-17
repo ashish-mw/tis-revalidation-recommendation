@@ -28,7 +28,7 @@ public class DeferralReasonService {
 
     //insert DeferralReason's data in DB on startup
     public void insertDeferralReason() {
-        final var insufficientEvidence = buildDeferralReason("1", "Insufficient evidence", buildDeferralSubReason("1"));
+        final var insufficientEvidence = buildDeferralReason("1", "Insufficient evidence for a positive recommendation", buildDeferralSubReason("1"));
         final var doctorSubjectToProcess = buildDeferralReason("2", "The doctor is subject to an ongoing process", buildDeferralSubReason("2"));
         deferralReasonRepository.saveAll(List.of(insufficientEvidence, doctorSubjectToProcess));
     }

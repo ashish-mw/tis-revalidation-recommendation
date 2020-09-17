@@ -32,7 +32,7 @@ public class DeferralReasonServiceIT {
         final var deferralReasonByCode = service.getDeferralReasonByCode("1");
         assertNotNull(deferralReasonByCode);
         assertThat(deferralReasonByCode.getCode(), is("1"));
-        assertThat(deferralReasonByCode.getReason(), is("Insufficient evidence"));
+        assertThat(deferralReasonByCode.getReason(), is("Insufficient evidence for a positive recommendation"));
         assertThat(deferralReasonByCode.getDeferralSubReasons(), hasSize(8));
     }
 

@@ -1,16 +1,5 @@
 package uk.nhs.hee.tis.revalidation.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import uk.nhs.hee.tis.revalidation.dto.*;
-import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
-import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
-
-import java.util.List;
-
 import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.data.domain.PageRequest.of;
@@ -20,102 +9,109 @@ import static org.springframework.data.domain.Sort.by;
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.ON_HOLD;
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.YES;
 
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
+import uk.nhs.hee.tis.revalidation.dto.TraineeAdminDto;
+import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDto;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
+import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDto;
+import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
+import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
+
 @Transactional
 @Service
 public class DoctorsForDBService {
 
+  @Value("${app.reval.pagination.pageSize}")
+  private int pageSize;
 
-    @Value("${app.reval.pagination.pageSize}")
-    private int pageSize;
+  @Autowired
+  private DoctorsForDBRepository doctorsRepository;
 
-    @Autowired
-    private DoctorsForDBRepository doctorsRepository;
+  public TraineeSummaryDto getAllTraineeDoctorDetails(final TraineeRequestDto requestDTO) {
+    final var paginatedDoctors = getSortedAndFilteredDoctorsByPageNumber(requestDTO);
+    final var doctorsList = paginatedDoctors.get().collect(toList());
+    final var gmcIds = doctorsList.stream().map(doc -> doc.getGmcReferenceNumber())
+        .collect(toList());
+    final var traineeDoctors = doctorsList.stream().map(d ->
+        convert(d)).collect(toList());
 
-    @Autowired
-    private TraineeCoreService traineeCoreService;
+    return TraineeSummaryDto.builder()
+        .traineeInfo(traineeDoctors)
+        .countTotal(getCountAll())
+        .countUnderNotice(getCountUnderNotice())
+        .totalPages(paginatedDoctors.getTotalPages())
+        .totalResults(paginatedDoctors.getTotalElements())
+        .build();
+  }
 
-    public TraineeSummaryDto getAllTraineeDoctorDetails(final TraineeRequestDto requestDTO) {
-        final var paginatedDoctors = getSortedAndFilteredDoctorsByPageNumber(requestDTO);
-        final var doctorsList = paginatedDoctors.get().collect(toList());
-        final var gmcIds = doctorsList.stream().map(doc -> doc.getGmcReferenceNumber()).collect(toList());
-        final var traineeCoreInfo = traineeCoreService.getTraineeInformationFromCore(gmcIds);
-        final var traineeDoctors = doctorsList.stream().map(d ->
-                convert(d, traineeCoreInfo.get(d.getGmcReferenceNumber()))).collect(toList());
-
-        return TraineeSummaryDto.builder()
-                .traineeInfo(traineeDoctors)
-                .countTotal(getCountAll())
-                .countUnderNotice(getCountUnderNotice())
-                .totalPages(paginatedDoctors.getTotalPages())
-                .totalResults(paginatedDoctors.getTotalElements())
-                .build();
+  public void updateTrainee(final DoctorsForDbDto gmcDoctor) {
+    final var doctorsForDB = DoctorsForDB.convert(gmcDoctor);
+    final var doctor = doctorsRepository.findById(gmcDoctor.getGmcReferenceNumber());
+    if (doctor.isPresent()) {
+      doctorsForDB.setAdmin(doctor.get().getAdmin());
     }
+    doctorsRepository.save(doctorsForDB);
+  }
 
-    public void updateTrainee(final DoctorsForDbDto gmcDoctor) {
-        final var doctorsForDB = DoctorsForDB.convert(gmcDoctor);
-        final var doctor = doctorsRepository.findById(gmcDoctor.getGmcReferenceNumber());
-        if (doctor.isPresent()) {
-            doctorsForDB.setAdmin(doctor.get().getAdmin());
-        }
+  public void updateTraineeAdmin(final List<TraineeAdminDto> traineeAdmins) {
+    traineeAdmins.stream().forEach(traineeAdmin -> {
+      final var doctor = doctorsRepository.findById(traineeAdmin.getGmcNumber());
+      if (doctor.isPresent()) {
+        final var doctorsForDB = doctor.get();
+        doctorsForDB.setAdmin(traineeAdmin.getAdmin());
+        doctorsForDB.setLastUpdatedDate(now());
         doctorsRepository.save(doctorsForDB);
+      }
+    });
+  }
+
+  private TraineeInfoDto convert(final DoctorsForDB doctorsForDB) {
+    final var traineeInfoDTOBuilder = TraineeInfoDto.builder()
+        .gmcReferenceNumber(doctorsForDB.getGmcReferenceNumber())
+        .doctorFirstName(doctorsForDB.getDoctorFirstName())
+        .doctorLastName(doctorsForDB.getDoctorLastName())
+        .submissionDate(doctorsForDB.getSubmissionDate())
+        .designatedBody(doctorsForDB.getDesignatedBodyCode())
+        .dateAdded(doctorsForDB.getDateAdded())
+        .underNotice(doctorsForDB.getUnderNotice().name())
+        .sanction(doctorsForDB.getSanction())
+        .doctorStatus(doctorsForDB.getDoctorStatus().name()) //TODO update with legacy statuses
+        .lastUpdatedDate(doctorsForDB.getLastUpdatedDate())
+        .admin(doctorsForDB.getAdmin());
+
+    return traineeInfoDTOBuilder.build();
+
+  }
+
+  private Page<DoctorsForDB> getSortedAndFilteredDoctorsByPageNumber(
+      final TraineeRequestDto requestDTO) {
+    final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
+    final var pageableAndSortable = of(requestDTO.getPageNumber(), pageSize,
+        by(direction, requestDTO.getSortColumn()));
+    if (requestDTO.isUnderNotice()) {
+      return doctorsRepository
+          .findByUnderNotice(pageableAndSortable, requestDTO.getSearchQuery(), requestDTO.getDbcs(),
+              YES, ON_HOLD);
     }
 
-    public void updateTraineeAdmin(final List<TraineeAdminDto> traineeAdmins) {
-        traineeAdmins.stream().forEach(traineeAdmin -> {
-            final var doctor = doctorsRepository.findById(traineeAdmin.getGmcNumber());
-            if (doctor.isPresent()) {
-                final var doctorsForDB = doctor.get();
-                doctorsForDB.setAdmin(traineeAdmin.getAdmin());
-                doctorsForDB.setLastUpdatedDate(now());
-                doctorsRepository.save(doctorsForDB);
-            }
-        });
-    }
+    return doctorsRepository
+        .findAll(pageableAndSortable, requestDTO.getSearchQuery(), requestDTO.getDbcs());
+  }
 
-    private TraineeInfoDto convert(final DoctorsForDB doctorsForDB, final TraineeCoreDto traineeCoreDTO) {
-        final var traineeInfoDTOBuilder = TraineeInfoDto.builder()
-                .gmcReferenceNumber(doctorsForDB.getGmcReferenceNumber())
-                .doctorFirstName(doctorsForDB.getDoctorFirstName())
-                .doctorLastName(doctorsForDB.getDoctorLastName())
-                .submissionDate(doctorsForDB.getSubmissionDate())
-                .designatedBody(doctorsForDB.getDesignatedBodyCode())
-                .dateAdded(doctorsForDB.getDateAdded())
-                .underNotice(doctorsForDB.getUnderNotice().name())
-                .sanction(doctorsForDB.getSanction())
-                .doctorStatus(doctorsForDB.getDoctorStatus().name()) //TODO update with legacy statuses
-                .lastUpdatedDate(doctorsForDB.getLastUpdatedDate())
-                .admin(doctorsForDB.getAdmin());
+  //TODO: explore to implement cache
+  private long getCountAll() {
+    return doctorsRepository.count();
+  }
 
-        if (traineeCoreDTO != null) {
-            traineeInfoDTOBuilder
-                    .cctDate(traineeCoreDTO.getCctDate())
-                    .programmeName(traineeCoreDTO.getProgrammeName())
-                    .programmeMembershipType(traineeCoreDTO.getProgrammeMembershipType())
-                    .currentGrade(traineeCoreDTO.getCurrentGrade());
-        }
-
-        return traineeInfoDTOBuilder.build();
-
-    }
-
-    private Page<DoctorsForDB> getSortedAndFilteredDoctorsByPageNumber(final TraineeRequestDto requestDTO) {
-        final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
-        final var pageableAndSortable = of(requestDTO.getPageNumber(), pageSize, by(direction, requestDTO.getSortColumn()));
-        if (requestDTO.isUnderNotice()) {
-            return doctorsRepository.findByUnderNotice(pageableAndSortable, requestDTO.getSearchQuery(), requestDTO.getDbcs() , YES, ON_HOLD);
-        }
-
-        return doctorsRepository.findAll(pageableAndSortable, requestDTO.getSearchQuery(), requestDTO.getDbcs());
-    }
-
-    //TODO: explore to implement cache
-    private long getCountAll() {
-        return doctorsRepository.count();
-    }
-
-    //TODO: explore to implement cache
-    private long getCountUnderNotice() {
-        return doctorsRepository.countByUnderNoticeIn(YES, ON_HOLD);
-    }
+  //TODO: explore to implement cache
+  private long getCountUnderNotice() {
+    return doctorsRepository.countByUnderNoticeIn(YES, ON_HOLD);
+  }
 
 }

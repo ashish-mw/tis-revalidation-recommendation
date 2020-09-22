@@ -3,7 +3,7 @@ spring:
   profiles:
     active: ${SPRING_PROFILE:local}
   application:
-    name: TIS-HEE-REVALIDATION
+    name: tis-revalidation-recommendation
   jackson:
     serialization.write_dates_as_timestamps: false
     serialization.indent_output: true

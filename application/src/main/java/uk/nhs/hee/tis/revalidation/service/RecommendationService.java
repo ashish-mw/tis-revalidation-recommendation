@@ -47,9 +47,6 @@ public class RecommendationService {
     private RecommendationRepository recommendationRepository;
 
     @Autowired
-    private TraineeCoreService traineeCoreService;
-
-    @Autowired
     private DeferralReasonService deferralReasonService;
 
     @Autowired
@@ -62,22 +59,13 @@ public class RecommendationService {
 
         if (optionalDoctorsForDB.isPresent()) {
             final var doctorsForDB = optionalDoctorsForDB.get();
-            final var traineeCoreInfo = traineeCoreService.getTraineeInformationFromCore(of(gmcId));
 
-            final var recommendationDTOBuilder = TraineeRecommendationDto.builder()
+            return TraineeRecommendationDto.builder()
                     .fullName(format("%s %s", doctorsForDB.getDoctorFirstName(), doctorsForDB.getDoctorLastName()))
                     .gmcNumber(doctorsForDB.getGmcReferenceNumber())
-                    .underNotice(doctorsForDB.getUnderNotice().value());
-            if (traineeCoreInfo.get(gmcId) != null) {
-                final var traineeCoreDTO = traineeCoreInfo.get(gmcId);
-                recommendationDTOBuilder.cctDate(traineeCoreDTO.getCctDate());
-                recommendationDTOBuilder.currentGrade(traineeCoreDTO.getCurrentGrade());
-                recommendationDTOBuilder.programmeMembershipType(traineeCoreDTO.getProgrammeMembershipType());
-            }
-
-            recommendationDTOBuilder.revalidations(getCurrentAndLegacyRecommendation(doctorsForDB));
-            recommendationDTOBuilder.deferralReasons(deferralReasonService.getAllDeferralReasons());
-            return recommendationDTOBuilder.build();
+                    .underNotice(doctorsForDB.getUnderNotice().value())
+                    .revalidations(getCurrentAndLegacyRecommendation(doctorsForDB))
+                    .deferralReasons(deferralReasonService.getAllDeferralReasons()).build();
         }
 
         return null;

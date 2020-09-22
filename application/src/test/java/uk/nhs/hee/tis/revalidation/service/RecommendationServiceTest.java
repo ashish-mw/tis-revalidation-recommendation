@@ -48,9 +48,6 @@ public class RecommendationServiceTest {
     private RecommendationService recommendationService;
 
     @Mock
-    private TraineeCoreService traineeCoreService;
-
-    @Mock
     private RecommendationRepository recommendationRepository;
 
     @Mock
@@ -168,13 +165,9 @@ public class RecommendationServiceTest {
         final var gmcId = faker.number().digits(7);
         final var doctorsForDB = buildDoctorForDB(gmcId);
         when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
-        when(traineeCoreService.getTraineeInformationFromCore(List.of(gmcId))).thenReturn(Map.of(gmcId, traineeCoreDTO));
         when(snapshotService.getSnapshotRecommendations(doctorsForDB)).thenReturn(List.of(snapshot1, snapshot2));
         when(recommendationRepository.findByGmcNumber(gmcId)).thenReturn(List.of(buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE, UNDER_REVIEW)));
         when(deferralReasonService.getAllDeferralReasons()).thenReturn(deferralReasons);
-        when(traineeCoreDTO.getCctDate()).thenReturn(cctDate);
-        when(traineeCoreDTO.getProgrammeMembershipType()).thenReturn(programmeMembershipType);
-        when(traineeCoreDTO.getCurrentGrade()).thenReturn(currentGrade);
 
         when(snapshot1.getAdmin()).thenReturn(admin1);
         when(snapshot1.getGmcNumber()).thenReturn(gmcId);
@@ -206,10 +199,6 @@ public class RecommendationServiceTest {
         assertThat(recommendation.getGmcNumber(), is(gmcId));
         assertThat(recommendation.getFullName(), is(getFullName(firstName, lastName)));
         assertThat(recommendation.getUnderNotice(), is(underNotice.value()));
-        assertThat(recommendation.getCctDate(), is(cctDate));
-        assertThat(recommendation.getProgrammeMembershipType(), is(programmeMembershipType));
-        assertThat(recommendation.getCurrentGrade(), is(currentGrade));
-        assertThat(recommendation.getDeferralReasons(), hasSize(2));
 
         assertThat(recommendation.getRevalidations(), hasSize(3));
         var revalidationDTO = recommendation.getRevalidations().get(0);
@@ -256,16 +245,12 @@ public class RecommendationServiceTest {
         final var gmcId = faker.number().digits(7);
         final var doctorsForDB = buildDoctorForDB(gmcId);
         when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
-        when(traineeCoreService.getTraineeInformationFromCore(List.of(gmcId))).thenReturn(Map.of(gmcId, traineeCoreDTO));
         when(snapshotService.getSnapshotRecommendations(doctorsForDB)).thenReturn(List.of(snapshot1));
         final var recommendation1 = buildRecommendation(gmcNumber1, recommendationId, SUBMITTED_TO_GMC, REVALIDATE, APPROVED);
         when(recommendationRepository.findByGmcNumber(gmcId)).thenReturn(List.of(recommendation1));
         when(gmcClientService.checkRecommendationStatus(gmcNumber1,
                 gmcRecommendationId2, recommendationId, designatedBodyCode)).thenReturn(APPROVED);
         when(deferralReasonService.getAllDeferralReasons()).thenReturn(deferralReasons);
-        when(traineeCoreDTO.getCctDate()).thenReturn(cctDate);
-        when(traineeCoreDTO.getProgrammeMembershipType()).thenReturn(programmeMembershipType);
-        when(traineeCoreDTO.getCurrentGrade()).thenReturn(currentGrade);
 
         when(snapshot1.getAdmin()).thenReturn(admin1);
         when(snapshot1.getGmcNumber()).thenReturn(gmcId);
@@ -284,9 +269,6 @@ public class RecommendationServiceTest {
         assertThat(recommendation.getGmcNumber(), is(gmcId));
         assertThat(recommendation.getFullName(), is(getFullName(firstName, lastName)));
         assertThat(recommendation.getUnderNotice(), is(underNotice.value()));
-        assertThat(recommendation.getCctDate(), is(cctDate));
-        assertThat(recommendation.getProgrammeMembershipType(), is(programmeMembershipType));
-        assertThat(recommendation.getCurrentGrade(), is(currentGrade));
         assertThat(recommendation.getDeferralReasons(), hasSize(2));
 
         assertThat(recommendation.getRevalidations(), hasSize(2));
@@ -323,14 +305,10 @@ public class RecommendationServiceTest {
         final var gmcId = faker.number().digits(7);
         final var doctorsForDB = buildDoctorForDB(gmcId);
         when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
-        when(traineeCoreService.getTraineeInformationFromCore(List.of(gmcId))).thenReturn(Map.of(gmcId, traineeCoreDTO));
         when(snapshotService.getSnapshotRecommendations(doctorsForDB)).thenReturn(List.of(snapshot1));
         when(recommendationRepository.findByGmcNumber(gmcId)).thenReturn(List.of(buildRecommendation(gmcId, newRecommendationId,
                 SUBMITTED_TO_GMC, REVALIDATE, UNDER_REVIEW)));
         when(deferralReasonService.getAllDeferralReasons()).thenReturn(deferralReasons);
-        when(traineeCoreDTO.getCctDate()).thenReturn(cctDate);
-        when(traineeCoreDTO.getProgrammeMembershipType()).thenReturn(programmeMembershipType);
-        when(traineeCoreDTO.getCurrentGrade()).thenReturn(currentGrade);
 
         when(snapshot1.getAdmin()).thenReturn(admin1);
         when(snapshot1.getDeferralComment()).thenReturn(deferralComment1);
@@ -348,10 +326,6 @@ public class RecommendationServiceTest {
         assertThat(recommendation.getGmcNumber(), is(gmcId));
         assertThat(recommendation.getFullName(), is(getFullName(firstName, lastName)));
         assertThat(recommendation.getUnderNotice(), is(underNotice.value()));
-        assertThat(recommendation.getCctDate(), is(cctDate));
-        assertThat(recommendation.getProgrammeMembershipType(), is(programmeMembershipType));
-        assertThat(recommendation.getCurrentGrade(), is(currentGrade));
-        assertThat(recommendation.getDeferralReasons(), hasSize(2));
 
         assertThat(recommendation.getRevalidations(), hasSize(2));
         var revalidationDTO = recommendation.getRevalidations().get(0);
@@ -382,7 +356,6 @@ public class RecommendationServiceTest {
         final var gmcId = faker.number().digits(8);
         final var doctorsForDB = buildDoctorForDB(gmcId);
         when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
-        when(traineeCoreService.getTraineeInformationFromCore(List.of(gmcId))).thenReturn(Map.of());
         final var recommendation = recommendationService.getTraineeInfo(gmcId);
         assertThat(recommendation.getGmcNumber(), is(gmcId));
         assertThat(recommendation.getFullName(), is(getFullName(firstName, lastName)));

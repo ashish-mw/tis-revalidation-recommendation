@@ -93,16 +93,8 @@ public class RecommendationIT extends BaseIT {
     @Test
     public void shouldReturnCoreDataForTrainee() throws Exception {
         doctorsForDBRepository.saveAll(List.of(doc1));
-        final var coreData = of(gmcRef1, coreDTO1);
-        stubCoreRequest(coreData);
 
         final var recommendation = recommendationService.getTraineeInfo(gmcRef1);
-
-        assertThat(recommendation.getGmcNumber(), is(gmcRef1));
-        assertThat(recommendation.getFullName(), is(fullName(fName1, lName1)));
-        assertThat(recommendation.getCctDate(), is(cctDate1));
-        assertThat(recommendation.getProgrammeMembershipType(), is(memType1));
-        assertThat(recommendation.getCurrentGrade(), is(grade1));
 
         assertThat(recommendation.getRevalidations(), hasSize(2));
         var revalidationDTO = recommendation.getRevalidations().get(0);
@@ -131,53 +123,9 @@ public class RecommendationIT extends BaseIT {
     }
 
     @Test
-    public void shouldReturnRecommendationWhenTcsReturn404() throws Exception {
-        doctorsForDBRepository.saveAll(List.of(doc1));
-        stubCoreRequestReturn404();
-
-        final var recommendation = recommendationService.getTraineeInfo(gmcRef1);
-
-        assertThat(recommendation.getGmcNumber(), is(gmcRef1));
-        assertThat(recommendation.getFullName(), is(fullName(fName1, lName1)));
-        assertThat(recommendation.getCctDate(), is(nullValue()));
-        assertThat(recommendation.getProgrammeMembershipType(), is(nullValue()));
-        assertThat(recommendation.getCurrentGrade(), is(nullValue()));
-    }
-
-    @Test
-    public void shouldReturnRecommendationWhenTcsReturn400() throws Exception {
-        doctorsForDBRepository.saveAll(List.of(doc1));
-        stubCoreRequestReturn400();
-
-        final var recommendation = recommendationService.getTraineeInfo(gmcRef1);
-
-        assertThat(recommendation.getGmcNumber(), is(gmcRef1));
-        assertThat(recommendation.getFullName(), is(fullName(fName1, lName1)));
-        assertThat(recommendation.getCctDate(), is(nullValue()));
-        assertThat(recommendation.getProgrammeMembershipType(), is(nullValue()));
-        assertThat(recommendation.getCurrentGrade(), is(nullValue()));
-    }
-
-    @Test
-    public void shouldReturnRecommendationWhenTcsReturn500() throws Exception {
-        doctorsForDBRepository.saveAll(List.of(doc1));
-        stubCoreRequestReturn500();
-
-        final var recommendation = recommendationService.getTraineeInfo(gmcRef1);
-
-        assertThat(recommendation.getGmcNumber(), is(gmcRef1));
-        assertThat(recommendation.getFullName(), is(fullName(fName1, lName1)));
-        assertThat(recommendation.getCctDate(), is(nullValue()));
-        assertThat(recommendation.getProgrammeMembershipType(), is(nullValue()));
-        assertThat(recommendation.getCurrentGrade(), is(nullValue()));
-    }
-
-    @Test
     public void shouldGetTraineeListOfRecommendation() throws JsonProcessingException {
         snapshotRepository.deleteAll();
         doctorsForDBRepository.saveAll(List.of(doc1));
-        final var coreData = of(gmcRef1, coreDTO1);
-        stubCoreRequest(coreData);
         final var recordDTO1 = TraineeRecommendationRecordDto.builder()
                 .gmcNumber(gmcRef1)
                 .recommendationType(REVALIDATE.name())

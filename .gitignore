@@ -31,5 +31,5 @@ build/
 ### VS Code ###
 .vscode/
 
-### TIS-HEE-REVALIDATION ###
+### tis-revalidation-recommendation ###
 /scripts/.docker/

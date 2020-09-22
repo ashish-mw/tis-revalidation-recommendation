@@ -17,8 +17,8 @@
     <groupId>uk.nhs.hee.tis</groupId>
     <artifactId>revalidation</artifactId>
     <version>1.0</version>
-    <name>TIS-HEE-REVALIDATION</name>
-    <description>TIS Revalidation project</description>
+    <name>tis-revalidation-recommendation</name>
+    <description>TIS Revalidation Recommendation project</description>
 
     <properties>
         <java.version>11</java.version>
@@ -37,7 +37,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.login>${env.SONAR_TOKEN}</sonar.login>
         <sonar.organization>health-education-england</sonar.organization>
-        <sonar.projectKey>Health-Education-England_TIS-HEE-REVALIDATION</sonar.projectKey>
+        <sonar.projectKey>Health-Education-England_tis-revalidation-recommendation</sonar.projectKey>
         <sonar.moduleKey>${artifactId}</sonar.moduleKey>
         <sonar.java.checkstyle.reportPaths>
             ${project.build.directory}/checkstyle-result.xml

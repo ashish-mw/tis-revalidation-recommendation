@@ -144,7 +144,7 @@ jobs:
 
       - name: Build, tag and push image to Amazon ECR
         env:
-          ECR_REPOSITORY: tis-hee-revalidation
+          ECR_REPOSITORY: ${{ github.event.repository.name }}
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
@@ -177,14 +177,14 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: .aws/task-definition.json
-          container-name: reval-be
-          image: ${{ steps.login-ecr.outputs.registry }}/tis-hee-revalidation:${{ github.sha }}
+          container-name: ${{ github.event.repository.name }}
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ github.event.repository.name }}:${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: reval-be
+          service: ${{ github.event.repository.name }}
           cluster: revalidation-preprod
           wait-for-service-stability: false
 
@@ -193,12 +193,12 @@ jobs:
         uses: rtCamp/action-slack-notify@v2.0.0
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_TITLE: 'TIS-HEE-REVALIDATION has been deployed through the pipeline'
+          SLACK_TITLE: 'tis-revalidation-recommendation has been deployed through the pipeline'
 
       - name: Slack Notification failure
         if: failure()
         uses: rtCamp/action-slack-notify@v2.0.0
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_TITLE: "TIS-HEE-REVALIDATION build has failed in the pipeline"
+          SLACK_TITLE: "tis-revalidation-recommendation build has failed in the pipeline"
           SLACK_COLOR: "#fc1303"

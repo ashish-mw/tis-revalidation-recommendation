@@ -1,4 +1,4 @@
-# TIS-HEE-REVALIDATION
+# tis-revalidation-recommendation
 
 Revalidation V2
 

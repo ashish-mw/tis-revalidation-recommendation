@@ -30,7 +30,6 @@
         <javafaker.version>1.0.2</javafaker.version>
         <jackson-datatype.version>2.10.2</jackson-datatype.version>
         <springfox-swagger.version>2.9.1</springfox-swagger.version>
-        <wiremock.version>2.26.0</wiremock.version>
         <gmc-api.version>1.0.0</gmc-api.version>
         <jaxb-runtime.version>2.3.2</jaxb-runtime.version>
         <sentry.version>1.7.30</sentry.version>
@@ -158,13 +157,6 @@
                 <groupId>com.github.javafaker</groupId>
                 <artifactId>javafaker</artifactId>
                 <version>${javafaker.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.github.tomakehurst</groupId>
-                <artifactId>wiremock</artifactId>
-                <version>${wiremock.version}</version>
                 <scope>test</scope>
             </dependency>
 

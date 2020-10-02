@@ -79,4 +79,11 @@ public class DateUtilTest {
     assertThat(gmcDate, is(localDate));
   }
 
+  @Test
+  public void shouldReturnNullWhenDateIsEmptyString() {
+    final var dateToFormat = "";
+    final var gmcDate = convertGmcDateToLocalDate(dateToFormat);
+    assertNull(gmcDate);
+  }
+
 }

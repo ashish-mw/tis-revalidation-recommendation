@@ -39,7 +39,7 @@ public class DateUtil {
 
   public static String convertDateInGmcFormat(final LocalDate date) {
     log.info("Format date to GMC format: {}", date);
-    if (date != null) {
+    if (!StringUtils.isEmpty(date)) {
       return date.format(GMC_DATE_FORMATTER);
     }
 
@@ -48,7 +48,7 @@ public class DateUtil {
 
   public static LocalDate convertGmcDateToLocalDate(final String date) {
     log.info("Format date to GMC format: {}", date);
-    if (date != null) {
+    if (!StringUtils.isEmpty(date)) {
       return parse(date, GMC_DATE_FORMATTER);
     }
 

@@ -60,8 +60,9 @@ public class RecommendationControllerTest {
     private String programmeName = faker.lorem().sentence(3);
     private String programmeMembershipType = faker.lorem().characters(10);
     private String currentGrade = faker.lorem().characters(4);
-    private String deferralReason = faker.lorem().sentence(2);
-    private String deferralSubReason = faker.lorem().sentence(3);
+    private String deferralReason1 = "1";
+    private String deferralReason2 = "2";
+    private String deferralSubReason1 = "1";
     private LocalDate deferralDate = LocalDate.now();
     private String deferralComments = faker.lorem().sentence(5);
     private String recommendationType = faker.options().option(RecommendationType.class).name();
@@ -117,8 +118,8 @@ public class RecommendationControllerTest {
                 .gmcNumber(gmcId)
                 .recommendationType(DEFER.name())
                 .deferralDate(deferralDate)
-                .deferralReason(deferralReason)
-                .deferralSubReason(deferralSubReason)
+                .deferralReason(deferralReason1)
+                .deferralSubReason(deferralSubReason1)
                 .comments(List.of())
                 .build();
 
@@ -154,13 +155,71 @@ public class RecommendationControllerTest {
                 .comments(List.of())
                 .build();
 
-        final var expectedErrors = List.of("Deferral date can't be empty or null","Deferral Reason can't be empty or null");
+        final var expectedErrors = List.of("Deferral date can't be empty or in past","Deferral Reason can't be empty or null");
         this.mockMvc.perform(post(RECOMMENDATION_API_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(recordDTO)))
                 .andExpect(status().is4xxClientError())
                 .andExpect(content().json(mapper.writeValueAsString(expectedErrors)));
+    }
+
+    @Test
+    public void shouldThroughExceptionWhenRecommendationIsDeferAndDeferralDateIsInPast() throws Exception {
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+            .gmcNumber(gmcId)
+            .recommendationType(DEFER.name())
+            .deferralDate(deferralDate.minusDays(1))
+            .deferralReason(deferralReason1)
+            .deferralSubReason(deferralSubReason1)
+            .comments(List.of())
+            .build();
+
+        final var expectedErrors = List.of("Deferral date can't be empty or in past");
+        this.mockMvc.perform(post(RECOMMENDATION_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(recordDTO)))
+            .andExpect(status().is4xxClientError())
+            .andExpect(content().json(mapper.writeValueAsString(expectedErrors)));
+    }
+
+    @Test
+    public void shouldThroughExceptionWhenRecommendationIfDeferralReasonRequiredSubReasonAndNotProvided() throws Exception {
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+            .gmcNumber(gmcId)
+            .recommendationType(DEFER.name())
+            .deferralDate(deferralDate.minusDays(1))
+            .deferralReason(deferralReason1)
+            .deferralSubReason(null)
+            .comments(List.of())
+            .build();
+
+        final var expectedErrors = List.of("Deferral date can't be empty or in past", "Deferral Sub Reason can't be empty or null");
+        this.mockMvc.perform(post(RECOMMENDATION_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(recordDTO)))
+            .andExpect(status().is4xxClientError())
+            .andExpect(content().json(mapper.writeValueAsString(expectedErrors)));
+    }
+
+    @Test
+    public void shouldSaveRecommendationWhenDeferralSubReasonIsNotRequired() throws Exception {
+        final var recordDTO = TraineeRecommendationRecordDto.builder()
+            .gmcNumber(gmcId)
+            .recommendationType(DEFER.name())
+            .deferralDate(deferralDate)
+            .deferralReason(deferralReason2)
+            .deferralSubReason(null)
+            .comments(List.of())
+            .build();
+
+        this.mockMvc.perform(post(RECOMMENDATION_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(recordDTO)))
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -195,8 +254,8 @@ public class RecommendationControllerTest {
                 .recommendationId(recommendationId)
                 .recommendationType(DEFER.name())
                 .deferralDate(deferralDate)
-                .deferralReason(deferralReason)
-                .deferralSubReason(deferralSubReason)
+                .deferralReason(deferralReason1)
+                .deferralSubReason(deferralSubReason1)
                 .comments(List.of())
                 .build();
 
@@ -238,7 +297,7 @@ public class RecommendationControllerTest {
         return TraineeRecommendationRecordDto.builder()
                 .deferralComment(deferralComments)
                 .deferralDate(deferralDate)
-                .deferralReason(deferralReason)
+                .deferralReason(deferralReason1)
                 .gmcOutcome(gmcOutcome)
                 .recommendationType(recommendationType)
                 .admin(admin)

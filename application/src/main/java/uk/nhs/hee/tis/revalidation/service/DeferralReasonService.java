@@ -73,7 +73,7 @@ public class DeferralReasonService {
                     DeferralReason.builder().code("5").reason("Interruption to practice").build(),
                     DeferralReason.builder().code("6").reason("Patient feedback").build(),
                     DeferralReason.builder().code("7").reason("QIA").build(),
-                    DeferralReason.builder().code("8").reason("The doctor is subject to an ongoing process").build()
+                    DeferralReason.builder().code("8").reason("Significant events").build()
             );
         }
             return List.of();

@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.nhs.hee.tis.revalidation.dto.RoUserProfileDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
@@ -132,7 +133,8 @@ public class RecommendationService {
   }
 
   //submit a recommendation to gmc
-  public boolean submitRecommendation(final String recommendationId, final String gmcNumber) {
+  public boolean submitRecommendation(final String recommendationId, final String gmcNumber,
+      final RoUserProfileDto userProfileDto) {
     log.info("submitting request to gmc for recommendation: {} and gmcNumber: {}", recommendationId,
         gmcNumber);
     final var doctorsForDB = doctorsForDBRepository.findById(gmcNumber);
@@ -140,7 +142,8 @@ public class RecommendationService {
         .findByIdAndGmcNumber(recommendationId, gmcNumber);
 
     final var doctor = doctorsForDB.get();
-    final var tryRecommendationV2Response = gmcClientService.submitToGmc(doctor, recommendation);
+    final var tryRecommendationV2Response = gmcClientService.submitToGmc(doctor, recommendation,
+        userProfileDto);
     final var tryRecommendationV2Result = tryRecommendationV2Response
         .getTryRecommendationV2Result();
     if (tryRecommendationV2Result != null) {

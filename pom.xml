@@ -32,7 +32,7 @@
         <springfox-swagger.version>3.0.0</springfox-swagger.version>
         <gmc-api.version>1.0.0</gmc-api.version>
         <jaxb-runtime.version>2.3.3</jaxb-runtime.version>
-        <sentry.version>1.7.30</sentry.version>
+        <sentry.version>3.1.1</sentry.version>
         <!-- Sonar cloud -->
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.login>${env.SONAR_TOKEN}</sonar.login>
@@ -162,7 +162,12 @@
 
             <dependency>
                 <groupId>io.sentry</groupId>
-                <artifactId>sentry-spring</artifactId>
+                <artifactId>sentry-spring-boot-starter</artifactId>
+                <version>${sentry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.sentry</groupId>
+                <artifactId>sentry-logback</artifactId>
                 <version>${sentry.version}</version>
             </dependency>
 

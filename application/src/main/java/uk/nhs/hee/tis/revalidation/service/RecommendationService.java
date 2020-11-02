@@ -66,6 +66,7 @@ public class RecommendationService {
               format("%s %s", doctorsForDB.getDoctorFirstName(), doctorsForDB.getDoctorLastName()))
           .gmcNumber(doctorsForDB.getGmcReferenceNumber())
           .underNotice(doctorsForDB.getUnderNotice().value())
+          .designatedBody(doctorsForDB.getDesignatedBodyCode())
           .revalidations(getCurrentAndLegacyRecommendation(doctorsForDB))
           .deferralReasons(deferralReasonService.getAllDeferralReasons()).build();
     }

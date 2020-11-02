@@ -2,9 +2,9 @@ package uk.nhs.hee.tis.revalidation.service;
 
 import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -38,7 +38,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationResponseCT;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationV2Response;
 import uk.nhs.hee.tis.revalidation.dto.DeferralReasonDto;
-import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDto;
+import uk.nhs.hee.tis.revalidation.dto.RoUserProfileDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.entity.DeferralReason;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
@@ -87,9 +87,6 @@ public class RecommendationServiceTest {
   private DeferralReason deferralSubReason;
 
   @Mock
-  private TraineeCoreDto traineeCoreDTO;
-
-  @Mock
   private SnapshotService snapshotService;
 
   private String firstName;
@@ -101,9 +98,6 @@ public class RecommendationServiceTest {
   private String sanction;
   private String designatedBodyCode;
   private RecommendationStatus status;
-  private LocalDate cctDate;
-  private String programmeMembershipType;
-  private String currentGrade;
 
   private String deferralComment1, deferralComment2;
   private LocalDate deferralDate1, deferralDate2;
@@ -123,6 +117,13 @@ public class RecommendationServiceTest {
   private String snapshotRevalidationId1, snapshotRevalidationId2;
   private List<DeferralReasonDto> deferralReasons;
 
+  private String roFirstName;
+  private String roLastName;
+  private String roPhoneNumber;
+  private String roEmailAddress;
+  private String roUserName;
+
+
   @Before
   public void setup() {
     firstName = faker.name().firstName();
@@ -134,9 +135,6 @@ public class RecommendationServiceTest {
     underNotice = faker.options().option(UnderNotice.class);
     sanction = faker.lorem().characters(2);
     designatedBodyCode = faker.lorem().characters(7);
-    cctDate = LocalDate.now();
-    programmeMembershipType = faker.lorem().characters(10);
-    currentGrade = faker.lorem().characters(5);
 
     deferralComment1 = faker.lorem().characters(20);
     deferralDate1 = LocalDate.of(2018, 03, 15);
@@ -172,6 +170,12 @@ public class RecommendationServiceTest {
     newRecommendationId = faker.lorem().characters(10);
     deferralReasons = List.of(new DeferralReasonDto("1", "evidence", List.of()),
         new DeferralReasonDto("2", "ongoing", List.of()));
+
+    roFirstName = faker.name().firstName();
+    roLastName = faker.name().lastName();
+    roUserName = faker.name().username();
+    roEmailAddress = faker.internet().emailAddress();
+    roPhoneNumber = faker.phoneNumber().phoneNumber();
   }
 
   @Test
@@ -510,12 +514,13 @@ public class RecommendationServiceTest {
   public void shouldSubmitRecommendation() {
     final var recommendation = buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE,
         UNDER_REVIEW);
+    final var userProfileDto = getUserProfileDto(gmcNumber1);
     when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
     when(recommendationRepository.findByIdAndGmcNumber(recommendationId, gmcNumber1))
         .thenReturn(recommendation);
-    when(gmcClientService.submitToGmc(doctorsForDB, recommendation))
+    when(gmcClientService.submitToGmc(doctorsForDB, recommendation, userProfileDto))
         .thenReturn(buildRecommendationV2Response(SUCCESS.getCode()));
-    recommendationService.submitRecommendation(recommendationId, gmcNumber1);
+    recommendationService.submitRecommendation(recommendationId, gmcNumber1, userProfileDto);
     verify(recommendationRepository).save(recommendation);
   }
 
@@ -523,12 +528,13 @@ public class RecommendationServiceTest {
   public void shouldNotUpdateRecommendationWhenSubmitFail() {
     final var recommendation = buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE,
         UNDER_REVIEW);
+    final var userProfileDto = getUserProfileDto(gmcNumber1);
     when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
     when(recommendationRepository.findByIdAndGmcNumber(recommendationId, gmcNumber1))
         .thenReturn(recommendation);
-    when(gmcClientService.submitToGmc(doctorsForDB, recommendation))
+    when(gmcClientService.submitToGmc(doctorsForDB, recommendation, userProfileDto))
         .thenReturn(buildRecommendationV2Response(INVALID_RECOMMENDATION.getCode()));
-    recommendationService.submitRecommendation(recommendationId, gmcNumber1);
+    recommendationService.submitRecommendation(recommendationId, gmcNumber1, userProfileDto);
     verify(recommendationRepository, times(0)).save(recommendation);
   }
 
@@ -708,6 +714,17 @@ public class RecommendationServiceTest {
         .actualSubmissionDate(actualSubmissionDate)
         .outcome(outcome)
         .comments(comments)
+        .build();
+  }
+
+  private RoUserProfileDto getUserProfileDto(final String gmcId) {
+    return RoUserProfileDto.builder()
+        .gmcId(gmcId)
+        .firstName(roFirstName)
+        .lastName(roLastName)
+        .emailAddress(roEmailAddress)
+        .phoneNumber(roPhoneNumber)
+        .userName(roUserName)
         .build();
   }
 }

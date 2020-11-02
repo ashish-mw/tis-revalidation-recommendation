@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
+import uk.nhs.hee.tis.revalidation.dto.RoUserProfileDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeCoreDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
@@ -34,6 +35,12 @@ public class BaseIT {
   protected String memType1, memType2, memType3, memType4, memType5;
   protected String grade1, grade2, grade3, grade4, grade5;
   protected String admin;
+  protected String roFirstName;
+  protected String roLastName;
+  protected String roPhoneNumber;
+  protected String roEmailAddress;
+  protected String roUserName;
+  protected RoUserProfileDto userProfileDto;
 
   protected void setupData() {
     gmcRef1 = faker.number().digits(7);
@@ -114,6 +121,12 @@ public class BaseIT {
     grade4 = faker.lorem().characters(5);
     grade5 = faker.lorem().characters(5);
 
+    roFirstName = faker.name().firstName();
+    roLastName = faker.name().lastName();
+    roUserName = faker.name().username();
+    roEmailAddress = faker.internet().emailAddress();
+    roPhoneNumber = faker.phoneNumber().phoneNumber();
+
     admin = faker.internet().emailAddress();
 
     doc1 = new DoctorsForDB(gmcRef1, fName1, lName1, subDate1, addedDate1, un1, sanction1, status1,
@@ -132,5 +145,12 @@ public class BaseIT {
     coreDTO3 = new TraineeCoreDto(gmcRef3, cctDate3, memType3, progName3, grade3);
     coreDTO4 = new TraineeCoreDto(gmcRef4, cctDate4, memType4, progName4, grade4);
     coreDTO5 = new TraineeCoreDto(gmcRef5, cctDate5, memType5, progName5, grade5);
+    userProfileDto = RoUserProfileDto.builder()
+        .firstName(roFirstName)
+        .lastName(roLastName)
+        .emailAddress(roEmailAddress)
+        .phoneNumber(roPhoneNumber)
+        .userName(roUserName)
+        .build();
   }
 }

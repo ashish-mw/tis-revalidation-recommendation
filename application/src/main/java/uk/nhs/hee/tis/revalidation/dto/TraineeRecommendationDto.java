@@ -24,6 +24,7 @@ public class TraineeRecommendationDto {
     private String currentGrade;
     private LocalDate cctDate;
     private String underNotice;
+    private String designatedBody;
     private List<TraineeRecommendationRecordDto> revalidations;
     private List<DeferralReasonDto> deferralReasons;
 

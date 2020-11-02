@@ -220,6 +220,7 @@ public class RecommendationServiceTest {
     assertThat(recommendation.getGmcNumber(), is(gmcId));
     assertThat(recommendation.getFullName(), is(getFullName(firstName, lastName)));
     assertThat(recommendation.getUnderNotice(), is(underNotice.value()));
+    assertThat(recommendation.getDesignatedBody(), is(designatedBodyCode));
 
     assertThat(recommendation.getRevalidations(), hasSize(3));
     var revalidationDTO = recommendation.getRevalidations().get(0);
@@ -291,6 +292,7 @@ public class RecommendationServiceTest {
     assertThat(recommendation.getGmcNumber(), is(gmcId));
     assertThat(recommendation.getFullName(), is(getFullName(firstName, lastName)));
     assertThat(recommendation.getUnderNotice(), is(underNotice.value()));
+    assertThat(recommendation.getDesignatedBody(), is(designatedBodyCode));
     assertThat(recommendation.getDeferralReasons(), hasSize(2));
 
     assertThat(recommendation.getRevalidations(), hasSize(2));
@@ -349,6 +351,7 @@ public class RecommendationServiceTest {
     assertThat(recommendation.getGmcNumber(), is(gmcId));
     assertThat(recommendation.getFullName(), is(getFullName(firstName, lastName)));
     assertThat(recommendation.getUnderNotice(), is(underNotice.value()));
+    assertThat(recommendation.getDesignatedBody(), is(designatedBodyCode));
 
     assertThat(recommendation.getRevalidations(), hasSize(2));
     var revalidationDTO = recommendation.getRevalidations().get(0);

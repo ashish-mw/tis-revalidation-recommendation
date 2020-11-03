@@ -51,7 +51,8 @@ public class GmcClientService {
       final String recommendationId,
       final String designatedBody) {
 
-    log.info("checking recommendation status for gmcId: {} and recommendationId: {}", gmcNumber, recommendationId);
+    log.info("checking recommendation status for gmcId: {} and recommendationId: {}", gmcNumber,
+        recommendationId);
     final var checkRecommendationStatus =
         buildCheckRecommendationStatusRequest(gmcNumber, gmcRecommendationId, recommendationId,
             designatedBody);
@@ -62,17 +63,16 @@ public class GmcClientService {
 
       final var checkRecommendationStatusResult = checkRecommendationStatusResponse
           .getCheckRecommendationStatusResult();
-      final var gmdReturnCode = checkRecommendationStatusResult.getReturnCode();
-      if (SUCCESS.getCode().equals(gmdReturnCode)) {
+      final var gmcReturnCode = checkRecommendationStatusResult.getReturnCode();
+      log.info("Check recommendation status return code: {}", gmcReturnCode);
+      if (SUCCESS.getCode().equals(gmcReturnCode)) {
         final var status = checkRecommendationStatusResult.getStatus();
         return RecommendationGmcOutcome.fromString(status);
       } else {
-        final var responseCode = fromCode(gmdReturnCode);
+        final var responseCode = fromCode(gmcReturnCode);
         log.error(
-            "Gmc recommendation check status request is failed for GmcId: {} and recommendationId: {} with Response: {}."
-                +
-                " Recommendation will stay in Under Review state", gmcNumber, recommendationId,
-            responseCode.getMessage());
+            "Gmc recommendation check status request is failed for GmcId: {} and recommendationId: {}."
+                + " Recommendation will stay in Under Review state", gmcNumber, recommendationId);
       }
     } catch (Exception e) {
       log.error("Failed to check status with GMC", e);
@@ -109,7 +109,8 @@ public class GmcClientService {
     tryRecommendation.setPassword(gmcPassword);
 
     try {
-      log.info("Submitting recommendation to GMC for gmcId: {}", doctorForDB.getGmcReferenceNumber());
+      log.info("Submitting recommendation to GMC for gmcId: {}",
+          doctorForDB.getGmcReferenceNumber());
       final var tryRecommendationV2Response = (TryRecommendationV2Response) webServiceTemplate
           .marshalSendAndReceive(gmcConnectUrl, tryRecommendation,
               new SoapActionCallback(gmcSoapBaseAction + TRY_RECOMMENDATION_V2));

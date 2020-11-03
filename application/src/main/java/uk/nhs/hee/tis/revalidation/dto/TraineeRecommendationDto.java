@@ -25,6 +25,7 @@ public class TraineeRecommendationDto {
     private LocalDate cctDate;
     private String underNotice;
     private String designatedBody;
+    private LocalDate gmcSubmissionDate;
     private List<TraineeRecommendationRecordDto> revalidations;
     private List<DeferralReasonDto> deferralReasons;
 

@@ -148,6 +148,8 @@ public class RecommendationService {
     final var tryRecommendationV2Result = tryRecommendationV2Response
         .getTryRecommendationV2Result();
     if (tryRecommendationV2Result != null) {
+      log.info("Receive response for submit request for gmcId: {} with return code: {}",
+          doctor.getGmcReferenceNumber(), tryRecommendationV2Result.getReturnCode());
       final var returnCode = tryRecommendationV2Result.getReturnCode();
       if (SUCCESS.getCode().equals(returnCode)) {
         recommendation.setRecommendationStatus(SUBMITTED_TO_GMC);

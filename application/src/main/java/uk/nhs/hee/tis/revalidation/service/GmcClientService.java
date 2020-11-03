@@ -46,10 +46,10 @@ public class GmcClientService {
       final String recommendationId,
       final String designatedBody) {
 
+    log.info("checking recommendation status for gmcId: {} and recommendationId: {}", gmcNumber, recommendationId);
     final var checkRecommendationStatus =
         buildCheckRecommendationStatusRequest(gmcNumber, gmcRecommendationId, recommendationId,
             designatedBody);
-    log.info("GMC Connect Url {}", gmcConnectUrl);
     try {
       final var checkRecommendationStatusResponse = (CheckRecommendationStatusResponse) webServiceTemplate
           .marshalSendAndReceive(gmcConnectUrl, checkRecommendationStatus,
@@ -103,8 +103,8 @@ public class GmcClientService {
     tryRecommendation.setUsername(gmcUserName);
     tryRecommendation.setPassword(gmcPassword);
 
-    log.info("GMC Connect Url {}", gmcConnectUrl);
     try {
+      log.info("Submitting recommendation to GMC for gmcId: {}", doctorForDB.getGmcReferenceNumber());
       final var tryRecommendationV2Response = (TryRecommendationV2Response) webServiceTemplate
           .marshalSendAndReceive(gmcConnectUrl, tryRecommendation,
               new SoapActionCallback(gmcConnectUrl));

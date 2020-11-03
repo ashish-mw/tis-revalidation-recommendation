@@ -28,6 +28,8 @@ import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 public class GmcClientService {
 
   private static final String INTERNAL_USER_ID = "InternalUserId";
+  private static final String TRY_RECOMMENDATION_V2 = "TryRecommendationV2";
+  private static final String CHECK_RECOMMENDATION_STATUS = "CheckRecommendationStatus";
 
   @Autowired
   private WebServiceTemplate webServiceTemplate;
@@ -41,6 +43,9 @@ public class GmcClientService {
   @Value("${app.gmc.gmcPassword}")
   private String gmcPassword;
 
+  @Value("${app.gmc.soapActionBase}")
+  private String gmcSoapBaseAction;
+
   public RecommendationGmcOutcome checkRecommendationStatus(final String gmcNumber,
       final String gmcRecommendationId,
       final String recommendationId,
@@ -53,7 +58,7 @@ public class GmcClientService {
     try {
       final var checkRecommendationStatusResponse = (CheckRecommendationStatusResponse) webServiceTemplate
           .marshalSendAndReceive(gmcConnectUrl, checkRecommendationStatus,
-              new SoapActionCallback(gmcConnectUrl));
+              new SoapActionCallback(gmcSoapBaseAction + CHECK_RECOMMENDATION_STATUS));
 
       final var checkRecommendationStatusResult = checkRecommendationStatusResponse
           .getCheckRecommendationStatusResult();
@@ -107,7 +112,7 @@ public class GmcClientService {
       log.info("Submitting recommendation to GMC for gmcId: {}", doctorForDB.getGmcReferenceNumber());
       final var tryRecommendationV2Response = (TryRecommendationV2Response) webServiceTemplate
           .marshalSendAndReceive(gmcConnectUrl, tryRecommendation,
-              new SoapActionCallback(gmcConnectUrl));
+              new SoapActionCallback(gmcSoapBaseAction + TRY_RECOMMENDATION_V2));
       return tryRecommendationV2Response;
     } catch (Exception e) {
       log.error("Failed to submit to GMC", e);

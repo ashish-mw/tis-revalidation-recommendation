@@ -19,9 +19,6 @@ jobs:
         with:
           java-version: 11
 
-      - name: update the AWS client
-        uses: chrislennon/action-aws-cli@v1.1
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -30,7 +27,7 @@ jobs:
           aws-region: eu-west-1
 
       - name: Add CodeArtifact env var
-        run: echo "::set-env name=CODEARTIFACT_AUTH_TOKEN::$(aws codeartifact get-authorization-token --domain hee --domain-owner 430723991443 --query authorizationToken --output text)"
+        run: echo "CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain hee --domain-owner 430723991443 --query authorizationToken --output text)" >> $GITHUB_ENV
 
       - name: maven-settings-xml-action
         uses: whelk-io/maven-settings-xml-action@v4
@@ -49,7 +46,7 @@ jobs:
 
   analyze:
     name: Perform quality analysis
-    needs: [build]
+    needs: [ build ]
     runs-on: ubuntu-latest
 
     steps:
@@ -67,9 +64,6 @@ jobs:
         with:
           java-version: 11
 
-      - name: update the AWS client
-        uses: chrislennon/action-aws-cli@v1.1
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -78,7 +72,7 @@ jobs:
           aws-region: eu-west-1
 
       - name: Add CodeArtifact env var
-        run: echo "::set-env name=CODEARTIFACT_AUTH_TOKEN::$(aws codeartifact get-authorization-token --domain hee --domain-owner 430723991443 --query authorizationToken --output text)"
+        run: echo "CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain hee --domain-owner 430723991443 --query authorizationToken --output text)" >> $GITHUB_ENV
 
       - name: maven-settings-xml-action
         uses: whelk-io/maven-settings-xml-action@v4

@@ -1,9 +1,9 @@
 package uk.nhs.hee.tis.revalidation.service;
 
 import static java.time.LocalDate.now;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -318,6 +318,29 @@ public class DoctorsForDBServiceTest {
     when(repository.findById(gmcRef5)).thenReturn(Optional.of(doc5));
     doctorsForDBService.updateTraineeAdmin(List.of(ta1, ta2, ta3, ta4, ta5));
     verify(repository, times(5)).save(any());
+  }
+
+  @Test
+  public void shouldRemoveDesignatedBodyCode() {
+    when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
+    doctorsForDBService.removeDesignatedBodyCode(gmcRef1);
+
+    verify(repository).save(doc1);
+  }
+
+  @Test
+  public void shouldNotRemoveDesignatedBodyCodeWhenNoDoctorFound() {
+    when(repository.findById(gmcRef1)).thenReturn(Optional.empty());
+    doctorsForDBService.removeDesignatedBodyCode(gmcRef1);
+
+    verify(repository, times(0)).save(doc1);
+  }
+
+  @Test
+  public void shouldGetDesignatedBodyCode() {
+    when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
+    final var designatedBodyCode = doctorsForDBService.getDesignatedBodyCode(gmcRef1);
+    assertThat(designatedBodyCode, is(doc1.getDesignatedBodyCode()));
   }
 
 

@@ -11,13 +11,19 @@ import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 @Component
 public class RabbitMessageListener {
 
-    @Autowired
-    private DoctorsForDBService doctorsForDBService;
+  @Autowired
+  private DoctorsForDBService doctorsForDBService;
 
-    @RabbitListener(queues="${app.rabbit.queue}")
-    public void receivedMessage(final DoctorsForDbDto gmcDoctor) {
-        log.info("Message received from rabbit: {}", gmcDoctor);
-        doctorsForDBService.updateTrainee(gmcDoctor);
-    }
+  @RabbitListener(queues = "${app.rabbit.queue}")
+  public void receivedMessage(final DoctorsForDbDto gmcDoctor) {
+    log.info("Message received from rabbit: {}", gmcDoctor);
+    doctorsForDBService.updateTrainee(gmcDoctor);
+  }
+
+  @RabbitListener(queues = "${app.rabbit.remove.dbc.queue}")
+  public void receiveRemoveDoctorDesignatedBodyCodeMessage(final String gmcId) {
+    log.info("Message received to remove designated body code from rabbit, GmcId: {}", gmcId);
+    doctorsForDBService.removeDesignatedBodyCode(gmcId);
+  }
 
 }

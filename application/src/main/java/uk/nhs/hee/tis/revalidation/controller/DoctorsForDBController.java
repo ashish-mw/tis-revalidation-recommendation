@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -87,6 +88,17 @@ public class DoctorsForDBController {
 
     doctorsForDBService.updateTraineeAdmin(traineeAdmins.getTraineeAdmins());
     return ResponseEntity.ok().build();
+  }
+
+  @ApiOperation(value = "Get doctor DB Code", notes = "It will return doctor db code", response = ResponseEntity.class)
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Doctor's designated body code", response = ResponseEntity.class)})
+  @GetMapping("/designated-body/{gmcId}")
+  public ResponseEntity<String> getDesignatedBodyCode(@PathVariable("gmcId") final String gmcId) {
+    log.info("Receive request to get designatedBodyCode for user: {}", gmcId);
+    final var designatedBodyCode = doctorsForDBService
+        .getDesignatedBodyCode(gmcId);
+    return ResponseEntity.ok().body(designatedBodyCode);
   }
 
   //TODO: find a better way like separate validator

@@ -10,6 +10,7 @@ import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.ON_HOLD;
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.YES;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
+@Slf4j
 @Transactional
 @Service
 public class DoctorsForDBService {
@@ -71,6 +73,23 @@ public class DoctorsForDBService {
     });
   }
 
+  public String getDesignatedBodyCode(final String gmcId) {
+    final var doctorsForDB = doctorsRepository.findById(gmcId);
+    return doctorsForDB.isPresent() ? doctorsForDB.get().getDesignatedBodyCode() : null;
+  }
+
+  public void removeDesignatedBodyCode(final String gmcId) {
+    final var doctorsForDBOptional = doctorsRepository.findById(gmcId);
+    if (doctorsForDBOptional.isPresent()) {
+      log.info("Removing designated body code from doctors for DB");
+      final var doctorsForDB = doctorsForDBOptional.get();
+      doctorsForDB.setDesignatedBodyCode(null);
+      doctorsRepository.save(doctorsForDB);
+    } else {
+      log.info("No doctor found to remove designated body code");
+    }
+  }
+
   private TraineeInfoDto convert(final DoctorsForDB doctorsForDB) {
     final var traineeInfoDTOBuilder = TraineeInfoDto.builder()
         .gmcReferenceNumber(doctorsForDB.getGmcReferenceNumber())
@@ -113,5 +132,4 @@ public class DoctorsForDBService {
   private long getCountUnderNotice() {
     return doctorsRepository.countByUnderNoticeIn(YES, ON_HOLD);
   }
-
 }

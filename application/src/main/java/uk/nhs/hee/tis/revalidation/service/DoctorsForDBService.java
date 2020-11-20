@@ -78,7 +78,7 @@ public class DoctorsForDBService {
     final var doctorsForDB = doctorsRepository.findById(gmcId);
     final var designatedBodyCode =
         doctorsForDB.isPresent() ? doctorsForDB.get().getDesignatedBodyCode() : null;
-    return DesignatedBodyDto.builder().designatedBodyDto(designatedBodyCode).build();
+    return DesignatedBodyDto.builder().designatedBodyCode(designatedBodyCode).build();
   }
 
   public void removeDesignatedBodyCode(final String gmcId) {

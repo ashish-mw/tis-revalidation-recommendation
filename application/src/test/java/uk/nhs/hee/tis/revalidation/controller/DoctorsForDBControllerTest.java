@@ -34,6 +34,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.nhs.hee.tis.revalidation.dto.DesignatedBodyDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeAdminDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeAdminUpdateDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDto;
@@ -196,10 +197,11 @@ public class DoctorsForDBControllerTest {
   @Test
   public void shouldReturnDesignatedBodyCode() throws Exception {
 
-    when(doctorsForDBService.getDesignatedBodyCode(gmcRef1)).thenReturn(designatedBody1);
+    final var designatedBodyDto = DesignatedBodyDto.builder().designatedBodyDto(designatedBody1).build();
+    when(doctorsForDBService.getDesignatedBodyCode(gmcRef1)).thenReturn(designatedBodyDto);
     final var url = format("%s%s/%s", DOCTORS_API_URL, GET_DESIGNATED_BODY, gmcRef1);
     this.mockMvc.perform(get(url))
-        .andExpect(content().string(designatedBody1))
+        .andExpect(content().json(mapper.writeValueAsString(designatedBodyDto)))
         .andExpect(status().isOk());
   }
 

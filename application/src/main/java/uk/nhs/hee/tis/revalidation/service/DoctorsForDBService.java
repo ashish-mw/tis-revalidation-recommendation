@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.nhs.hee.tis.revalidation.dto.DesignatedBodyDto;
 import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeAdminDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDto;
@@ -73,9 +74,11 @@ public class DoctorsForDBService {
     });
   }
 
-  public String getDesignatedBodyCode(final String gmcId) {
+  public DesignatedBodyDto getDesignatedBodyCode(final String gmcId) {
     final var doctorsForDB = doctorsRepository.findById(gmcId);
-    return doctorsForDB.isPresent() ? doctorsForDB.get().getDesignatedBodyCode() : null;
+    final var designatedBodyCode =
+        doctorsForDB.isPresent() ? doctorsForDB.get().getDesignatedBodyCode() : null;
+    return DesignatedBodyDto.builder().designatedBodyDto(designatedBodyCode).build();
   }
 
   public void removeDesignatedBodyCode(final String gmcId) {

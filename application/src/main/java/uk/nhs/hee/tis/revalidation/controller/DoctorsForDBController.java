@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.nhs.hee.tis.revalidation.dto.DesignatedBodyDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeAdminUpdateDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDto;
@@ -94,11 +95,11 @@ public class DoctorsForDBController {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Doctor's designated body code", response = ResponseEntity.class)})
   @GetMapping("/designated-body/{gmcId}")
-  public ResponseEntity<String> getDesignatedBodyCode(@PathVariable("gmcId") final String gmcId) {
+  public ResponseEntity<DesignatedBodyDto> getDesignatedBodyCode(@PathVariable("gmcId") final String gmcId) {
     log.info("Receive request to get designatedBodyCode for user: {}", gmcId);
-    final var designatedBodyCode = doctorsForDBService
+    final var designatedBody = doctorsForDBService
         .getDesignatedBodyCode(gmcId);
-    return ResponseEntity.ok().body(designatedBodyCode);
+    return ResponseEntity.ok().body(designatedBody);
   }
 
   //TODO: find a better way like separate validator

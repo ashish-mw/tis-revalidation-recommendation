@@ -197,7 +197,7 @@ public class DoctorsForDBControllerTest {
   @Test
   public void shouldReturnDesignatedBodyCode() throws Exception {
 
-    final var designatedBodyDto = DesignatedBodyDto.builder().designatedBodyDto(designatedBody1).build();
+    final var designatedBodyDto = DesignatedBodyDto.builder().designatedBodyCode(designatedBody1).build();
     when(doctorsForDBService.getDesignatedBodyCode(gmcRef1)).thenReturn(designatedBodyDto);
     final var url = format("%s%s/%s", DOCTORS_API_URL, GET_DESIGNATED_BODY, gmcRef1);
     this.mockMvc.perform(get(url))

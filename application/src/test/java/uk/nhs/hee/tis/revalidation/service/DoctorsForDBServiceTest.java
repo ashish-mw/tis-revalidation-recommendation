@@ -340,7 +340,7 @@ public class DoctorsForDBServiceTest {
   public void shouldGetDesignatedBodyCode() {
     when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
     final var designatedBody = doctorsForDBService.getDesignatedBodyCode(gmcRef1);
-    assertThat(designatedBody.getDesignatedBodyDto(), is(doc1.getDesignatedBodyCode()));
+    assertThat(designatedBody.getDesignatedBodyCode(), is(doc1.getDesignatedBodyCode()));
   }
 
 

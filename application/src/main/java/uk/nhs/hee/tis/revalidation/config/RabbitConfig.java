@@ -20,8 +20,8 @@ public class RabbitConfig {
   @Value("${app.rabbit.queue}")
   private String queueName;
 
-  @Value("${app.rabbit.remove.dbc.queue}")
-  private String removeDbcQueue;
+  @Value("${app.rabbit.connection.queue}")
+  private String connectionQueue;
 
   @Value("${app.rabbit.exchange}")
   private String exchange;
@@ -29,7 +29,7 @@ public class RabbitConfig {
   @Value("${app.rabbit.routingkey}")
   private String routingKey;
 
-  @Value("${app.rabbit.remove.dbc.routingkey}")
+  @Value("${app.rabbit.connection.routingkey}")
   private String removeDbcRoutingKey;
 
   @Bean
@@ -38,8 +38,8 @@ public class RabbitConfig {
   }
 
   @Bean
-  public Queue removeDbcQueue() {
-    return new Queue(removeDbcQueue, false);
+  public Queue connectionQueue() {
+    return new Queue(connectionQueue, false);
   }
 
   @Bean
@@ -53,8 +53,8 @@ public class RabbitConfig {
   }
 
   @Bean
-  public Binding removeDbcbinding(final Queue removeDbcQueue, final DirectExchange exchange) {
-    return BindingBuilder.bind(removeDbcQueue).to(exchange).with(removeDbcRoutingKey);
+  public Binding connectionbinding(final Queue connectionQueue, final DirectExchange exchange) {
+    return BindingBuilder.bind(connectionQueue).to(exchange).with(removeDbcRoutingKey);
   }
 
   @Bean

@@ -23,6 +23,7 @@ import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
+import uk.nhs.hee.tis.revalidation.dto.ConnectionMessageDto;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 @Slf4j
@@ -81,15 +82,15 @@ public class DoctorsForDBService {
     return DesignatedBodyDto.builder().designatedBodyCode(designatedBodyCode).build();
   }
 
-  public void removeDesignatedBodyCode(final String gmcId) {
-    final var doctorsForDBOptional = doctorsRepository.findById(gmcId);
+  public void removeDesignatedBodyCode(final ConnectionMessageDto message) {
+    final var doctorsForDBOptional = doctorsRepository.findById(message.getGmcId());
     if (doctorsForDBOptional.isPresent()) {
-      log.info("Removing designated body code from doctors for DB");
+      log.info("Updating designated body code from doctors for DB");
       final var doctorsForDB = doctorsForDBOptional.get();
-      doctorsForDB.setDesignatedBodyCode(null);
+      doctorsForDB.setDesignatedBodyCode(message.getDesignatedBodyCode());
       doctorsRepository.save(doctorsForDB);
     } else {
-      log.info("No doctor found to remove designated body code");
+      log.info("No doctor found to update designated body code");
     }
   }
 

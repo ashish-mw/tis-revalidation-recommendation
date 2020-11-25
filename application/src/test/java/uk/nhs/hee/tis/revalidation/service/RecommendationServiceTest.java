@@ -29,12 +29,14 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationResponseCT;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationV2Response;
 import uk.nhs.hee.tis.revalidation.dto.DeferralReasonDto;
@@ -51,7 +53,7 @@ import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RecommendationServiceTest {
 
   private final Faker faker = new Faker();
@@ -124,7 +126,7 @@ public class RecommendationServiceTest {
   private String roUserName;
 
 
-  @Before
+  @BeforeEach
   public void setup() {
     firstName = faker.name().firstName();
     lastName = faker.name().lastName();
@@ -472,7 +474,7 @@ public class RecommendationServiceTest {
     verify(recommendationRepository).save(anyObject());
   }
 
-  @Test(expected = RecommendationException.class)
+  @Test
   public void shouldThrowExceptionWhenDeferralDateWithin60DaysOfSubmissionDate() {
     final var deferralDate = submissionDate.plusDays(59);
     final var recordDTO = TraineeRecommendationRecordDto.builder()
@@ -489,12 +491,12 @@ public class RecommendationServiceTest {
     when(deferralReasonService.getDeferralReasonByCode(deferralResaon1)).thenReturn(deferralReason);
     when(deferralReason.getSubReasonByCode(deferralSubResaon1)).thenReturn(deferralSubReason);
 
-    recommendationService.saveRecommendation(recordDTO);
-
-    verify(recommendationRepository).save(anyObject());
+    Assertions.assertThrows(RecommendationException.class, () -> {
+      recommendationService.saveRecommendation(recordDTO);
+    });
   }
 
-  @Test(expected = RecommendationException.class)
+  @Test
   public void shouldThrowExceptionWhenDeferralDateMoreThen365DaysOfSubmissionDate() {
     final var deferralDate = submissionDate.plusDays(366);
     final var recordDTO = TraineeRecommendationRecordDto.builder()
@@ -511,9 +513,9 @@ public class RecommendationServiceTest {
     when(deferralReasonService.getDeferralReasonByCode(deferralResaon1)).thenReturn(deferralReason);
     when(deferralReason.getSubReasonByCode(deferralSubResaon1)).thenReturn(deferralSubReason);
 
-    recommendationService.saveRecommendation(recordDTO);
-
-    verify(recommendationRepository).save(anyObject());
+    Assertions.assertThrows(RecommendationException.class, () -> {
+      recommendationService.saveRecommendation(recordDTO);
+    });
   }
 
   @Test
@@ -530,7 +532,7 @@ public class RecommendationServiceTest {
     verify(recommendationRepository).save(recommendation);
   }
 
-  @Test(expected = RecommendationException.class)
+  @Test
   public void shouldNotUpdateRecommendationWhenSubmitFail() {
     final var recommendation = buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE,
         UNDER_REVIEW);
@@ -540,7 +542,10 @@ public class RecommendationServiceTest {
         .thenReturn(recommendation);
     when(gmcClientService.submitToGmc(doctorsForDB, recommendation, userProfileDto))
         .thenReturn(buildRecommendationV2Response(INVALID_RECOMMENDATION.getCode()));
-    recommendationService.submitRecommendation(recommendationId, gmcNumber1, userProfileDto);
+
+    Assertions.assertThrows(RecommendationException.class, () -> {
+      recommendationService.submitRecommendation(recommendationId, gmcNumber1, userProfileDto);
+    });
     verify(recommendationRepository, times(0)).save(recommendation);
   }
 
@@ -610,7 +615,7 @@ public class RecommendationServiceTest {
     verify(recommendationRepository).save(anyObject());
   }
 
-  @Test(expected = RecommendationException.class)
+  @Test
   public void shouldThrowExceptionWhenInvalidRecommendationIdProvidedForUpdate() {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
@@ -619,7 +624,9 @@ public class RecommendationServiceTest {
         .comments(comments)
         .build();
 
-    recommendationService.updateRecommendation(recordDTO);
+    Assertions.assertThrows(RecommendationException.class, () -> {
+      recommendationService.updateRecommendation(recordDTO);
+    });
   }
 
   @Test
@@ -643,7 +650,7 @@ public class RecommendationServiceTest {
     verify(recommendationRepository).save(anyObject());
   }
 
-  @Test(expected = RecommendationException.class)
+  @Test
   public void shouldNotSaveRecommendationWhenOneAlreadyInDraft() throws JsonProcessingException {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
@@ -655,11 +662,12 @@ public class RecommendationServiceTest {
         .gmcNumber(gmcNumber1).recommendationStatus(READY_TO_REVIEW).build();
     when(recommendationRepository.findByGmcNumber(gmcNumber1))
         .thenReturn(List.of(draftRecommendation1));
-
-    recommendationService.saveRecommendation(recordDTO);
+    Assertions.assertThrows(RecommendationException.class, () -> {
+      recommendationService.saveRecommendation(recordDTO);
+    });
   }
 
-  @Test(expected = RecommendationException.class)
+  @Test
   public void shouldNotSaveRecommendationWhenStatusIsSubmittedButStillUnderReview()
       throws JsonProcessingException {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
@@ -674,7 +682,9 @@ public class RecommendationServiceTest {
     when(recommendationRepository.findByGmcNumber(gmcNumber1))
         .thenReturn(List.of(draftRecommendation1));
 
-    recommendationService.saveRecommendation(recordDTO);
+    Assertions.assertThrows(RecommendationException.class, () -> {
+      recommendationService.saveRecommendation(recordDTO);
+    });
   }
 
   private DoctorsForDB buildDoctorForDB(final String gmcId) {

@@ -18,12 +18,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +38,7 @@ import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DoctorsForDBServiceTest {
 
   private final Faker faker = new Faker();
@@ -64,7 +65,7 @@ public class DoctorsForDBServiceTest {
   private String designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5;
   private String admin1, admin2, admin3, admin4, admin5;
 
-  @Before
+  @BeforeEach
   public void setup() {
     ReflectionTestUtils.setField(doctorsForDBService, "pageSize", 20);
     setupData();

@@ -1,18 +1,18 @@
 package uk.nhs.hee.tis.revalidation.it;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.nhs.hee.tis.revalidation.RevalidationApplication;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
@@ -20,7 +20,7 @@ import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
 @Slf4j
-@RunWith(SpringRunner.class)
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = RevalidationApplication.class)
 @TestPropertySource("classpath:application-test.yml")
 @ActiveProfiles("test")
@@ -32,7 +32,7 @@ public class DoctorsSearchIT extends BaseIT {
   @Autowired
   private DoctorsForDBRepository repository;
 
-  @Before
+  @BeforeEach
   public void setup() {
     repository.deleteAll();
     setupData();

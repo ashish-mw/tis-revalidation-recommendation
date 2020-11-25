@@ -1,18 +1,19 @@
 package uk.nhs.hee.tis.revalidation.it;
 
 import static java.time.LocalDate.now;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.convertDateInGmcFormat;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -28,7 +29,7 @@ import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
 @Slf4j
-@RunWith(SpringRunner.class)
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = RevalidationApplication.class)
 @TestPropertySource("classpath:application-test.yml")
 @ActiveProfiles("test")
@@ -40,7 +41,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
   @Autowired
   private DoctorsForDBRepository repository;
 
-  @Before
+  @BeforeEach
   public void setup() {
     ReflectionTestUtils.setField(service, "pageSize", 20);
     repository.deleteAll();

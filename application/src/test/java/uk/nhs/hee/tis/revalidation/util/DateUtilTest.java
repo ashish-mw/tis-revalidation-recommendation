@@ -2,16 +2,17 @@ package uk.nhs.hee.tis.revalidation.util;
 
 import static java.time.LocalDate.of;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.convertDateInGmcFormat;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.convertGmcDateToLocalDate;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDate;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDateTime;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 
 public class DateUtilTest {
 

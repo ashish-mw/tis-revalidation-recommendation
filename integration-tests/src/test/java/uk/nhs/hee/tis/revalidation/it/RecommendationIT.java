@@ -6,8 +6,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.APPROVED;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.REJECTED;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.UNDER_REVIEW;
@@ -23,9 +23,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -45,7 +47,7 @@ import uk.nhs.hee.tis.revalidation.service.DeferralReasonService;
 import uk.nhs.hee.tis.revalidation.service.RecommendationService;
 
 @Slf4j
-@RunWith(SpringRunner.class)
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = RevalidationApplication.class)
 @TestPropertySource("classpath:application-test.yml")
 @ActiveProfiles("test")
@@ -86,7 +88,7 @@ public class RecommendationIT extends BaseIT {
   private Snapshot snapshot1, snapshot2;
   private SnapshotRevalidation snapshotRevalidation1, snapshotRevalidation2;
 
-  @Before
+  @BeforeEach
   public void setup() {
     doctorsForDBRepository.deleteAll();
     snapshotRepository.deleteAll();
@@ -296,7 +298,7 @@ public class RecommendationIT extends BaseIT {
         is(List.of("recommendation comments", "new comments")));
   }
 
-  @Test(expected = RecommendationException.class)
+  @Test
   public void shouldNotAllowToCreateRecommendationWhenOneAlreadyInDraft() {
     doctorsForDBRepository.saveAll(List.of(doc1));
     final var recordDTO = TraineeRecommendationRecordDto.builder()
@@ -317,12 +319,12 @@ public class RecommendationIT extends BaseIT {
         .recommendationType(REVALIDATE.name())
         .comments(List.of("recommendation comments", "new comments"))
         .build();
-
-    final var updatedRecommendation = recommendationService.saveRecommendation(newRecortDTO);
-
+    Assertions.assertThrows(RecommendationException.class, () -> {
+      final var updatedRecommendation = recommendationService.saveRecommendation(newRecortDTO);
+    });
   }
 
-  @Test(expected = RecommendationException.class)
+  @Test
   public void shouldNotAllowToCreateRecommendationWhenSubmitToGmcButStillUnderReview() {
     doctorsForDBRepository.saveAll(List.of(doc1));
     final var recordDTO = TraineeRecommendationRecordDto.builder()
@@ -348,7 +350,9 @@ public class RecommendationIT extends BaseIT {
         .comments(List.of("recommendation comments", "new comments"))
         .build();
 
-    recommendationService.saveRecommendation(newRecortDTO);
+    Assertions.assertThrows(RecommendationException.class, () -> {
+      recommendationService.saveRecommendation(newRecortDTO);
+    });
 
   }
 

@@ -28,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.nhs.hee.tis.revalidation.dto.ConnectionMessageDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeAdminDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
@@ -321,17 +322,19 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldRemoveDesignatedBodyCode() {
+  public void shouldUpdateDesignatedBodyCode() {
     when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
-    doctorsForDBService.removeDesignatedBodyCode(gmcRef1);
+    final var message = ConnectionMessageDto.builder().gmcId(gmcRef1).build();
+    doctorsForDBService.removeDesignatedBodyCode(message);
 
     verify(repository).save(doc1);
   }
 
   @Test
-  public void shouldNotRemoveDesignatedBodyCodeWhenNoDoctorFound() {
+  public void shouldNotUpdateDesignatedBodyCodeWhenNoDoctorFound() {
     when(repository.findById(gmcRef1)).thenReturn(Optional.empty());
-    doctorsForDBService.removeDesignatedBodyCode(gmcRef1);
+    final var message = ConnectionMessageDto.builder().gmcId(gmcRef1).build();
+    doctorsForDBService.removeDesignatedBodyCode(message);
 
     verify(repository, times(0)).save(doc1);
   }

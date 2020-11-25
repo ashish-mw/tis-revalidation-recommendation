@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.nhs.hee.tis.revalidation.dto.ConnectionMessageDto;
 import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
@@ -20,10 +21,10 @@ public class RabbitMessageListener {
     doctorsForDBService.updateTrainee(gmcDoctor);
   }
 
-  @RabbitListener(queues = "${app.rabbit.remove.dbc.queue}")
-  public void receiveRemoveDoctorDesignatedBodyCodeMessage(final String gmcId) {
-    log.info("Message received to remove designated body code from rabbit, GmcId: {}", gmcId);
-    doctorsForDBService.removeDesignatedBodyCode(gmcId);
+  @RabbitListener(queues = "${app.rabbit.connection.queue}")
+  public void receiveRemoveDoctorDesignatedBodyCodeMessage(final ConnectionMessageDto message) {
+    log.info("Message received to update designated body code from rabbit, Message: {}", message);
+    doctorsForDBService.removeDesignatedBodyCode(message);
   }
 
 }

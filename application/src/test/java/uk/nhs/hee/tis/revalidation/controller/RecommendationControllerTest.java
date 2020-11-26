@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -39,6 +40,7 @@ public class RecommendationControllerTest {
   private static final String RECOMMENDATION_API_URL = "/api/recommendation";
   private static final String RECOMMENDATION_API_GMCID_PATH_VARIABLE = "{gmcId}";
   private static final String RECOMMENDATION_API_SUBMIT_PATH_VARIABLE = "/{gmcId}/submit/{recommendationId}";
+  private static final String RECOMMENDATION_API_LATEST_GMCIDS_PATH_VARIABLE = "latest/{gmcIds}";
   private final Faker faker = new Faker();
 
   @Autowired
@@ -294,6 +296,17 @@ public class RecommendationControllerTest {
         .content(mapper.writeValueAsString(recordDTO)))
         .andExpect(status().isBadRequest())
         .andExpect(content().string("Recommendation Id should not be empty"));
+  }
+
+  @Test
+  public void shouldReturnLatestTraineeRecommendations() throws Exception {
+    final var traineeRecommendationRecordDto = Map.of(gmcId, prepareRevalidationDTO());
+    when(service.getLatestRecommendations(List.of(gmcId))).thenReturn(traineeRecommendationRecordDto);
+    final var url = format("%s/%s", RECOMMENDATION_API_URL, RECOMMENDATION_API_LATEST_GMCIDS_PATH_VARIABLE);
+    this.mockMvc.perform(get(url, gmcId))
+        .andExpect(status().isOk())
+        .andExpect(content().json(mapper.writeValueAsString(traineeRecommendationRecordDto)));
+
   }
 
   private TraineeRecommendationDto prepareRecommendationDTO() {

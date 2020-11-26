@@ -199,7 +199,7 @@ public class RecommendationService {
           .admin(recommendation.getAdmin())
           .build();
     }
-    return null;
+    return new TraineeRecommendationRecordDto();
   }
 
   //get latest recommendations of a list of trainees

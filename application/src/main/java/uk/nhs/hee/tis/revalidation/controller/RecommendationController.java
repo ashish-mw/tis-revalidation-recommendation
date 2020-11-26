@@ -6,6 +6,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +54,17 @@ public class RecommendationController {
     }
 
     return new ResponseEntity<>(TraineeRecommendationDto.builder().build(), HttpStatus.OK);
+  }
+
+  @ApiOperation(value = "Get recommendation details of a list of trainees", notes = "It will return trainees' recommendation details", response = Map.class)
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Trainees' recommendation details", response = Map.class)})
+  @GetMapping("/latest/{gmcIds}")
+  public ResponseEntity<Map<String, TraineeRecommendationRecordDto>> getRecommendations(
+      @PathVariable("gmcIds") final List<String> gmcIds) {
+    log.info("Receive request to fetch recommendations for GmcIds: {}", gmcIds);
+    final var recommendations = service.getLatestRecommendations(gmcIds);
+    return new ResponseEntity<Map<String, TraineeRecommendationRecordDto>>(recommendations, HttpStatus.OK);
   }
 
   @ApiOperation(value = "Save new recommendation", notes = "It will allow user to save new recommendation", response = ResponseEntity.class)

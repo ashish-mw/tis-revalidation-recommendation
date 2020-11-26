@@ -94,7 +94,7 @@ public class RecommendationService {
           .recommendationStatus(READY_TO_REVIEW)
           .comments(recordDTO.getComments())
           .gmcSubmissionDate(submissionDate)
-          .admin(doctor.getAdmin())
+          .admin(recordDTO.getAdmin())
           .build();
     } else {
       final var deferralDate = recordDTO.getDeferralDate();
@@ -116,7 +116,7 @@ public class RecommendationService {
             .deferralReason(deferralReason.getCode())
             .deferralSubReason(deferralSubReasonCode)
             .gmcSubmissionDate(submissionDate)
-            .admin(doctor.getAdmin())
+            .admin(recordDTO.getAdmin())
             .build();
       } else {
         throw new RecommendationException(format(

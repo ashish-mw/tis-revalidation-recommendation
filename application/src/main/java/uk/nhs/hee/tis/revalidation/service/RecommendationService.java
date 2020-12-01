@@ -1,7 +1,9 @@
 package uk.nhs.hee.tis.revalidation.service;
 
 import static java.lang.String.format;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.SUCCESS;
 import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.fromCode;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.APPROVED;
@@ -14,7 +16,9 @@ import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.REVALIDATE;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -171,6 +175,26 @@ public class RecommendationService {
     return false;
   }
 
+  //get latest recommendations of a trainee
+  public TraineeRecommendationRecordDto getLatestRecommendation(final String gmcId) {
+    log.info("Fetching latest recommendation info for GmcId: {}", gmcId);
+    Optional<Recommendation> optionalRecommendation = recommendationRepository
+        .findFirstByGmcNumberOrderByGmcSubmissionDateDesc(gmcId);
+
+    if (optionalRecommendation.isPresent()) {
+      final var recommendation = optionalRecommendation.get();
+
+      return buildTraineeRecommendationRecordDto(recommendation.getGmcNumber(), recommendation.getGmcSubmissionDate(), recommendation);
+    }
+    return new TraineeRecommendationRecordDto();
+  }
+
+  //get latest recommendations of a list of trainees
+  public Map<String, TraineeRecommendationRecordDto> getLatestRecommendations(final List<String> gmcIds) {
+    log.info("Mapping latest recommendation info for GmcIds: {}", gmcIds);
+    return gmcIds.stream().collect(toMap(identity(), this::getLatestRecommendation));
+  }
+
   private List<TraineeRecommendationRecordDto> getCurrentAndLegacyRecommendation(
       final DoctorsForDB doctorsForDB) {
     final var gmcNumber = doctorsForDB.getGmcReferenceNumber();
@@ -179,20 +203,7 @@ public class RecommendationService {
 
     final var recommendations = recommendationRepository.findByGmcNumber(gmcNumber);
     final var currentRecommendations = recommendations.stream().map(rec -> {
-      return TraineeRecommendationRecordDto.builder()
-          .gmcNumber(gmcNumber)
-          .recommendationId(rec.getId())
-          .deferralDate(rec.getDeferralDate())
-          .deferralReason(rec.getDeferralReason())
-          .deferralSubReason(rec.getDeferralSubReason())
-          .gmcOutcome(getOutcome(rec.getOutcome()))
-          .recommendationStatus(rec.getRecommendationStatus().name())
-          .recommendationType(rec.getRecommendationType().name())
-          .gmcSubmissionDate(doctorsForDB.getSubmissionDate())
-          .actualSubmissionDate(rec.getActualSubmissionDate())
-          .admin(rec.getAdmin())
-          .comments(rec.getComments())
-          .build();
+      return buildTraineeRecommendationRecordDto(gmcNumber, doctorsForDB.getSubmissionDate(), rec);
     }).collect(toList());
 
     final var snapshotRecommendations = snapshotService.getSnapshotRecommendations(doctorsForDB);
@@ -263,5 +274,22 @@ public class RecommendationService {
       throw new RecommendationException(
           "Trainee already have an recommendation in draft state or waiting for approval from GMC.");
     }
+  }
+
+  private TraineeRecommendationRecordDto buildTraineeRecommendationRecordDto(String gmcNumber, LocalDate submissionDate, Recommendation rec) {
+    return TraineeRecommendationRecordDto.builder()
+        .gmcNumber(gmcNumber)
+        .recommendationId(rec.getId())
+        .deferralDate(rec.getDeferralDate())
+        .deferralReason(rec.getDeferralReason())
+        .deferralSubReason(rec.getDeferralSubReason())
+        .gmcOutcome(getOutcome(rec.getOutcome()))
+        .recommendationStatus(rec.getRecommendationStatus().name())
+        .recommendationType(rec.getRecommendationType().name())
+        .gmcSubmissionDate(submissionDate)
+        .actualSubmissionDate(rec.getActualSubmissionDate())
+        .admin(rec.getAdmin())
+        .comments(rec.getComments())
+        .build();
   }
 }

@@ -687,6 +687,20 @@ public class RecommendationServiceTest {
     });
   }
 
+  @Test
+  public void shouldReturnLatestRecommendations() throws ParseException {
+    final var gmcId = faker.number().digits(7);
+    final var recommendation = buildRecommendation(gmcId, recommendationId, status, REVALIDATE, UNDER_REVIEW);
+    when(recommendationRepository.findFirstByGmcNumberOrderByGmcSubmissionDateDesc(gmcId)).thenReturn(
+        Optional.of(recommendation));
+    final var recommendationResult = recommendationService.getLatestRecommendation(gmcId);
+
+    assertThat(recommendationResult.getGmcNumber(), is(gmcId));
+    assertThat(recommendationResult.getGmcSubmissionDate(), is(submissionDate));
+    assertThat(recommendationResult.getComments(), is(comments));
+    assertThat(recommendationResult.getAdmin(), is(admin1));
+  }
+
   private DoctorsForDB buildDoctorForDB(final String gmcId) {
     return DoctorsForDB.builder()
         .gmcReferenceNumber(gmcId)

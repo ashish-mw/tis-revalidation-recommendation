@@ -184,20 +184,7 @@ public class RecommendationService {
     if (optionalRecommendation.isPresent()) {
       final var recommendation = optionalRecommendation.get();
 
-      return TraineeRecommendationRecordDto.builder()
-          .gmcNumber(recommendation.getGmcNumber())
-          .recommendationId(recommendation.getId())
-          .gmcOutcome(getOutcome(recommendation.getOutcome()))
-          .recommendationType(recommendation.getRecommendationType().name())
-          .gmcSubmissionDate(recommendation.getGmcSubmissionDate())
-          .gmcRevalidationId(recommendation.getGmcRevalidationId())
-          .recommendationStatus(recommendation.getRecommendationStatus().name())
-          .deferralDate(recommendation.getDeferralDate())
-          .deferralReason(recommendation.getDeferralReason())
-          .deferralSubReason(recommendation.getDeferralSubReason())
-          .comments(recommendation.getComments())
-          .admin(recommendation.getAdmin())
-          .build();
+      return buildTraineeRecommendationRecordDto(recommendation.getGmcNumber(), recommendation.getGmcSubmissionDate(), recommendation);
     }
     return new TraineeRecommendationRecordDto();
   }
@@ -216,20 +203,7 @@ public class RecommendationService {
 
     final var recommendations = recommendationRepository.findByGmcNumber(gmcNumber);
     final var currentRecommendations = recommendations.stream().map(rec -> {
-      return TraineeRecommendationRecordDto.builder()
-          .gmcNumber(gmcNumber)
-          .recommendationId(rec.getId())
-          .deferralDate(rec.getDeferralDate())
-          .deferralReason(rec.getDeferralReason())
-          .deferralSubReason(rec.getDeferralSubReason())
-          .gmcOutcome(getOutcome(rec.getOutcome()))
-          .recommendationStatus(rec.getRecommendationStatus().name())
-          .recommendationType(rec.getRecommendationType().name())
-          .gmcSubmissionDate(doctorsForDB.getSubmissionDate())
-          .actualSubmissionDate(rec.getActualSubmissionDate())
-          .admin(rec.getAdmin())
-          .comments(rec.getComments())
-          .build();
+      return buildTraineeRecommendationRecordDto(gmcNumber, doctorsForDB.getSubmissionDate(), rec);
     }).collect(toList());
 
     final var snapshotRecommendations = snapshotService.getSnapshotRecommendations(doctorsForDB);
@@ -300,5 +274,22 @@ public class RecommendationService {
       throw new RecommendationException(
           "Trainee already have an recommendation in draft state or waiting for approval from GMC.");
     }
+  }
+
+  private TraineeRecommendationRecordDto buildTraineeRecommendationRecordDto(String gmcNumber, LocalDate submissionDate, Recommendation rec) {
+    return TraineeRecommendationRecordDto.builder()
+        .gmcNumber(gmcNumber)
+        .recommendationId(rec.getId())
+        .deferralDate(rec.getDeferralDate())
+        .deferralReason(rec.getDeferralReason())
+        .deferralSubReason(rec.getDeferralSubReason())
+        .gmcOutcome(getOutcome(rec.getOutcome()))
+        .recommendationStatus(rec.getRecommendationStatus().name())
+        .recommendationType(rec.getRecommendationType().name())
+        .gmcSubmissionDate(submissionDate)
+        .actualSubmissionDate(rec.getActualSubmissionDate())
+        .admin(rec.getAdmin())
+        .comments(rec.getComments())
+        .build();
   }
 }

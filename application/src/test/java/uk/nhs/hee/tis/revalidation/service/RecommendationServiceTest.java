@@ -691,7 +691,7 @@ public class RecommendationServiceTest {
   public void shouldReturnLatestRecommendations() throws ParseException {
     final var gmcId = faker.number().digits(7);
     final var recommendation = buildRecommendation(gmcId, recommendationId, status, REVALIDATE, UNDER_REVIEW);
-    when(recommendationRepository.findFirstByGmcNumberOrderByGmcSubmissionDateDesc(gmcId)).thenReturn(
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcId)).thenReturn(
         Optional.of(recommendation));
     final var recommendationResult = recommendationService.getLatestRecommendation(gmcId);
 

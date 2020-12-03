@@ -20,7 +20,6 @@ import uk.nhs.hee.tis.revalidation.dto.DesignatedBodyDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeAdminUpdateDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDto;
-import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
 @Slf4j
@@ -95,11 +94,24 @@ public class DoctorsForDBController {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Doctor's designated body code", response = ResponseEntity.class)})
   @GetMapping("/designated-body/{gmcId}")
-  public ResponseEntity<DesignatedBodyDto> getDesignatedBodyCode(@PathVariable("gmcId") final String gmcId) {
+  public ResponseEntity<DesignatedBodyDto> getDesignatedBodyCode(
+      @PathVariable("gmcId") final String gmcId) {
     log.info("Receive request to get designatedBodyCode for user: {}", gmcId);
     final var designatedBody = doctorsForDBService
         .getDesignatedBodyCode(gmcId);
     return ResponseEntity.ok().body(designatedBody);
+  }
+
+  @ApiOperation(value = "Get doctors by Gmc Ids", notes = "It will return doctors", response = ResponseEntity.class)
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Doctor's by gmcIds", response = ResponseEntity.class)})
+  @GetMapping("/{gmcIds}")
+  public ResponseEntity<TraineeSummaryDto> getDoctors(
+      @PathVariable("gmcIds") final List<String> gmcId) {
+    log.info("Receive request to get designatedBodyCode for user: {}", gmcId);
+    final var doctors = doctorsForDBService
+        .getDoctorsByGmcIds(gmcId);
+    return ResponseEntity.ok().body(doctors);
   }
 
   //TODO: find a better way like separate validator

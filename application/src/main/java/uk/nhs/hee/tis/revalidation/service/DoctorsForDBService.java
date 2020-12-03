@@ -11,11 +11,13 @@ import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.YES;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.IterableUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.nhs.hee.tis.revalidation.dto.ConnectionMessageDto;
 import uk.nhs.hee.tis.revalidation.dto.DesignatedBodyDto;
 import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeAdminDto;
@@ -23,7 +25,6 @@ import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
-import uk.nhs.hee.tis.revalidation.dto.ConnectionMessageDto;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 @Slf4j
@@ -92,6 +93,13 @@ public class DoctorsForDBService {
     } else {
       log.info("No doctor found to update designated body code");
     }
+  }
+
+  public TraineeSummaryDto getDoctorsByGmcIds(final List<String> gmcIds) {
+    final Iterable<DoctorsForDB> doctorsForDb = doctorsRepository.findAllById(gmcIds);
+    final var doctorsForDBS = IterableUtils.toList(doctorsForDb);
+    final var traineeInfoDtos = doctorsForDBS.stream().map(d -> convert(d)).collect(toList());
+    return TraineeSummaryDto.builder().traineeInfo(traineeInfoDtos).build();
   }
 
   private TraineeInfoDto convert(final DoctorsForDB doctorsForDB) {

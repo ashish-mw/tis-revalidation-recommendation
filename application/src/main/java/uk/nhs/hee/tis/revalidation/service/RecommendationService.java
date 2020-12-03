@@ -179,7 +179,7 @@ public class RecommendationService {
   public TraineeRecommendationRecordDto getLatestRecommendation(final String gmcId) {
     log.info("Fetching latest recommendation info for GmcId: {}", gmcId);
     Optional<Recommendation> optionalRecommendation = recommendationRepository
-        .findFirstByGmcNumberOrderByGmcSubmissionDateDesc(gmcId);
+        .findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcId);
 
     if (optionalRecommendation.isPresent()) {
       final var recommendation = optionalRecommendation.get();

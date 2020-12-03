@@ -206,6 +206,16 @@ public class DoctorsForDBControllerTest {
         .andExpect(status().isOk());
   }
 
+  @Test
+  public void shouldReturnDoctorsByGmcId() throws Exception {
+    final var gmcDoctorDTO = prepareGmcDoctor();
+    when(doctorsForDBService.getDoctorsByGmcIds(List.of(gmcRef1))).thenReturn(gmcDoctorDTO);
+    final var url = format("%s/%s", DOCTORS_API_URL, gmcRef1);
+    this.mockMvc.perform(get(url))
+        .andExpect(content().json(mapper.writeValueAsString(gmcDoctorDTO)))
+        .andExpect(status().isOk());
+  }
+
   private TraineeSummaryDto prepareGmcDoctor() {
     final var doctorsForDB = buildDoctorsForDBList();
     return TraineeSummaryDto.builder()

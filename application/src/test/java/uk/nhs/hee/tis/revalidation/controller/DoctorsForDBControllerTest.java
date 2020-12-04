@@ -49,6 +49,7 @@ import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 public class DoctorsForDBControllerTest {
 
   private static final String DOCTORS_API_URL = "/api/v1/doctors";
+  private static final String DOCTORS_API_URL_BY_GMC_ID = "/api/v1/doctors/gmcIds";
   private static final String UPDATE_ADMIN = "/assign-admin";
   private static final String GET_DESIGNATED_BODY = "/designated-body";
 
@@ -210,7 +211,7 @@ public class DoctorsForDBControllerTest {
   public void shouldReturnDoctorsByGmcId() throws Exception {
     final var gmcDoctorDTO = prepareGmcDoctor();
     when(doctorsForDBService.getDoctorsByGmcIds(List.of(gmcRef1))).thenReturn(gmcDoctorDTO);
-    final var url = format("%s/%s", DOCTORS_API_URL, gmcRef1);
+    final var url = format("%s/%s", DOCTORS_API_URL_BY_GMC_ID, gmcRef1);
     this.mockMvc.perform(get(url))
         .andExpect(content().json(mapper.writeValueAsString(gmcDoctorDTO)))
         .andExpect(status().isOk());

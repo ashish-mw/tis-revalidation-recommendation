@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -105,13 +106,16 @@ public class DoctorsForDBController {
   @ApiOperation(value = "Get doctors by Gmc Ids", notes = "It will return doctors", response = ResponseEntity.class)
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Doctor's by gmcIds", response = ResponseEntity.class)})
-  @GetMapping("/{gmcIds}")
+  @GetMapping(value = {"/gmcIds", "/gmcIds/{gmcIds}"})
   public ResponseEntity<TraineeSummaryDto> getDoctors(
-      @PathVariable("gmcIds") final List<String> gmcId) {
-    log.info("Receive request to get designatedBodyCode for user: {}", gmcId);
-    final var doctors = doctorsForDBService
-        .getDoctorsByGmcIds(gmcId);
-    return ResponseEntity.ok().body(doctors);
+      @PathVariable(required = false) final List<String> gmcIds) {
+    log.info("Receive request to get designatedBodyCode for user: {}", gmcIds);
+    if (Objects.nonNull(gmcIds)) {
+      final var doctors = doctorsForDBService
+          .getDoctorsByGmcIds(gmcIds);
+      return ResponseEntity.ok().body(doctors);
+    }
+    return ResponseEntity.ok().body(TraineeSummaryDto.builder().build());
   }
 
   //TODO: find a better way like separate validator

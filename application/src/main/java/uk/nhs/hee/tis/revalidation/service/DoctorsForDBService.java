@@ -99,7 +99,8 @@ public class DoctorsForDBService {
     final Iterable<DoctorsForDB> doctorsForDb = doctorsRepository.findAllById(gmcIds);
     final var doctorsForDBS = IterableUtils.toList(doctorsForDb);
     final var traineeInfoDtos = doctorsForDBS.stream().map(d -> convert(d)).collect(toList());
-    return TraineeSummaryDto.builder().traineeInfo(traineeInfoDtos).build();
+    return TraineeSummaryDto.builder().countTotal(traineeInfoDtos.size())
+        .totalResults(traineeInfoDtos.size()).traineeInfo(traineeInfoDtos).build();
   }
 
   private TraineeInfoDto convert(final DoctorsForDB doctorsForDB) {

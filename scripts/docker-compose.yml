@@ -28,5 +28,5 @@ services:
     container_name: gmcmock
     image: gmcmock:latest
     ports:
-      - '8090:8082'
+      - '8091:8082'
       - '4848:4848'

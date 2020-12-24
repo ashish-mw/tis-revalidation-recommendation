@@ -73,7 +73,6 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  @Disabled
   public void shouldReturnListOfAllDoctors() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
@@ -149,7 +148,6 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  @Disabled
   public void shouldReturnListOfDoctorsAttachedToASpecificDbc() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
@@ -186,7 +184,6 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  @Disabled
   public void shouldReturnListOfUnderNoticeDoctors() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
@@ -235,7 +232,6 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  @Disabled
   public void shouldReturnEmptyListOfDoctorsWhenNoRecordFound() {
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
@@ -259,7 +255,6 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  @Disabled
   public void shouldReturnListOfAllDoctorsWhoMatchSearchQuery() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));

@@ -3,10 +3,12 @@ package uk.nhs.hee.tis.revalidation.controller;
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
 import static java.util.List.of;
+import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.nhs.hee.tis.revalidation.controller.DoctorsForDBController.ASC;
 import static uk.nhs.hee.tis.revalidation.controller.DoctorsForDBController.DESC;
@@ -50,6 +52,7 @@ import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 public class DoctorsForDBControllerTest {
 
   private static final String DOCTORS_API_URL = "/api/v1/doctors";
+  private static final String UNHIDDEN_DOCTORS_API_URL = "/api/v1/doctors/unhidden";
   private static final String DOCTORS_API_URL_BY_GMC_ID = "/api/v1/doctors/gmcIds";
   private static final String UPDATE_ADMIN = "/assign-admin";
   private static final String GET_DESIGNATED_BODY = "/designated-body";
@@ -119,7 +122,27 @@ public class DoctorsForDBControllerTest {
   }
 
   @Test
-  @Disabled
+  public void shouldReturnUnhiddenTraineeDoctorsInformation() throws Exception {
+    final var gmcDoctorDTO = prepareGmcDoctor();
+    final var requestDTO = TraineeRequestDto.builder().sortOrder(ASC)
+        .sortColumn(SUBMISSION_DATE).searchQuery(EMPTY_STRING)
+        .dbcs(List.of(designatedBody1, designatedBody2)).build();
+    when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of(gmcRef1))).thenReturn(gmcDoctorDTO);
+    final var dbcString = String.format("%s,%s", designatedBody1, designatedBody2);
+    final var url = format("%s/%s", UNHIDDEN_DOCTORS_API_URL, gmcRef1);
+    this.mockMvc.perform(get(url)
+        .param(SORT_ORDER, ASC)
+        .param(SORT_COLUMN, SUBMISSION_DATE)
+        .param(UNDER_NOTICE, UNDER_NOTICE_VALUE)
+        .param(PAGE_NUMBER, PAGE_NUMBER_VALUE)
+        .param(SEARCH_QUERY, EMPTY_STRING)
+        .param(DESIGNATED_BODY_CODES, dbcString))
+        .andExpect(status().isOk())
+        .andExpect(
+            jsonPath("$.traineeInfo.[*].gmcReferenceNumber").value(hasItem(gmcRef2)));
+  }
+
+  @Test
   public void shouldReturnDataWhenSortOrderAndSortColumnAreEmpty() throws Exception {
     final var gmcDoctorDTO = prepareGmcDoctor();
     final var requestDTO = TraineeRequestDto.builder().sortOrder(DESC)
@@ -136,7 +159,6 @@ public class DoctorsForDBControllerTest {
   }
 
   @Test
-  @Disabled
   public void shouldReturnDataWhenSortOrderAndSortColumnAreInvalid() throws Exception {
     final var gmcDoctorDTO = prepareGmcDoctor();
     final var requestDTO = TraineeRequestDto.builder().sortOrder(DESC)
@@ -153,7 +175,6 @@ public class DoctorsForDBControllerTest {
   }
 
   @Test
-  @Disabled
   public void shouldReturnUnderNoticeTraineeDoctorsInformation() throws Exception {
     final var gmcDoctorDTO = prepareGmcDoctor();
     final var requestDTO = TraineeRequestDto.builder()
@@ -171,7 +192,6 @@ public class DoctorsForDBControllerTest {
   }
 
   @Test
-  @Disabled
   public void shouldSetDbcsToAllWhenItsEmpty() throws Exception {
     final var gmcDoctorDTO = prepareGmcDoctor();
     final var requestDTO = TraineeRequestDto.builder()

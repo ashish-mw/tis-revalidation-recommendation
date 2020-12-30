@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -77,7 +78,7 @@ public class DoctorsForDBServiceTest {
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
         .of(designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5);
-    when(repository.findAll(pageableAndSortable, "", dbcs)).thenReturn(page);
+    when(repository.findAll(pageableAndSortable, "", dbcs, List.of())).thenReturn(page);
 
     when(page.get()).thenReturn(Stream.of(doc1, doc2, doc3, doc4, doc5));
     when(page.getTotalPages()).thenReturn(1);
@@ -91,7 +92,7 @@ public class DoctorsForDBServiceTest {
         .dbcs(dbcs)
         .build();
 
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
 
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
@@ -151,7 +152,7 @@ public class DoctorsForDBServiceTest {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List.of(designatedBody1);
-    when(repository.findAll(pageableAndSortable, "", dbcs)).thenReturn(page);
+    when(repository.findAll(pageableAndSortable, "", dbcs, List.of())).thenReturn(page);
     when(page.get()).thenReturn(Stream.of(doc1));
     when(page.getTotalPages()).thenReturn(1);
     when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
@@ -164,7 +165,7 @@ public class DoctorsForDBServiceTest {
         .dbcs(dbcs)
         .build();
 
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
 
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
@@ -203,7 +204,7 @@ public class DoctorsForDBServiceTest {
         .searchQuery("")
         .dbcs(dbcs)
         .build();
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
     assertThat(allDoctors.getCountUnderNotice(), is(2L));
@@ -235,7 +236,7 @@ public class DoctorsForDBServiceTest {
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
         .of(designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5);
-    when(repository.findAll(pageableAndSortable, "", dbcs)).thenReturn(page);
+    when(repository.findAll(pageableAndSortable, "", dbcs, List.of())).thenReturn(page);
     when(page.get()).thenReturn(Stream.of());
     when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(0l);
     final var requestDTO = TraineeRequestDto.builder()
@@ -245,7 +246,7 @@ public class DoctorsForDBServiceTest {
         .searchQuery("")
         .dbcs(dbcs)
         .build();
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(0L));
     assertThat(allDoctors.getCountUnderNotice(), is(0L));
@@ -259,7 +260,7 @@ public class DoctorsForDBServiceTest {
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
         .of(designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5);
-    when(repository.findAll(pageableAndSortable, "query", dbcs)).thenReturn(page);
+    when(repository.findAll(pageableAndSortable, "query", dbcs, List.of())).thenReturn(page);
 
     when(page.get()).thenReturn(Stream.of(doc1, doc4));
     when(page.getTotalPages()).thenReturn(1);
@@ -273,7 +274,7 @@ public class DoctorsForDBServiceTest {
         .searchQuery("query")
         .dbcs(dbcs)
         .build();
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO);
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
     assertThat(allDoctors.getCountUnderNotice(), is(2L));

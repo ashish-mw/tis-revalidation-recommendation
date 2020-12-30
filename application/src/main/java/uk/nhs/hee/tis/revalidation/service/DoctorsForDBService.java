@@ -38,8 +38,8 @@ public class DoctorsForDBService {
   @Autowired
   private DoctorsForDBRepository doctorsRepository;
 
-  public TraineeSummaryDto getAllTraineeDoctorDetails(final TraineeRequestDto requestDTO) {
-    final var paginatedDoctors = getSortedAndFilteredDoctorsByPageNumber(requestDTO);
+  public TraineeSummaryDto getAllTraineeDoctorDetails(final TraineeRequestDto requestDTO, final List<String> hiddenGmcIds) {
+    final var paginatedDoctors = getSortedAndFilteredDoctorsByPageNumber(requestDTO, hiddenGmcIds);
     final var doctorsList = paginatedDoctors.get().collect(toList());
     final var gmcIds = doctorsList.stream().map(doc -> doc.getGmcReferenceNumber())
         .collect(toList());
@@ -122,7 +122,7 @@ public class DoctorsForDBService {
   }
 
   private Page<DoctorsForDB> getSortedAndFilteredDoctorsByPageNumber(
-      final TraineeRequestDto requestDTO) {
+      final TraineeRequestDto requestDTO, final List<String> hiddenGmcIds) {
     final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
     final var pageableAndSortable = of(requestDTO.getPageNumber(), pageSize,
         by(direction, requestDTO.getSortColumn()));
@@ -133,7 +133,7 @@ public class DoctorsForDBService {
     }
 
     return doctorsRepository
-        .findAll(pageableAndSortable, requestDTO.getSearchQuery(), requestDTO.getDbcs());
+        .findAll(pageableAndSortable, requestDTO.getSearchQuery(), requestDTO.getDbcs(), hiddenGmcIds);
   }
 
   //TODO: explore to implement cache

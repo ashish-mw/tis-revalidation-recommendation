@@ -23,7 +23,7 @@ public interface DoctorsForDBRepository extends MongoRepository<DoctorsForDB, St
       final List<String> dbcs, final UnderNotice... underNotice);
 
   @Query(value = "{ '$and' : [{ '$or' : [{'doctorFirstName' : { '$regex' : ?0, '$options' : 'i'}}, "
-      + "{ 'doctorLastName' : { '$regex' : ?0, '$options' : 'i'}}, { '_id' : { '$regex' : ?0, '$options' : 'i'}}]}, { 'designatedBodyCode' : { '$in' : ?1 }}]}")
-  Page<DoctorsForDB> findAll(final Pageable pageable, final String searchQuery, final List<String> dbcs);
+      + "{ 'doctorLastName' : { '$regex' : ?0, '$options' : 'i'}}, { '_id' : { '$regex' : ?0, '$options' : 'i'}}]}, { 'designatedBodyCode' : { '$in' : ?1 }}, { '_id' : { '$nin' : ?2 }}]}")
+  Page<DoctorsForDB> findAll(final Pageable pageable, final String searchQuery, final List<String> dbcs, final List<String> hiddenGmcIds);
 
 }

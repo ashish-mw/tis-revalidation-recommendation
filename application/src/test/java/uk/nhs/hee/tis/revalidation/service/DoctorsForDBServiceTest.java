@@ -189,7 +189,7 @@ public class DoctorsForDBServiceTest {
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
         .of(designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5);
-    when(repository.findByUnderNotice(pageableAndSortable, "", dbcs, List.of(), YES, ON_HOLD))
+    when(repository.findByUnderNotice(pageableAndSortable, "", dbcs, YES, ON_HOLD))
         .thenReturn(page);
 
     when(page.get()).thenReturn(Stream.of(doc1, doc2));

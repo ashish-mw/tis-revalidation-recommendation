@@ -61,11 +61,11 @@ public class BaseIT {
     lName4 = faker.name().lastName();
     lName5 = faker.name().lastName();
 
-    subDate1 = now();
-    subDate2 = now();
-    subDate3 = now();
-    subDate4 = now();
-    subDate5 = now();
+    subDate1 = now().minusDays(1);
+    subDate2 = now().minusDays(2);
+    subDate3 = now().minusDays(3);
+    subDate4 = now().minusDays(4);
+    subDate5 = now().minusDays(5);
 
     addedDate1 = now().minusDays(5);
     addedDate2 = now().minusDays(5);

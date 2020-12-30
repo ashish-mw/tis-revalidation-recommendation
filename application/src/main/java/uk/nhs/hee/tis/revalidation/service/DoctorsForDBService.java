@@ -129,7 +129,7 @@ public class DoctorsForDBService {
     if (requestDTO.isUnderNotice()) {
       return doctorsRepository
           .findByUnderNotice(pageableAndSortable, requestDTO.getSearchQuery(), requestDTO.getDbcs(),
-              hiddenGmcIds, YES, ON_HOLD);
+              YES, ON_HOLD);
     }
 
     return doctorsRepository

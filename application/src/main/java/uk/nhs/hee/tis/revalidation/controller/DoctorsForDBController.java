@@ -84,7 +84,7 @@ public class DoctorsForDBController {
   @ApiOperation(value = "All trainee doctors information which is not in the gmcId list", notes = "It will return all the information about trainee doctors who are not in the gmcId list ", response = TraineeSummaryDto.class)
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Trainee gmc doctors data", response = TraineeSummaryDto.class)})
-  @GetMapping("/unhidden/{gmcIds}")
+  @GetMapping(value = {"/unhidden/{gmcIds}", "/unhidden/"})
   public ResponseEntity<TraineeSummaryDto> getTraineeDoctorsInformationHideGmcIds(
       @PathVariable(required = false) final List<String> gmcIds,
       @RequestParam(name = SORT_COLUMN, defaultValue = SUBMISSION_DATE, required = false) final String sortColumn,

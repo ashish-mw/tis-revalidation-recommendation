@@ -35,7 +35,7 @@
         <sonar.login>${env.SONAR_TOKEN}</sonar.login>
         <sonar.organization>health-education-england</sonar.organization>
         <sonar.projectKey>Health-Education-England_tis-revalidation-recommendation</sonar.projectKey>
-        <sonar.moduleKey>${artifactId}</sonar.moduleKey>
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.java.checkstyle.reportPaths>
             ${project.build.directory}/checkstyle-result.xml
         </sonar.java.checkstyle.reportPaths>
@@ -157,6 +157,7 @@
     <build>
         <plugins>
             <plugin>
+                <version>3.7.0.1746</version>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
             </plugin>

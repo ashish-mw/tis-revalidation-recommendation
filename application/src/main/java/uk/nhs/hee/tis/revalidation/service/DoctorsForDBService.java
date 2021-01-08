@@ -41,8 +41,6 @@ public class DoctorsForDBService {
   public TraineeSummaryDto getAllTraineeDoctorDetails(final TraineeRequestDto requestDTO, final List<String> hiddenGmcIds) {
     final var paginatedDoctors = getSortedAndFilteredDoctorsByPageNumber(requestDTO, hiddenGmcIds);
     final var doctorsList = paginatedDoctors.get().collect(toList());
-    final var gmcIds = doctorsList.stream().map(doc -> doc.getGmcReferenceNumber())
-        .collect(toList());
     final var traineeDoctors = doctorsList.stream().map(d ->
         convert(d)).collect(toList());
 
@@ -115,7 +113,8 @@ public class DoctorsForDBService {
         .sanction(doctorsForDB.getSanction())
         .doctorStatus(doctorsForDB.getDoctorStatus().name()) //TODO update with legacy statuses
         .lastUpdatedDate(doctorsForDB.getLastUpdatedDate())
-        .admin(doctorsForDB.getAdmin());
+        .admin(doctorsForDB.getAdmin())
+        .connectionStatus(getConnectionStatus(doctorsForDB.getDesignatedBodyCode()));
 
     return traineeInfoDTOBuilder.build();
 
@@ -144,5 +143,9 @@ public class DoctorsForDBService {
   //TODO: explore to implement cache
   private long getCountUnderNotice() {
     return doctorsRepository.countByUnderNoticeIn(YES, ON_HOLD);
+  }
+
+  private String getConnectionStatus(final String designatedBody) {
+    return (designatedBody == null || designatedBody.equals("")) ? "No" : "Yes";
   }
 }

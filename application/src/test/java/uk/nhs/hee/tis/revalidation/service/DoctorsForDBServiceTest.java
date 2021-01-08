@@ -19,12 +19,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -65,6 +63,7 @@ public class DoctorsForDBServiceTest {
   private RecommendationStatus status1, status2, status3, status4, status5;
   private String designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5;
   private String admin1, admin2, admin3, admin4, admin5;
+  private String connectionStatus1, connectionStatus2, connectionStatus3, connectionStatus4, connectionStatus5;
 
   @BeforeEach
   public void setup() {
@@ -108,6 +107,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1.name()));
     assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
     assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1.name()));
+    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus1));
 
     assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
     assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fname2));
@@ -117,6 +117,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2.name()));
     assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
     assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2.name()));
+    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus2));
 
     assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef3));
     assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fname3));
@@ -126,6 +127,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(2).getUnderNotice(), is(un3.name()));
     assertThat(doctorsForDB.get(2).getSanction(), is(sanction3));
     assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status3.name()));
+    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus3));
 
     assertThat(doctorsForDB.get(3).getGmcReferenceNumber(), is(gmcRef4));
     assertThat(doctorsForDB.get(3).getDoctorFirstName(), is(fname4));
@@ -135,6 +137,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(3).getUnderNotice(), is(un4.name()));
     assertThat(doctorsForDB.get(3).getSanction(), is(sanction4));
     assertThat(doctorsForDB.get(3).getDoctorStatus(), is(status4.name()));
+    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus4));
 
     assertThat(doctorsForDB.get(4).getGmcReferenceNumber(), is(gmcRef5));
     assertThat(doctorsForDB.get(4).getDoctorFirstName(), is(fname5));
@@ -144,6 +147,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(4).getUnderNotice(), is(un5.name()));
     assertThat(doctorsForDB.get(4).getSanction(), is(sanction5));
     assertThat(doctorsForDB.get(4).getDoctorStatus(), is(status5.name()));
+    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus5));
 
   }
 
@@ -181,6 +185,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1.name()));
     assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
     assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1.name()));
+    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus1));
   }
 
   @Test
@@ -219,6 +224,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1.name()));
     assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
     assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1.name()));
+    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus1));
 
     assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef2));
     assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fname2));
@@ -228,6 +234,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2.name()));
     assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
     assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2.name()));
+    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus2));
 
   }
 
@@ -290,6 +297,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1.name()));
     assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
     assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1.name()));
+    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus1));
 
     assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef4));
     assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fname4));
@@ -299,6 +307,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(1).getUnderNotice(), is(un4.name()));
     assertThat(doctorsForDB.get(1).getSanction(), is(sanction4));
     assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status4.name()));
+    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus4));
 
   }
 
@@ -409,6 +418,12 @@ public class DoctorsForDBServiceTest {
     admin3 = faker.internet().emailAddress();
     admin4 = faker.internet().emailAddress();
     admin5 = faker.internet().emailAddress();
+
+    connectionStatus1 = "Yes";
+    connectionStatus2 = "Yes";
+    connectionStatus3 = "Yes";
+    connectionStatus4 = "Yes";
+    connectionStatus5 = "Yes";
 
     doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1,
         now(), designatedBody1, admin1);

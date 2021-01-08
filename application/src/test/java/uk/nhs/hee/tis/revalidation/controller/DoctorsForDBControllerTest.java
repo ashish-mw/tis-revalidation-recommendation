@@ -28,7 +28,6 @@ import com.github.javafaker.Faker;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -78,6 +77,8 @@ public class DoctorsForDBControllerTest {
   private RecommendationStatus doctorStatus1, doctorStatus2;
   private String admin;
   private String designatedBody1, designatedBody2;
+  private String connectionStatus1;
+  private String connectionStatus2;
 
   @BeforeEach
   public void setup() {
@@ -100,6 +101,8 @@ public class DoctorsForDBControllerTest {
     admin = faker.internet().emailAddress();
     designatedBody1 = faker.lorem().characters(8);
     designatedBody2 = faker.lorem().characters(8);
+    connectionStatus1 = faker.lorem().characters(3);
+    connectionStatus2 = faker.lorem().characters(3);
   }
 
   @Test
@@ -261,6 +264,7 @@ public class DoctorsForDBControllerTest {
         .underNotice(underNotice1.value())
         .sanction(sanction1)
         .doctorStatus(doctorStatus1.name())
+        .connectionStatus(connectionStatus1)
         .build();
 
     final var doctor2 = TraineeInfoDto.builder()
@@ -272,6 +276,7 @@ public class DoctorsForDBControllerTest {
         .underNotice(underNotice2.value())
         .sanction(sanction2)
         .doctorStatus(doctorStatus2.name())
+        .connectionStatus(connectionStatus2)
         .build();
     return of(doctor1, doctor2);
   }

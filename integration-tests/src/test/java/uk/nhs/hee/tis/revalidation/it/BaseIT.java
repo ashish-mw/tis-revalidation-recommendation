@@ -34,6 +34,7 @@ public class BaseIT {
   protected String progName1, progName2, progName3, progName4, progName5;
   protected String memType1, memType2, memType3, memType4, memType5;
   protected String grade1, grade2, grade3, grade4, grade5;
+  protected String connectionStatus1, connectionStatus2, connectionStatus3, connectionStatus4, connectionStatus5;
   protected String admin;
   protected String roFirstName;
   protected String roLastName;
@@ -120,6 +121,12 @@ public class BaseIT {
     grade3 = faker.lorem().characters(5);
     grade4 = faker.lorem().characters(5);
     grade5 = faker.lorem().characters(5);
+
+    connectionStatus1 = "Yes";
+    connectionStatus2 = "Yes";
+    connectionStatus3 = "Yes";
+    connectionStatus4 = "Yes";
+    connectionStatus5 = "Yes";
 
     roFirstName = faker.name().firstName();
     roLastName = faker.name().lastName();

@@ -9,6 +9,7 @@ import static org.springframework.data.domain.Sort.by;
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.ON_HOLD;
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.YES;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.IterableUtils;
@@ -122,6 +123,7 @@ public class DoctorsForDBService {
 
   private Page<DoctorsForDB> getSortedAndFilteredDoctorsByPageNumber(
       final TraineeRequestDto requestDTO, final List<String> hiddenGmcIds) {
+    final var hiddenGmcIdsNotNull = (hiddenGmcIds == null) ? new ArrayList<String>() : hiddenGmcIds;
     final var direction = "asc".equalsIgnoreCase(requestDTO.getSortOrder()) ? ASC : DESC;
     final var pageableAndSortable = of(requestDTO.getPageNumber(), pageSize,
         by(direction, requestDTO.getSortColumn()));
@@ -132,7 +134,7 @@ public class DoctorsForDBService {
     }
 
     return doctorsRepository
-        .findAll(pageableAndSortable, requestDTO.getSearchQuery(), requestDTO.getDbcs(), hiddenGmcIds);
+        .findAll(pageableAndSortable, requestDTO.getSearchQuery(), requestDTO.getDbcs(), hiddenGmcIdsNotNull);
   }
 
   //TODO: explore to implement cache

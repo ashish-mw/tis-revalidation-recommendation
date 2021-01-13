@@ -117,7 +117,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2.name()));
     assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
     assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2.name()));
-    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus2));
+    assertThat(doctorsForDB.get(1).getConnectionStatus(), is(connectionStatus2));
 
     assertThat(doctorsForDB.get(2).getGmcReferenceNumber(), is(gmcRef3));
     assertThat(doctorsForDB.get(2).getDoctorFirstName(), is(fname3));
@@ -127,7 +127,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(2).getUnderNotice(), is(un3.name()));
     assertThat(doctorsForDB.get(2).getSanction(), is(sanction3));
     assertThat(doctorsForDB.get(2).getDoctorStatus(), is(status3.name()));
-    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus3));
+    assertThat(doctorsForDB.get(2).getConnectionStatus(), is(connectionStatus3));
 
     assertThat(doctorsForDB.get(3).getGmcReferenceNumber(), is(gmcRef4));
     assertThat(doctorsForDB.get(3).getDoctorFirstName(), is(fname4));
@@ -137,7 +137,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(3).getUnderNotice(), is(un4.name()));
     assertThat(doctorsForDB.get(3).getSanction(), is(sanction4));
     assertThat(doctorsForDB.get(3).getDoctorStatus(), is(status4.name()));
-    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus4));
+    assertThat(doctorsForDB.get(3).getConnectionStatus(), is(connectionStatus4));
 
     assertThat(doctorsForDB.get(4).getGmcReferenceNumber(), is(gmcRef5));
     assertThat(doctorsForDB.get(4).getDoctorFirstName(), is(fname5));
@@ -147,7 +147,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(4).getUnderNotice(), is(un5.name()));
     assertThat(doctorsForDB.get(4).getSanction(), is(sanction5));
     assertThat(doctorsForDB.get(4).getDoctorStatus(), is(status5.name()));
-    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus5));
+    assertThat(doctorsForDB.get(4).getConnectionStatus(), is(connectionStatus5));
 
   }
 
@@ -234,7 +234,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(1).getUnderNotice(), is(un2.name()));
     assertThat(doctorsForDB.get(1).getSanction(), is(sanction2));
     assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status2.name()));
-    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus2));
+    assertThat(doctorsForDB.get(1).getConnectionStatus(), is(connectionStatus2));
 
   }
 
@@ -307,7 +307,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(1).getUnderNotice(), is(un4.name()));
     assertThat(doctorsForDB.get(1).getSanction(), is(sanction4));
     assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status4.name()));
-    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus4));
+    assertThat(doctorsForDB.get(1).getConnectionStatus(), is(connectionStatus4));
 
   }
 
@@ -357,7 +357,7 @@ public class DoctorsForDBServiceTest {
     assertThat(doctorsForDB.get(1).getUnderNotice(), is(un4.name()));
     assertThat(doctorsForDB.get(1).getSanction(), is(sanction4));
     assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status4.name()));
-    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus4));
+    assertThat(doctorsForDB.get(1).getConnectionStatus(), is(connectionStatus4));
 
   }
 

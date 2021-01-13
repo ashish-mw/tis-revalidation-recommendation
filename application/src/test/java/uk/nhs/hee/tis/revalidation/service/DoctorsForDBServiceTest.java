@@ -312,6 +312,56 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
+  public void shouldNotFailIfGmcIdNull() {
+
+    final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
+    List<String> dbcs = List
+        .of(designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5);
+    when(repository.findAll(pageableAndSortable, "query", dbcs, List.of())).thenReturn(page);
+
+    when(page.get()).thenReturn(Stream.of(doc1, doc4));
+    when(page.getTotalPages()).thenReturn(1);
+    when(page.getTotalElements()).thenReturn(2l);
+    when(repository.countByUnderNoticeIn(YES, ON_HOLD)).thenReturn(2l);
+    when(repository.count()).thenReturn(5l);
+    final var requestDTO = TraineeRequestDto.builder()
+        .sortOrder("desc")
+        .sortColumn("submissionDate")
+        .pageNumber(1)
+        .searchQuery("query")
+        .dbcs(dbcs)
+        .build();
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,null);
+    final var doctorsForDB = allDoctors.getTraineeInfo();
+    assertThat(allDoctors.getCountTotal(), is(5L));
+    assertThat(allDoctors.getCountUnderNotice(), is(2L));
+    assertThat(allDoctors.getTotalPages(), is(1L));
+    assertThat(allDoctors.getTotalResults(), is(2L));
+    assertThat(doctorsForDB, hasSize(2));
+
+    assertThat(doctorsForDB.get(0).getGmcReferenceNumber(), is(gmcRef1));
+    assertThat(doctorsForDB.get(0).getDoctorFirstName(), is(fname1));
+    assertThat(doctorsForDB.get(0).getDoctorLastName(), is(lname1));
+    assertThat(doctorsForDB.get(0).getSubmissionDate(), is(subDate1));
+    assertThat(doctorsForDB.get(0).getDateAdded(), is(addedDate1));
+    assertThat(doctorsForDB.get(0).getUnderNotice(), is(un1.name()));
+    assertThat(doctorsForDB.get(0).getSanction(), is(sanction1));
+    assertThat(doctorsForDB.get(0).getDoctorStatus(), is(status1.name()));
+    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus1));
+
+    assertThat(doctorsForDB.get(1).getGmcReferenceNumber(), is(gmcRef4));
+    assertThat(doctorsForDB.get(1).getDoctorFirstName(), is(fname4));
+    assertThat(doctorsForDB.get(1).getDoctorLastName(), is(lname4));
+    assertThat(doctorsForDB.get(1).getSubmissionDate(), is(subDate4));
+    assertThat(doctorsForDB.get(1).getDateAdded(), is(addedDate4));
+    assertThat(doctorsForDB.get(1).getUnderNotice(), is(un4.name()));
+    assertThat(doctorsForDB.get(1).getSanction(), is(sanction4));
+    assertThat(doctorsForDB.get(1).getDoctorStatus(), is(status4.name()));
+    assertThat(doctorsForDB.get(0).getConnectionStatus(), is(connectionStatus4));
+
+  }
+
+  @Test
   public void shouldUpdateAdmin() {
     final String newAdmin1 = faker.internet().emailAddress();
     final String newAdmin2 = faker.internet().emailAddress();

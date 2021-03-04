@@ -157,7 +157,7 @@
     <build>
         <plugins>
             <plugin>
-                <version>3.7.0.1746</version>
+                <version>3.8.0.2131</version>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
             </plugin>

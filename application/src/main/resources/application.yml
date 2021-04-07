@@ -73,3 +73,16 @@ app:
 sentry:
   dsn: ${SENTRY_DSN:}
   environment: ${SENTRY_ENVIRONMENT:}
+
+cloud:
+  aws:
+    region:
+      static: ${AWS_STATIC_REGION:eu-west-2}
+      auto: false
+    credentials:
+      access-key: ${ACCESS_KEY:}
+      secret-key: ${SECRET_KEY:}
+    stack:
+      auto: false
+    end-point:
+      uri: ${QUEUE_NAME:}

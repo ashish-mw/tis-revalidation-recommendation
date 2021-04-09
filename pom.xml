@@ -40,6 +40,8 @@
             ${project.build.directory}/checkstyle-result.xml
         </sonar.java.checkstyle.reportPaths>
         <commons-collections4.version>4.4</commons-collections4.version>
+        <spring-cloud-starter.version>2.3.0</spring-cloud-starter.version>
+        <mockito-inline.version>3.6.28</mockito-inline.version>
     </properties>
 
     <dependencyManagement>
@@ -140,6 +142,13 @@
             </dependency>
 
             <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-inline</artifactId>
+                <version>${mockito-inline.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>io.sentry</groupId>
                 <artifactId>sentry-spring-boot-starter</artifactId>
                 <version>${sentry.version}</version>
@@ -148,6 +157,19 @@
                 <groupId>io.sentry</groupId>
                 <artifactId>sentry-logback</artifactId>
                 <version>${sentry.version}</version>
+            </dependency>
+
+            <!--spring cloud for sqs-->
+
+            <dependency>
+                <groupId>io.awspring.cloud</groupId>
+                <artifactId>spring-cloud-starter-aws</artifactId>
+                <version>${spring-cloud-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.awspring.cloud</groupId>
+                <artifactId>spring-cloud-starter-aws-messaging</artifactId>
+                <version>${spring-cloud-starter.version}</version>
             </dependency>
 
         </dependencies>

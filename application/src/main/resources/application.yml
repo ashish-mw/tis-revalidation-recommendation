@@ -73,3 +73,8 @@ app:
 sentry:
   dsn: ${SENTRY_DSN:}
   environment: ${SENTRY_ENVIRONMENT:}
+
+cloud:
+  aws:
+    end-point:
+      uri: ${QUEUE_NAME:}

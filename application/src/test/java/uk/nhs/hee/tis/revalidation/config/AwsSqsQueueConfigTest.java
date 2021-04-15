@@ -21,17 +21,10 @@
 
 package uk.nhs.hee.tis.revalidation.config;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
 
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.awspring.cloud.core.env.ResourceIdResolver;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,31 +33,21 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 
 @ExtendWith(MockitoExtension.class)
 class AwsSqsQueueConfigTest {
 
   AwsSqsQueueConfig awsSqsQueueConfig;
-  ObjectMapper objectMapper;
-  DateFormat df;
-  @Mock
-  MappingJackson2MessageConverter jackson2MessageConverter;
+
   @Mock
   private AmazonSQSAsync amazonSqs;
-  @Mock
-  private ResourceIdResolver resourceIdResolver;
+
   @InjectMocks
   private AmazonSQSAsyncClientBuilder clientBuilder;
-
 
   @BeforeEach
   void setUp() {
     awsSqsQueueConfig = new AwsSqsQueueConfig();
-    objectMapper = new ObjectMapper();
-    df = new SimpleDateFormat("dd/MM/yyyy");
-    objectMapper.setDateFormat(df);
-    jackson2MessageConverter.setObjectMapper(objectMapper);
   }
 
   @Test
@@ -72,17 +55,11 @@ class AwsSqsQueueConfigTest {
     AmazonSQSAsync config = clientBuilder.build();
     try (MockedStatic<AmazonSQSAsyncClientBuilder> dummy = Mockito
         .mockStatic(AmazonSQSAsyncClientBuilder.class)) {
+      //static method mocking
       dummy.when(() -> AmazonSQSAsyncClientBuilder.defaultClient()).thenReturn(config);
     }
     assertNotNull("The returned value must not be null",
         String.valueOf(awsSqsQueueConfig.amazonSQSAsync()));
   }
 
-  @Test
-  public void testMappingJackson2MessageConverter() {
-    when(jackson2MessageConverter.getObjectMapper()).thenReturn(objectMapper);
-    assertThat(awsSqsQueueConfig.mappingJackson2MessageConverter(objectMapper).getObjectMapper()
-        .getDateFormat(), is(jackson2MessageConverter.getObjectMapper().getDateFormat()));
-
-  }
 }

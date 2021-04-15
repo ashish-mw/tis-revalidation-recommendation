@@ -21,11 +21,10 @@
 
 package uk.nhs.hee.tis.revalidation.controller;
 
+import io.awspring.cloud.messaging.core.QueueMessagingTemplate;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import io.awspring.cloud.messaging.core.QueueMessagingTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,11 +40,14 @@ public class GmcDoctorSyncController {
   @Value("${cloud.aws.end-point.uri}")
   private String sqsEndPoint;
 
-  @Autowired
   private QueueMessagingTemplate queueMessagingTemplate;
-
-  @Autowired
   private DoctorsForDBRepository doctorsForDBRepository;
+
+  public GmcDoctorSyncController(QueueMessagingTemplate queueMessagingTemplate,
+      DoctorsForDBRepository doctorsForDBRepository) {
+    this.queueMessagingTemplate = queueMessagingTemplate;
+    this.doctorsForDBRepository = doctorsForDBRepository;
+  }
 
   @GetMapping("/send-doctor")
   public ResponseEntity sendMessage() {
@@ -56,7 +58,7 @@ public class GmcDoctorSyncController {
     return ResponseEntity.ok().body("success");
   }
 
-  private void sendToSqsQueue(final List<DoctorsForDB> gmcDoctors) {
+  public void sendToSqsQueue(final List<DoctorsForDB> gmcDoctors) {
     gmcDoctors.stream()
         .forEach(doctor -> queueMessagingTemplate.convertAndSend(sqsEndPoint, doctor));
   }

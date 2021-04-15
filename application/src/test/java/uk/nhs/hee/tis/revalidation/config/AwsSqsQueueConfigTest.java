@@ -21,29 +21,18 @@
 
 package uk.nhs.hee.tis.revalidation.config;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.amazonaws.services.sqs.AmazonSQSAsync;
-import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class AwsSqsQueueConfigTest {
 
-  AwsSqsQueueConfig awsSqsQueueConfig;
-
-  @Mock
-  private AmazonSQSAsync amazonSqs;
-
-  @InjectMocks
-  private AmazonSQSAsyncClientBuilder clientBuilder;
+  private AwsSqsQueueConfig awsSqsQueueConfig;
 
   @BeforeEach
   void setUp() {
@@ -51,15 +40,7 @@ class AwsSqsQueueConfigTest {
   }
 
   @Test
-  public void testAmazonSQSAsync() {
-    AmazonSQSAsync config = clientBuilder.build();
-    try (MockedStatic<AmazonSQSAsyncClientBuilder> dummy = Mockito
-        .mockStatic(AmazonSQSAsyncClientBuilder.class)) {
-      //static method mocking
-      dummy.when(() -> AmazonSQSAsyncClientBuilder.defaultClient()).thenReturn(config);
-    }
-    assertNotNull("The returned value must not be null",
-        String.valueOf(awsSqsQueueConfig.amazonSQSAsync()));
+  void testAmazonSqsAsync() {
+    assertThat(awsSqsQueueConfig.amazonSQSAsync(), notNullValue());
   }
-
 }

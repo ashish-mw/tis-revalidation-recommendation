@@ -19,31 +19,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.revalidation.controller;
+package uk.nhs.hee.tis.revalidation.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.hee.tis.revalidation.service.GmcDoctorSyncService;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.verify;
 
-@Slf4j
-@RestController
-@RequestMapping("/api/v1/sqs")
-public class GmcDoctorSyncController {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-  private final GmcDoctorSyncService gmcDoctorSyncService;
+@ExtendWith(MockitoExtension.class)
+class GmcDoctorSyncServiceTest {
 
-  public GmcDoctorSyncController(final GmcDoctorSyncService gmcDoctorSyncService) {
-    this.gmcDoctorSyncService = gmcDoctorSyncService;
+  @Captor
+  ArgumentCaptor<String> syncStartMessage;
+  @Mock
+  private GmcDoctorSyncService gmcDoctorSyncService;
+
+  @BeforeEach
+  void setUp() {
   }
 
-  @GetMapping("/send-doctor")
-  public ResponseEntity startGmcSync() {
-    //this endpoint is needed to start gmc sync manually
+  @Test
+  void testReceiveMessageArgument() {
     gmcDoctorSyncService.receiveMessage("gmcSyncStart");
-    return ResponseEntity.ok().body("success");
-  }
 
+    verify(gmcDoctorSyncService).receiveMessage(syncStartMessage.capture());
+    assertThat(syncStartMessage.getValue(), is("gmcSyncStart"));
+  }
 }

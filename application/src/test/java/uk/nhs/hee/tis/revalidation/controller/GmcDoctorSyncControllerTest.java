@@ -22,20 +22,14 @@
 package uk.nhs.hee.tis.revalidation.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import io.awspring.cloud.messaging.core.QueueMessagingTemplate;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,21 +42,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
-import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
+import uk.nhs.hee.tis.revalidation.service.GmcDoctorSyncService;
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(GmcDoctorSyncController.class)
 public class GmcDoctorSyncControllerTest {
 
   private final List<DoctorsForDB> allDoctors = new ArrayList<>();
-  @MockBean
-  private DoctorsForDBRepository doctorsForDBRepository;
   @Autowired
   private MockMvc mockMvc;
-  @MockBean
-  private QueueMessagingTemplate queueMessagingTemplate;
 
-  DoctorsForDB doctorsForDB1;
+  @MockBean
+  private GmcDoctorSyncService gmcDoctorSyncService;
 
   @InjectMocks
   private GmcDoctorSyncController gmcDoctorSyncController;
@@ -72,7 +63,7 @@ public class GmcDoctorSyncControllerTest {
    */
   @BeforeEach
   public void setup() {
-    doctorsForDB1 = DoctorsForDB.builder()
+    DoctorsForDB doctorsForDB1 = DoctorsForDB.builder()
         .gmcReferenceNumber("101")
         .doctorFirstName("AAA")
         .doctorLastName("BBB")
@@ -106,8 +97,6 @@ public class GmcDoctorSyncControllerTest {
 
   @Test
   public void shouldSendMessageToSqs() throws Exception {
-    when(doctorsForDBRepository.findAll()).thenReturn(allDoctors);
-
     this.mockMvc.perform(get("/api/v1/sqs/send-doctor"))
         .andExpect(status().isOk())
         .andExpect(content().string("success"));
@@ -119,18 +108,4 @@ public class GmcDoctorSyncControllerTest {
     assertThat(allDoctors.get(1).getDesignatedBodyCode(), is("XYZ"));
 
   }
-
-  @Test
-  public void testSendToSqsQueue() throws Exception {
-    setField(gmcDoctorSyncController, "sqsEndPoint", "sqsEndPoint");
-
-    //method under test
-    gmcDoctorSyncController.sendToSqsQueue(allDoctors);
-
-    verify(queueMessagingTemplate).convertAndSend("sqsEndPoint", allDoctors.get(0));
-    assertThat(allDoctors, hasSize(2));
-    assertThat(allDoctors.get(0).getGmcReferenceNumber(), CoreMatchers.is("101"));
-    assertThat(allDoctors.get(1).getGmcReferenceNumber(), CoreMatchers.is("201"));
-  }
-
 }

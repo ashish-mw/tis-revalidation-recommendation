@@ -66,6 +66,9 @@ public class GmcDoctorSyncService {
     gmcDoctors.stream()
         .forEach(doctor -> queueMessagingTemplate.convertAndSend(sqsEndPoint, doctor));
     log.info("GMC doctors have been published to the SQS queue ");
+
+    DoctorsForDB syncEnd = DoctorsForDB.builder().syncEnd(true).build();
+    queueMessagingTemplate.convertAndSend(sqsEndPoint, syncEnd);
   }
 
 }

@@ -13,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.lang.Nullable;
 import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 
 @Data
@@ -35,6 +36,8 @@ public class DoctorsForDB {
   private LocalDate lastUpdatedDate;
   private String designatedBodyCode;
   private String admin;
+  @Nullable
+  Boolean syncEnd;
 
   public final static DoctorsForDB convert(final DoctorsForDbDto doctorsForDBDTO) {
     return DoctorsForDB.builder()

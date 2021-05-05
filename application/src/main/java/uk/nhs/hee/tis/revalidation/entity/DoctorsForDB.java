@@ -5,6 +5,10 @@ import static java.time.LocalDate.now;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.NOT_STARTED;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.convertGmcDateToLocalDate;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import io.swagger.annotations.ApiModel;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
@@ -28,11 +32,17 @@ public class DoctorsForDB {
   private String gmcReferenceNumber;
   private String doctorFirstName;
   private String doctorLastName;
+  @JsonDeserialize(using = LocalDateDeserializer.class)
+  @JsonSerialize(using = LocalDateSerializer.class)
   private LocalDate submissionDate;
+  @JsonDeserialize(using = LocalDateDeserializer.class)
+  @JsonSerialize(using = LocalDateSerializer.class)
   private LocalDate dateAdded;
   private UnderNotice underNotice;
   private String sanction;
   private RecommendationStatus doctorStatus;
+  @JsonDeserialize(using = LocalDateDeserializer.class)
+  @JsonSerialize(using = LocalDateSerializer.class)
   private LocalDate lastUpdatedDate;
   private String designatedBodyCode;
   private String admin;

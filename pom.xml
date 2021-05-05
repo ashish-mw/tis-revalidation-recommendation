@@ -179,7 +179,7 @@
     <build>
         <plugins>
             <plugin>
-                <version>3.8.0.2131</version>
+                <version>3.9.0.2155</version>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
             </plugin>

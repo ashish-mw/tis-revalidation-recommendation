@@ -62,6 +62,10 @@ app:
     routingKey: ${ROUTING_KEY:uk.nhs.hee}
     connection.queue: ${CONNECTION_QUEUE:connection-queue}
     connection.routingKey: ${CONNECTION_ROUTING_KEY:uk.nhs.hee.connection}
+    reval.exchange: ${REVAL_RABBIT_EXCHANGE:reval.exchange}
+    reval.queue.recommendation.syncstart: ${REVAL_RABBIT_RECOMMENDATION_SYNC_START_QUEUE:reval.queue.recommendation.syncstart}
+    reval.routingKey.recommendation.syncstart: ${REVAL_RABBIT_RECOMMENDATION_SYNCSTART_ROUTING_KEY:reval.recommendation.syncstart}
+
 
   gmc:
     url: ${GMC_CONNECT_URL:http://localhost:8090/GMCConnectMock2020/GMCWebServices}

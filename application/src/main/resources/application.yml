@@ -81,4 +81,4 @@ sentry:
 cloud:
   aws:
     end-point:
-      uri: ${QUEUE_NAME:}
+      uri: ${SQS_SYNC_GMC_QUEUE:}

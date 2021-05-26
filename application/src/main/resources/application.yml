@@ -82,4 +82,4 @@ sentry:
 cloud:
   aws:
     end-point:
-      uri: ${SQS_SYNC_GMC_QUEUE:https://sqs.eu-west-2.amazonaws.com/430723991443/reval-test-sqs}
+      uri: ${SQS_SYNC_GMC_QUEUE:}

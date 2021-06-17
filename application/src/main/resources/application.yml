@@ -58,11 +58,11 @@ app:
     sort.order: ${SORT_ORDER:asc,desc}
 
   rabbit:
-    exchange: ${EXCHANGE:gmc-connect-exchange}
-    queue: ${QUEUE:gmc-doctors-queue}
-    routingKey: ${ROUTING_KEY:uk.nhs.hee}
-    connection.queue: ${CONNECTION_QUEUE:connection-queue}
-    connection.routingKey: ${CONNECTION_ROUTING_KEY:uk.nhs.hee.connection}
+    exchange: ${EXCHANGE:reval.exchange.gmcsync}
+    queue: ${QUEUE:reval.queue.gmcsync.recommendation}
+    routingKey: ${ROUTING_KEY:reval.gmcsync}
+    connection.queue: ${CONNECTION_QUEUE:reval.queue.connection.manualupdate.recommendation}
+    connection.routingKey: ${CONNECTION_ROUTING_KEY:reval.connection.manualupdate}
     reval.exchange: ${REVAL_RABBIT_EXCHANGE:reval.exchange}
     reval.queue.recommendation.syncstart: ${REVAL_RABBIT_RECOMMENDATION_SYNC_START_QUEUE:reval.queue.recommendation.syncstart}
     reval.routingKey.recommendation.syncstart: ${REVAL_RABBIT_RECOMMENDATION_SYNCSTART_ROUTING_KEY:reval.recommendation.syncstart}

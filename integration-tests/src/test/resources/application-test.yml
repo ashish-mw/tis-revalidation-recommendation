@@ -51,9 +51,9 @@ app:
     tcs.url: ${TCS_URL:http://localhost:8080/tcsmock/api/revalidation}
 
   rabbit:
-    exchange: ${EXCHANGE:gmc-connect-exchange}
-    queue: ${QUEUE:gmc-doctors-queue}
-    routingKey: ${ROUTING_KEY:uk.nhs.hee}
+    exchange: ${EXCHANGE:reval.exchange.gmcsync}
+    queue: ${QUEUE:reval.queue.gmcsync.recommendation}
+    routingKey: ${ROUTING_KEY:reval.gmcsync}
 
   gmc:
     url: ${GMC_CONNECT_URL:http://localhost:8090/GMCConnectMock2020/GMCWebServices}

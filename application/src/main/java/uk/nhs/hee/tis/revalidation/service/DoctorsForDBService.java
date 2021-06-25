@@ -39,7 +39,8 @@ public class DoctorsForDBService {
   @Autowired
   private DoctorsForDBRepository doctorsRepository;
 
-  public TraineeSummaryDto getAllTraineeDoctorDetails(final TraineeRequestDto requestDTO, final List<String> hiddenGmcIds) {
+  public TraineeSummaryDto getAllTraineeDoctorDetails(final TraineeRequestDto requestDTO,
+      final List<String> hiddenGmcIds) {
     final var paginatedDoctors = getSortedAndFilteredDoctorsByPageNumber(requestDTO, hiddenGmcIds);
     final var doctorsList = paginatedDoctors.get().collect(toList());
     final var traineeDoctors = doctorsList.stream().map(d ->
@@ -134,7 +135,8 @@ public class DoctorsForDBService {
     }
 
     return doctorsRepository
-        .findAll(pageableAndSortable, requestDTO.getSearchQuery(), requestDTO.getDbcs(), hiddenGmcIdsNotNull);
+        .findAll(pageableAndSortable, requestDTO.getSearchQuery(), requestDTO.getDbcs(),
+            hiddenGmcIdsNotNull);
   }
 
   //TODO: explore to implement cache

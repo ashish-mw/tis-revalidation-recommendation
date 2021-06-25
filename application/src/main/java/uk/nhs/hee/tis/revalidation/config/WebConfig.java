@@ -9,18 +9,18 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class WebConfig {
 
-    @Bean
-    public CorsFilter addCorsMappings() {
-        final var source = new UrlBasedCorsConfigurationSource();
+  @Bean
+  public CorsFilter addCorsMappings() {
+    final var source = new UrlBasedCorsConfigurationSource();
 
-        final var config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
+    final var config = new CorsConfiguration();
+    config.setAllowCredentials(true);
+    config.addAllowedOriginPattern("*");
+    config.addAllowedHeader("*");
+    config.addAllowedMethod("*");
 
-        source.registerCorsConfiguration("/api/**", config);
-        source.registerCorsConfiguration("/swagger-ui.html", config);
-        return new CorsFilter(source);
-    }
+    source.registerCorsConfiguration("/api/**", config);
+    source.registerCorsConfiguration("/swagger-ui.html", config);
+    return new CorsFilter(source);
+  }
 }

@@ -9,10 +9,11 @@ import lombok.Data;
 @Builder
 @ApiModel(description = "Request for trainee data for summary page")
 public class TraineeRequestDto {
-    private String sortColumn;
-    private String sortOrder;
-    private boolean underNotice;
-    private int pageNumber;
-    private List<String> dbcs;
-    private String searchQuery;
+
+  private String sortColumn;
+  private String sortOrder;
+  private boolean underNotice;
+  private int pageNumber;
+  private List<String> dbcs;
+  private String searchQuery;
 }

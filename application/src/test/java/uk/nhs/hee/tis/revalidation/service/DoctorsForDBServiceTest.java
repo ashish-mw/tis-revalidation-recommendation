@@ -91,7 +91,7 @@ public class DoctorsForDBServiceTest {
         .dbcs(dbcs)
         .build();
 
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of());
 
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
@@ -169,7 +169,7 @@ public class DoctorsForDBServiceTest {
         .dbcs(dbcs)
         .build();
 
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of());
 
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
@@ -209,7 +209,7 @@ public class DoctorsForDBServiceTest {
         .searchQuery("")
         .dbcs(dbcs)
         .build();
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of());
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
     assertThat(allDoctors.getCountUnderNotice(), is(2L));
@@ -253,7 +253,7 @@ public class DoctorsForDBServiceTest {
         .searchQuery("")
         .dbcs(dbcs)
         .build();
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of());
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(0L));
     assertThat(allDoctors.getCountUnderNotice(), is(0L));
@@ -281,7 +281,7 @@ public class DoctorsForDBServiceTest {
         .searchQuery("query")
         .dbcs(dbcs)
         .build();
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of());
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
     assertThat(allDoctors.getCountUnderNotice(), is(2L));
@@ -331,7 +331,7 @@ public class DoctorsForDBServiceTest {
         .searchQuery("query")
         .dbcs(dbcs)
         .build();
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,null);
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, null);
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
     assertThat(allDoctors.getCountUnderNotice(), is(2L));
@@ -476,14 +476,14 @@ public class DoctorsForDBServiceTest {
     connectionStatus5 = "Yes";
 
     doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1,
-        now(), designatedBody1, admin1,null);
+        now(), designatedBody1, admin1, null);
     doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2,
-        now(), designatedBody2, admin2,null);
+        now(), designatedBody2, admin2, null);
     doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3, status3,
-        now(), designatedBody3, admin3,null);
+        now(), designatedBody3, admin3, null);
     doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4, status4,
-        now(), designatedBody4, admin4,null);
+        now(), designatedBody4, admin4, null);
     doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5,
-        now(), designatedBody5, admin5,null);
+        now(), designatedBody5, admin5, null);
   }
 }

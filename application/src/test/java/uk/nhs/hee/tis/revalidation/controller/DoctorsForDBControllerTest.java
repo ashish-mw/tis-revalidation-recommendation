@@ -111,7 +111,8 @@ public class DoctorsForDBControllerTest {
     final var requestDTO = TraineeRequestDto.builder().sortOrder(ASC)
         .sortColumn(SUBMISSION_DATE).searchQuery(EMPTY_STRING)
         .dbcs(List.of(designatedBody1, designatedBody2)).build();
-    when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of())).thenReturn(gmcDoctorDTO);
+    when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of()))
+        .thenReturn(gmcDoctorDTO);
     final var dbcString = String.format("%s,%s", designatedBody1, designatedBody2);
     this.mockMvc.perform(get("/api/v1/doctors")
         .param(SORT_ORDER, ASC)
@@ -130,7 +131,8 @@ public class DoctorsForDBControllerTest {
     final var requestDTO = TraineeRequestDto.builder().sortOrder(ASC)
         .sortColumn(SUBMISSION_DATE).searchQuery(EMPTY_STRING)
         .dbcs(List.of(designatedBody1, designatedBody2)).build();
-    when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of(gmcRef1))).thenReturn(gmcDoctorDTO);
+    when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of(gmcRef1)))
+        .thenReturn(gmcDoctorDTO);
     final var dbcString = String.format("%s,%s", designatedBody1, designatedBody2);
     final var url = format("%s/%s", UNHIDDEN_DOCTORS_API_URL, gmcRef1);
     this.mockMvc.perform(get(url)
@@ -152,7 +154,8 @@ public class DoctorsForDBControllerTest {
         .sortColumn(SUBMISSION_DATE)
         .searchQuery(EMPTY_STRING).dbcs(List.of(designatedBody1, designatedBody2)).build();
     final var dbcString = String.format("%s,%s", designatedBody1, designatedBody2);
-    when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of())).thenReturn(gmcDoctorDTO);
+    when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of()))
+        .thenReturn(gmcDoctorDTO);
     this.mockMvc.perform(get("/api/v1/doctors")
         .param(SORT_ORDER, "")
         .param(SORT_COLUMN, "")
@@ -168,7 +171,8 @@ public class DoctorsForDBControllerTest {
         .sortColumn(SUBMISSION_DATE)
         .searchQuery(EMPTY_STRING).dbcs(List.of(designatedBody1, designatedBody2)).build();
     final var dbcString = String.format("%s,%s", designatedBody1, designatedBody2);
-    when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of())).thenReturn(gmcDoctorDTO);
+    when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of()))
+        .thenReturn(gmcDoctorDTO);
     this.mockMvc.perform(get(DOCTORS_API_URL)
         .param(SORT_ORDER, "aa")
         .param(SORT_COLUMN, "date")
@@ -184,7 +188,8 @@ public class DoctorsForDBControllerTest {
         .sortOrder(ASC).sortColumn(SUBMISSION_DATE).underNotice(true).searchQuery(EMPTY_STRING)
         .dbcs(List.of(designatedBody1, designatedBody2)).build();
     final var dbcString = String.format("%s,%s", designatedBody1, designatedBody2);
-    when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of())).thenReturn(gmcDoctorDTO);
+    when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of()))
+        .thenReturn(gmcDoctorDTO);
     this.mockMvc.perform(get(DOCTORS_API_URL)
         .param(SORT_ORDER, ASC)
         .param(SORT_COLUMN, SUBMISSION_DATE)
@@ -200,7 +205,8 @@ public class DoctorsForDBControllerTest {
     final var requestDTO = TraineeRequestDto.builder()
         .sortOrder(ASC).sortColumn(SUBMISSION_DATE).underNotice(true).searchQuery(EMPTY_STRING)
         .build();
-    when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of())).thenReturn(gmcDoctorDTO);
+    when(doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of()))
+        .thenReturn(gmcDoctorDTO);
     this.mockMvc.perform(get(DOCTORS_API_URL)
         .param(SORT_ORDER, ASC)
         .param(SORT_COLUMN, SUBMISSION_DATE)

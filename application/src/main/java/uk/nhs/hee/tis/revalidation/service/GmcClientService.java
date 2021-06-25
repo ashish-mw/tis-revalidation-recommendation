@@ -101,7 +101,7 @@ public class GmcClientService {
       request.setRoRecommendationSubreason("");
       request.setRequestedDeferralDate(null);
     }
-    request.setClientRequestID(recommendation.getId().toString());
+    request.setClientRequestID(recommendation.getId());
     request.setInternalUser(userProfileDto.getUserName());
     request.setInternalUserEmailAddress(userProfileDto.getEmailAddress());
     tryRecommendation.setRecReq(request);

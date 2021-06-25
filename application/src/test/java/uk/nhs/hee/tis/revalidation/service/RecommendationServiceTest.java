@@ -35,7 +35,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationResponseCT;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationV2Response;
@@ -690,9 +689,11 @@ public class RecommendationServiceTest {
   @Test
   public void shouldReturnLatestRecommendations() throws ParseException {
     final var gmcId = faker.number().digits(7);
-    final var recommendation = buildRecommendation(gmcId, recommendationId, status, REVALIDATE, UNDER_REVIEW);
-    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcId)).thenReturn(
-        Optional.of(recommendation));
+    final var recommendation = buildRecommendation(gmcId, recommendationId, status, REVALIDATE,
+        UNDER_REVIEW);
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcId))
+        .thenReturn(
+            Optional.of(recommendation));
     final var recommendationResult = recommendationService.getLatestRecommendation(gmcId);
 
     assertThat(recommendationResult.getGmcNumber(), is(gmcId));

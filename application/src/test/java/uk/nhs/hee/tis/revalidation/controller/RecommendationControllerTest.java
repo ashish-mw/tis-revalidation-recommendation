@@ -58,7 +58,6 @@ public class RecommendationControllerTest {
   private String lastName = faker.name().lastName();
   private LocalDate submissionDate = LocalDate.now();
   private LocalDate dateAdded = LocalDate.now();
-  ;
   private UnderNotice underNotice = faker.options().option(UnderNotice.class);
   private String sanction = faker.lorem().characters(2);
   private RecommendationStatus status = faker.options().option(RecommendationStatus.class);
@@ -301,8 +300,10 @@ public class RecommendationControllerTest {
   @Test
   public void shouldReturnLatestTraineeRecommendations() throws Exception {
     final var traineeRecommendationRecordDto = Map.of(gmcId, prepareRevalidationDTO());
-    when(service.getLatestRecommendations(List.of(gmcId))).thenReturn(traineeRecommendationRecordDto);
-    final var url = format("%s/%s", RECOMMENDATION_API_URL, RECOMMENDATION_API_LATEST_GMCIDS_PATH_VARIABLE);
+    when(service.getLatestRecommendations(List.of(gmcId)))
+        .thenReturn(traineeRecommendationRecordDto);
+    final var url = format("%s/%s", RECOMMENDATION_API_URL,
+        RECOMMENDATION_API_LATEST_GMCIDS_PATH_VARIABLE);
     this.mockMvc.perform(get(url, gmcId))
         .andExpect(status().isOk())
         .andExpect(content().json(mapper.writeValueAsString(traineeRecommendationRecordDto)));

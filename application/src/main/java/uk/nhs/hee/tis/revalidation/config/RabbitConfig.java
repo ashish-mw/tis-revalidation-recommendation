@@ -102,7 +102,8 @@ public class RabbitConfig {
   }
 
   @Bean
-  public Binding connectionbinding(final Queue connectionQueue, final DirectExchange revalExchange) {
+  public Binding connectionbinding(final Queue connectionQueue,
+      final DirectExchange revalExchange) {
     return BindingBuilder.bind(connectionQueue).to(revalExchange).with(removeDbcRoutingKey);
   }
 

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TraineeAdminDto {
-    private String admin;
-    private String gmcNumber;
+
+  private String admin;
+  private String gmcNumber;
 }

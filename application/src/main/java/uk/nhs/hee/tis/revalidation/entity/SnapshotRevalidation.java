@@ -1,32 +1,32 @@
 package uk.nhs.hee.tis.revalidation.entity;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class SnapshotRevalidation {
-    private String id;
-    private String proposedOutcomeCode;
-    private String deferralDate;
-    private String deferralReason;
-    private String deferralSubReason;
-    private String deferralComment;
-    private String revalidationStatusCode;
-    private String gmcSubmissionDateTime;
-    private String gmcSubmissionReturnCode;
-    private String gmcRecommendationId;
-    private String gmcOutcomeCode;
-    private String gmcStatusCheckDateTime;
-    private String admin;
-    private String submissionDate;
-    private String recommendationSubmitter;
-    private String dateAdded;
-    private List<String> comments;
+
+  private String id;
+  private String proposedOutcomeCode;
+  private String deferralDate;
+  private String deferralReason;
+  private String deferralSubReason;
+  private String deferralComment;
+  private String revalidationStatusCode;
+  private String gmcSubmissionDateTime;
+  private String gmcSubmissionReturnCode;
+  private String gmcRecommendationId;
+  private String gmcOutcomeCode;
+  private String gmcStatusCheckDateTime;
+  private String admin;
+  private String submissionDate;
+  private String recommendationSubmitter;
+  private String dateAdded;
+  private List<String> comments;
 }

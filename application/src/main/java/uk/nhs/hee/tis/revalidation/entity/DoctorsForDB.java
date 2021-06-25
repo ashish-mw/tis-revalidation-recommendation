@@ -28,8 +28,6 @@ import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 @ApiModel(description = "Trainee doctors's core profile data")
 public class DoctorsForDB {
 
-  @Nullable
-  Boolean syncEnd;
   @Id
   private String gmcReferenceNumber;
   private String doctorFirstName;
@@ -48,6 +46,8 @@ public class DoctorsForDB {
   private LocalDate lastUpdatedDate;
   private String designatedBodyCode;
   private String admin;
+  @Nullable
+  Boolean syncEnd;
 
   public final static DoctorsForDB convert(final DoctorsForDbDto doctorsForDBDTO) {
     return DoctorsForDB.builder()

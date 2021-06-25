@@ -30,7 +30,7 @@ import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 @SpringBootTest(classes = RevalidationApplication.class)
 @TestPropertySource("classpath:application-test.yml")
 @ActiveProfiles("test")
-public class RevalidationIT {
+class RevalidationIT {
 
   private final Faker faker = new Faker();
 
@@ -56,7 +56,7 @@ public class RevalidationIT {
 
   @DisplayName("Given a message arrive in queue, when revalidation recieve it, then store it in database")
   @Test
-  public void shouldReceiveDoctorInformationAndAddIntoDatabase() throws InterruptedException {
+  void shouldReceiveDoctorInformationAndAddIntoDatabase() throws InterruptedException {
 
     gmcReference = faker.number().digits(8);
     firstName = faker.name().firstName();

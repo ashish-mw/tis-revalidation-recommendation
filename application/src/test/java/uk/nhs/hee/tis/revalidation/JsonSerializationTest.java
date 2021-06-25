@@ -18,7 +18,7 @@ import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(DoctorsForDBController.class)
-public class JsonSerializationTest {
+class JsonSerializationTest {
 
   @MockBean
   private DoctorsForDBService mDoctorsForDbService;
@@ -27,7 +27,7 @@ public class JsonSerializationTest {
   private ObjectMapper mapper;
 
   @Test
-  public void testDateSerialization() throws JsonProcessingException {
+  void testDateSerialization() throws JsonProcessingException {
     assertThat(mapper, is(notNullValue()));
 
     final var doctor = DoctorsForDbDto.builder()

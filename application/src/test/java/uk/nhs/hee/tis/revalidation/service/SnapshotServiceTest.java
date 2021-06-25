@@ -27,7 +27,7 @@ import uk.nhs.hee.tis.revalidation.entity.SnapshotRevalidation;
 import uk.nhs.hee.tis.revalidation.repository.SnapshotRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class SnapshotServiceTest {
+class SnapshotServiceTest {
 
   private Faker faker = new Faker();
 
@@ -95,7 +95,7 @@ public class SnapshotServiceTest {
   }
 
   @Test
-  public void shouldSaveRecommendationToSnapshot() {
+  void shouldSaveRecommendationToSnapshot() {
     when(recommendation.getId()).thenReturn(id);
     when(recommendation.getGmcNumber()).thenReturn(gmcNumber);
     when(recommendation.getOutcome()).thenReturn(outcome);
@@ -120,7 +120,7 @@ public class SnapshotServiceTest {
   }
 
   @Test
-  public void shouldGetSnapshotRecommendations() {
+  void shouldGetSnapshotRecommendations() {
     when(doctorsForDB.getGmcReferenceNumber()).thenReturn(gmcNumber);
     when(doctorsForDB.getDesignatedBodyCode()).thenReturn(designatedBody);
     when(snapshotRepository.findByGmcNumber(gmcNumber)).thenReturn(List.of(snapshot1));

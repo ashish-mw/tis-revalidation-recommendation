@@ -48,7 +48,7 @@ import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(DoctorsForDBController.class)
-public class DoctorsForDBControllerTest {
+class DoctorsForDBControllerTest {
 
   private static final String DOCTORS_API_URL = "/api/v1/doctors";
   private static final String UNHIDDEN_DOCTORS_API_URL = "/api/v1/doctors/unhidden";
@@ -106,7 +106,7 @@ public class DoctorsForDBControllerTest {
   }
 
   @Test
-  public void shouldReturnTraineeDoctorsInformation() throws Exception {
+  void shouldReturnTraineeDoctorsInformation() throws Exception {
     final var gmcDoctorDTO = prepareGmcDoctor();
     final var requestDTO = TraineeRequestDto.builder().sortOrder(ASC)
         .sortColumn(SUBMISSION_DATE).searchQuery(EMPTY_STRING)
@@ -126,7 +126,7 @@ public class DoctorsForDBControllerTest {
   }
 
   @Test
-  public void shouldReturnUnhiddenTraineeDoctorsInformation() throws Exception {
+  void shouldReturnUnhiddenTraineeDoctorsInformation() throws Exception {
     final var gmcDoctorDTO = prepareGmcDoctor();
     final var requestDTO = TraineeRequestDto.builder().sortOrder(ASC)
         .sortColumn(SUBMISSION_DATE).searchQuery(EMPTY_STRING)
@@ -148,7 +148,7 @@ public class DoctorsForDBControllerTest {
   }
 
   @Test
-  public void shouldReturnDataWhenSortOrderAndSortColumnAreEmpty() throws Exception {
+  void shouldReturnDataWhenSortOrderAndSortColumnAreEmpty() throws Exception {
     final var gmcDoctorDTO = prepareGmcDoctor();
     final var requestDTO = TraineeRequestDto.builder().sortOrder(DESC)
         .sortColumn(SUBMISSION_DATE)
@@ -165,7 +165,7 @@ public class DoctorsForDBControllerTest {
   }
 
   @Test
-  public void shouldReturnDataWhenSortOrderAndSortColumnAreInvalid() throws Exception {
+  void shouldReturnDataWhenSortOrderAndSortColumnAreInvalid() throws Exception {
     final var gmcDoctorDTO = prepareGmcDoctor();
     final var requestDTO = TraineeRequestDto.builder().sortOrder(DESC)
         .sortColumn(SUBMISSION_DATE)
@@ -182,7 +182,7 @@ public class DoctorsForDBControllerTest {
   }
 
   @Test
-  public void shouldReturnUnderNoticeTraineeDoctorsInformation() throws Exception {
+  void shouldReturnUnderNoticeTraineeDoctorsInformation() throws Exception {
     final var gmcDoctorDTO = prepareGmcDoctor();
     final var requestDTO = TraineeRequestDto.builder()
         .sortOrder(ASC).sortColumn(SUBMISSION_DATE).underNotice(true).searchQuery(EMPTY_STRING)
@@ -200,7 +200,7 @@ public class DoctorsForDBControllerTest {
   }
 
   @Test
-  public void shouldSetDbcsToAllWhenItsEmpty() throws Exception {
+  void shouldSetDbcsToAllWhenItsEmpty() throws Exception {
     final var gmcDoctorDTO = prepareGmcDoctor();
     final var requestDTO = TraineeRequestDto.builder()
         .sortOrder(ASC).sortColumn(SUBMISSION_DATE).underNotice(true).searchQuery(EMPTY_STRING)
@@ -216,7 +216,7 @@ public class DoctorsForDBControllerTest {
 
 
   @Test
-  public void shouldUpdateAdminForTrainee() throws Exception {
+  void shouldUpdateAdminForTrainee() throws Exception {
     final var url = format("%s/%s", DOCTORS_API_URL, UPDATE_ADMIN);
     final var ta1 = TraineeAdminDto.builder().gmcNumber(gmcRef1).admin(admin).build();
     final var ta2 = TraineeAdminDto.builder().gmcNumber(gmcRef2).admin(admin).build();
@@ -230,7 +230,7 @@ public class DoctorsForDBControllerTest {
   }
 
   @Test
-  public void shouldReturnDesignatedBodyCode() throws Exception {
+  void shouldReturnDesignatedBodyCode() throws Exception {
 
     final var designatedBodyDto = DesignatedBodyDto.builder().designatedBodyCode(designatedBody1)
         .build();
@@ -242,7 +242,7 @@ public class DoctorsForDBControllerTest {
   }
 
   @Test
-  public void shouldReturnDoctorsByGmcId() throws Exception {
+  void shouldReturnDoctorsByGmcId() throws Exception {
     final var gmcDoctorDTO = prepareGmcDoctor();
     when(doctorsForDBService.getDoctorsByGmcIds(List.of(gmcRef1))).thenReturn(gmcDoctorDTO);
     final var url = format("%s/%s", DOCTORS_API_URL_BY_GMC_ID, gmcRef1);

@@ -38,7 +38,7 @@ import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 
 @ExtendWith(MockitoExtension.class)
-public class DoctorsForDBServiceTest {
+class DoctorsForDBServiceTest {
 
   private final Faker faker = new Faker();
 
@@ -72,7 +72,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldReturnListOfAllDoctors() {
+  void shouldReturnListOfAllDoctors() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
@@ -152,7 +152,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldReturnListOfDoctorsAttachedToASpecificDbc() {
+  void shouldReturnListOfDoctorsAttachedToASpecificDbc() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List.of(designatedBody1);
@@ -189,7 +189,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldReturnListOfUnderNoticeDoctors() {
+  void shouldReturnListOfUnderNoticeDoctors() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
@@ -239,7 +239,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldReturnEmptyListOfDoctorsWhenNoRecordFound() {
+  void shouldReturnEmptyListOfDoctorsWhenNoRecordFound() {
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
         .of(designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5);
@@ -262,7 +262,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldReturnListOfAllDoctorsWhoMatchSearchQuery() {
+  void shouldReturnListOfAllDoctorsWhoMatchSearchQuery() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
@@ -312,7 +312,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldNotFailIfGmcIdNull() {
+  void shouldNotFailIfGmcIdNull() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
@@ -362,7 +362,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldUpdateAdmin() {
+  void shouldUpdateAdmin() {
     final String newAdmin1 = faker.internet().emailAddress();
     final String newAdmin2 = faker.internet().emailAddress();
     final String newAdmin3 = faker.internet().emailAddress();
@@ -383,7 +383,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldUpdateDesignatedBodyCode() {
+  void shouldUpdateDesignatedBodyCode() {
     when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
     final var message = ConnectionMessageDto.builder().gmcId(gmcRef1).build();
     doctorsForDBService.removeDesignatedBodyCode(message);
@@ -392,7 +392,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldNotUpdateDesignatedBodyCodeWhenNoDoctorFound() {
+  void shouldNotUpdateDesignatedBodyCodeWhenNoDoctorFound() {
     when(repository.findById(gmcRef1)).thenReturn(Optional.empty());
     final var message = ConnectionMessageDto.builder().gmcId(gmcRef1).build();
     doctorsForDBService.removeDesignatedBodyCode(message);
@@ -401,7 +401,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldGetDesignatedBodyCode() {
+  void shouldGetDesignatedBodyCode() {
     when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
     final var designatedBody = doctorsForDBService.getDesignatedBodyCode(gmcRef1);
     assertThat(designatedBody.getDesignatedBodyCode(), is(doc1.getDesignatedBodyCode()));

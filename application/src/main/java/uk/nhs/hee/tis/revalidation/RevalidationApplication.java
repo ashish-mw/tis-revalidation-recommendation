@@ -39,7 +39,7 @@ public class RevalidationApplication {
 
   @Bean
   public Jaxb2Marshaller marshaller() {
-    final Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
+    final var marshaller = new Jaxb2Marshaller();
     marshaller
         .setPackagesToScan("uk.nhs.hee.tis.gmc.client", "uk.nhs.hee.tis.gmc.client.generated");
     return marshaller;
@@ -47,7 +47,7 @@ public class RevalidationApplication {
 
   @Bean
   public WebServiceTemplate webServiceTemplate() {
-    final WebServiceTemplate webServiceTemplate = new WebServiceTemplate();
+    final var webServiceTemplate = new WebServiceTemplate();
     webServiceTemplate.setMarshaller(marshaller());
     webServiceTemplate.setUnmarshaller(marshaller());
     return webServiceTemplate;

@@ -33,7 +33,7 @@ import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 @SpringBootTest(classes = RevalidationApplication.class)
 @TestPropertySource("classpath:application-test.yml")
 @ActiveProfiles("test")
-public class DoctorsForDBServiceIT extends BaseIT {
+class DoctorsForDBServiceIT extends BaseIT {
 
   @Autowired
   private DoctorsForDBService service;
@@ -128,7 +128,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
 
   @DisplayName("Trainee doctors information should be sorted by first name in asc order")
   @Test
-  public void shouldReturnDataSortByFirstNameInAscOrder() throws Exception {
+  void shouldReturnDataSortByFirstNameInAscOrder() throws Exception {
     fName1 = "Zolo";
     fName2 = "Andy";
     fName3 = "Mark";
@@ -180,7 +180,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
 
   @DisplayName("Trainee doctors information should be sorted by last name in desc order")
   @Test
-  public void shouldReturnDataSortByLastNameInDescOrder() throws Exception {
+  void shouldReturnDataSortByLastNameInDescOrder() throws Exception {
     lName1 = "John";
     lName2 = "Adam";
     lName3 = "Webber";
@@ -232,7 +232,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
 
   @DisplayName("Trainee doctors information should be sorted by submission date in desc order")
   @Test
-  public void shouldReturnDataWithTotalCountAndUnderNoticeCount() throws Exception {
+  void shouldReturnDataWithTotalCountAndUnderNoticeCount() throws Exception {
     un1 = UnderNotice.YES;
     un2 = UnderNotice.NO;
     un3 = UnderNotice.YES;
@@ -260,7 +260,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
 
   @DisplayName("Get Under Notice Trainee doctors information also sorted by submission date in desc order")
   @Test
-  public void shouldReturnUnderNoticeDoctorsSortBySubmissionDate() throws Exception {
+  void shouldReturnUnderNoticeDoctorsSortBySubmissionDate() throws Exception {
 
     subDate1 = now().minusDays(5);
     subDate2 = now().minusDays(2);
@@ -343,7 +343,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnUnderNoticeDoctorsFilterByDesignatedBodies() throws Exception {
+  void shouldReturnUnderNoticeDoctorsFilterByDesignatedBodies() throws Exception {
 
     subDate1 = now().minusDays(5);
     subDate2 = now().minusDays(2);
@@ -408,7 +408,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
 
   @DisplayName("Trainee doctors information should be paginated and sorted by submission date in desc order")
   @Test
-  public void shouldReturnTraineeInfoInPaginatedForm() throws Exception {
+  void shouldReturnTraineeInfoInPaginatedForm() throws Exception {
     subDate1 = now().minusDays(5);
     subDate2 = now().minusDays(2);
     subDate3 = now().minusDays(8);
@@ -520,7 +520,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
 
   @DisplayName("Trainee doctors information should be not return any data if page number is not correct")
   @Test
-  public void shouldReturnNoDataWhenPassInvalidPageNumber() {
+  void shouldReturnNoDataWhenPassInvalidPageNumber() {
     subDate1 = now().minusDays(5);
     subDate2 = now().minusDays(2);
     subDate3 = now().minusDays(8);
@@ -549,7 +549,7 @@ public class DoctorsForDBServiceIT extends BaseIT {
   }
 
   @Test
-  public void shouldUpdateAdminForTrainee() {
+  void shouldUpdateAdminForTrainee() {
     final var adminEmail1 = faker.internet().emailAddress();
     final var adminEmail2 = faker.internet().emailAddress();
     final var ta1 = TraineeAdminDto.builder().admin(adminEmail1).gmcNumber(gmcRef1).build();

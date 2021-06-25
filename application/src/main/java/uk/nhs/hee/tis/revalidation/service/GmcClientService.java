@@ -71,8 +71,8 @@ public class GmcClientService {
       } else {
         final var responseCode = fromCode(gmcReturnCode);
         log.error(
-            "Gmc recommendation check status request is failed for GmcId: {} and recommendationId: {}."
-                + " Recommendation will stay in Under Review state", gmcNumber, recommendationId);
+            "Gmc recommendation check status request is failed for GmcId: {} and recommendationId: {}. Reason: {}."
+                + " Recommendation will stay in Under Review state", gmcNumber, recommendationId, responseCode);
       }
     } catch (Exception e) {
       log.error("Failed to check status with GMC", e);
@@ -83,8 +83,8 @@ public class GmcClientService {
 
   public TryRecommendationV2Response submitToGmc(final DoctorsForDB doctorForDB,
       final Recommendation recommendation, final RoUserProfileDto userProfileDto) {
-    final TryRecommendationV2 tryRecommendation = new TryRecommendationV2();
-    final TryRecommendationV2Request request = new TryRecommendationV2Request();
+    final var tryRecommendation = new TryRecommendationV2();
+    final var request = new TryRecommendationV2Request();
     request.setDoctorSurname(doctorForDB.getDoctorLastName());
     request.setDoctorUID(doctorForDB.getGmcReferenceNumber());
     request.setRoSurname(userProfileDto.getLastName());
@@ -111,10 +111,9 @@ public class GmcClientService {
     try {
       log.info("Submitting recommendation to GMC for gmcId: {}",
           doctorForDB.getGmcReferenceNumber());
-      final var tryRecommendationV2Response = (TryRecommendationV2Response) webServiceTemplate
+      return (TryRecommendationV2Response) webServiceTemplate
           .marshalSendAndReceive(gmcConnectUrl, tryRecommendation,
               new SoapActionCallback(gmcSoapBaseAction + TRY_RECOMMENDATION_V2));
-      return tryRecommendationV2Response;
     } catch (Exception e) {
       log.error("Failed to submit to GMC", e);
     }

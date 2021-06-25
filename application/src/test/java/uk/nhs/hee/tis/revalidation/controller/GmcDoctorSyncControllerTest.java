@@ -46,7 +46,7 @@ import uk.nhs.hee.tis.revalidation.service.GmcDoctorSyncService;
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(GmcDoctorSyncController.class)
-public class GmcDoctorSyncControllerTest {
+class GmcDoctorSyncControllerTest {
 
   private final List<DoctorsForDB> allDoctors = new ArrayList<>();
   @Autowired
@@ -96,7 +96,7 @@ public class GmcDoctorSyncControllerTest {
   }
 
   @Test
-  public void shouldSendMessageToSqs() throws Exception {
+  void shouldSendMessageToSqs() throws Exception {
     this.mockMvc.perform(get("/api/v1/sqs/send-doctor"))
         .andExpect(status().isOk())
         .andExpect(content().string("success"));

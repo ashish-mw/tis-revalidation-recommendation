@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.Recommendation;
@@ -89,18 +90,18 @@ public class SnapshotService {
   }
 
   private String getDeferralReasonByCode(final String reasonCode) {
-    return (reasonCode == null || "".equals(reasonCode)) ? null
-        : deferralReasonService.getDeferralReasonByCode(reasonCode).getReason();
+    return StringUtils.hasLength(reasonCode) ?
+        deferralReasonService.getDeferralReasonByCode(reasonCode).getReason() : null;
   }
 
   private String getDeferralSubReasonByCode(final String reasonCode, final String subCode) {
-    return (reasonCode == null || "".equals(reasonCode)) && (subCode == null || "".equals(subCode)) ? null :
+    return !(StringUtils.hasLength(reasonCode) || StringUtils.hasLength(subCode)) ? null :
         deferralReasonService.getDeferralSubReasonByReasonCodeAndReasonSubCode(reasonCode, subCode)
             .getReason();
   }
 
   private String toUpperCase(final String code) {
-    return !(code == null || "".equals(code)) ? code.toUpperCase() : code;
+    return StringUtils.hasLength(code) ? code.toUpperCase() : code;
   }
 
 }

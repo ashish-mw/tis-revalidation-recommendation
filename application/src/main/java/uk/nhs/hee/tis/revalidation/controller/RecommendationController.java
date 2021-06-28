@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -63,8 +64,7 @@ public class RecommendationController {
       @PathVariable("gmcIds") final List<String> gmcIds) {
     log.info("Receive request to fetch recommendations for GmcIds: {}", gmcIds);
     final var recommendations = service.getLatestRecommendations(gmcIds);
-    return new ResponseEntity<>(recommendations,
-        HttpStatus.OK);
+    return new ResponseEntity<>(recommendations, HttpStatus.OK);
   }
 
   @ApiOperation(value = "Save new recommendation", notes = "It will allow user to save new recommendation", response = ResponseEntity.class)
@@ -93,8 +93,7 @@ public class RecommendationController {
       final BindingResult bindingResult) {
 
     log.info("recommendation: {}", traineeRecommendationDTO);
-    if (traineeRecommendationDTO.getRecommendationId() == null
-        || "".equals(traineeRecommendationDTO.getRecommendationId())) {
+    if (!StringUtils.hasLength(traineeRecommendationDTO.getRecommendationId())) {
       return new ResponseEntity<>("Recommendation Id should not be empty", HttpStatus.BAD_REQUEST);
     }
 
@@ -110,13 +109,13 @@ public class RecommendationController {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "New recommendation is submitted to gmc", response = ResponseEntity.class)})
   @PostMapping("/{gmcId}/submit/{recommendationId}")
-  public ResponseEntity<String> submitRecommendation(@RequestBody RoUserProfileDto userProfileDto,
+  public ResponseEntity<Void> submitRecommendation(@RequestBody RoUserProfileDto userProfileDto,
       @PathVariable("gmcId") String gmcNumber,
       @PathVariable("recommendationId") String recommendationId) {
 
     log.info("Revalidation officer profile: {}", userProfileDto);
     service.submitRecommendation(recommendationId, gmcNumber, userProfileDto);
-    return ResponseEntity.ok("success");
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 
 

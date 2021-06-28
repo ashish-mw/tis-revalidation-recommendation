@@ -24,7 +24,7 @@ import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 @SpringBootTest(classes = RevalidationApplication.class)
 @TestPropertySource("classpath:application-test.yml")
 @ActiveProfiles("test")
-public class DoctorsSearchIT extends BaseIT {
+class DoctorsSearchIT extends BaseIT {
 
   @Autowired
   private DoctorsForDBService service;
@@ -39,7 +39,7 @@ public class DoctorsSearchIT extends BaseIT {
   }
 
   @Test
-  public void shouldSearchForDoctorsByGmcReferenceNumber() throws Exception {
+  void shouldSearchForDoctorsByGmcReferenceNumber() throws Exception {
 
     repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
 
@@ -66,7 +66,7 @@ public class DoctorsSearchIT extends BaseIT {
   }
 
   @Test
-  public void shouldSearchForDoctorsByDoctorFirstName() throws Exception {
+  void shouldSearchForDoctorsByDoctorFirstName() throws Exception {
 
     repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
 
@@ -93,7 +93,7 @@ public class DoctorsSearchIT extends BaseIT {
   }
 
   @Test
-  public void shouldSearchForDoctorsByDoctorLastName() throws Exception {
+  void shouldSearchForDoctorsByDoctorLastName() throws Exception {
 
     repository.saveAll(List.of(doc1, doc2, doc3, doc4, doc5));
 
@@ -120,7 +120,7 @@ public class DoctorsSearchIT extends BaseIT {
   }
 
   @Test
-  public void shouldSearchForFirstOrLastName() throws Exception {
+  void shouldSearchForFirstOrLastName() throws Exception {
     fName2 = "smith";
     lName4 = "smith";
     doc2.setDoctorFirstName(fName2);
@@ -159,7 +159,7 @@ public class DoctorsSearchIT extends BaseIT {
   }
 
   @Test
-  public void shouldSearchForFirstOrLastNameOrGmcNumber() throws Exception {
+  void shouldSearchForFirstOrLastNameOrGmcNumber() throws Exception {
     fName1 = "wAqar";
     fName2 = "saqab";
     lName4 = "wAQAs";
@@ -220,7 +220,7 @@ public class DoctorsSearchIT extends BaseIT {
   }
 
   @Test
-  public void shouldSearchUnderNoticeDoctorsForFirstOrLastNameOrGmcNumber() throws Exception {
+  void shouldSearchUnderNoticeDoctorsForFirstOrLastNameOrGmcNumber() throws Exception {
     un1 = UnderNotice.YES;
     un2 = UnderNotice.YES;
     un3 = UnderNotice.NO;
@@ -288,7 +288,7 @@ public class DoctorsSearchIT extends BaseIT {
   }
 
   @Test
-  public void shouldSearchUnderNoticeDoctorsForFirstOrLastName() throws Exception {
+  void shouldSearchUnderNoticeDoctorsForFirstOrLastName() throws Exception {
     un1 = UnderNotice.NO;
     un2 = UnderNotice.YES;
     un3 = UnderNotice.NO;

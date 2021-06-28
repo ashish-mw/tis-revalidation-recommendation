@@ -64,7 +64,8 @@ public class RecommendationController {
       @PathVariable("gmcIds") final List<String> gmcIds) {
     log.info("Receive request to fetch recommendations for GmcIds: {}", gmcIds);
     final var recommendations = service.getLatestRecommendations(gmcIds);
-    return new ResponseEntity<Map<String, TraineeRecommendationRecordDto>>(recommendations, HttpStatus.OK);
+    return new ResponseEntity<Map<String, TraineeRecommendationRecordDto>>(recommendations,
+        HttpStatus.OK);
   }
 
   @ApiOperation(value = "Save new recommendation", notes = "It will allow user to save new recommendation", response = ResponseEntity.class)

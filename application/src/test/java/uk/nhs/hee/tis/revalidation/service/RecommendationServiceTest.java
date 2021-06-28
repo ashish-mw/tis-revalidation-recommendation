@@ -35,7 +35,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationResponseCT;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationV2Response;
@@ -54,7 +53,7 @@ import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class RecommendationServiceTest {
+class RecommendationServiceTest {
 
   private final Faker faker = new Faker();
 
@@ -181,7 +180,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldReturnRecommendationWithCurrentAndLegacyRecommendations()
+  void shouldReturnRecommendationWithCurrentAndLegacyRecommendations()
       throws ParseException {
     final var gmcId = faker.number().digits(7);
     final var doctorsForDB = buildDoctorForDB(gmcId);
@@ -266,7 +265,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldUpdateSnapshotIfRecommendationStatusBecomeApprove() throws ParseException {
+  void shouldUpdateSnapshotIfRecommendationStatusBecomeApprove() throws ParseException {
     final var gmcId = faker.number().digits(7);
     final var doctorsForDB = buildDoctorForDB(gmcId);
     when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
@@ -329,7 +328,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldReturnCurrentRecommendationWhichAreSubmittedToGMC() throws ParseException {
+  void shouldReturnCurrentRecommendationWhichAreSubmittedToGMC() throws ParseException {
     final var gmcId = faker.number().digits(7);
     final var doctorsForDB = buildDoctorForDB(gmcId);
     when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
@@ -383,7 +382,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldReturnRecommendationWithCurrentAndLegacyRevalidationsWithoutTisCoreInformation() {
+  void shouldReturnRecommendationWithCurrentAndLegacyRevalidationsWithoutTisCoreInformation() {
     final var gmcId = faker.number().digits(8);
     final var doctorsForDB = buildDoctorForDB(gmcId);
     when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
@@ -397,7 +396,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldSaveRevalidateRecommendationInDraftState() throws JsonProcessingException {
+  void shouldSaveRevalidateRecommendationInDraftState() throws JsonProcessingException {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
         .recommendationType(REVALIDATE.name())
@@ -414,7 +413,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldSaveNonEngagementRecommendationInDraftState() {
+  void shouldSaveNonEngagementRecommendationInDraftState() {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
         .recommendationType(NON_ENGAGEMENT.name())
@@ -431,7 +430,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldSaveDeferRecommendationInDraftState() {
+  void shouldSaveDeferRecommendationInDraftState() {
     final var deferralDate = LocalDate.now().plusDays(90);
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
@@ -454,7 +453,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldSaveDeferRecommendationInDraftStateWhenDeferralReasonIsNotRequiredSubReason() {
+  void shouldSaveDeferRecommendationInDraftStateWhenDeferralReasonIsNotRequiredSubReason() {
     final var deferralDate = LocalDate.now().plusDays(90);
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
@@ -475,7 +474,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldThrowExceptionWhenDeferralDateWithin60DaysOfSubmissionDate() {
+  void shouldThrowExceptionWhenDeferralDateWithin60DaysOfSubmissionDate() {
     final var deferralDate = submissionDate.plusDays(59);
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
@@ -497,7 +496,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldThrowExceptionWhenDeferralDateMoreThen365DaysOfSubmissionDate() {
+  void shouldThrowExceptionWhenDeferralDateMoreThen365DaysOfSubmissionDate() {
     final var deferralDate = submissionDate.plusDays(366);
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
@@ -519,7 +518,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldSubmitRecommendation() {
+  void shouldSubmitRecommendation() {
     final var recommendation = buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE,
         UNDER_REVIEW);
     final var userProfileDto = getUserProfileDto(gmcNumber1);
@@ -533,7 +532,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldNotUpdateRecommendationWhenSubmitFail() {
+  void shouldNotUpdateRecommendationWhenSubmitFail() {
     final var recommendation = buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE,
         UNDER_REVIEW);
     final var userProfileDto = getUserProfileDto(gmcNumber1);
@@ -550,7 +549,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldUpdateRevalidateRecommendationInDraftState() {
+  void shouldUpdateRevalidateRecommendationInDraftState() {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
         .recommendationId(recommendationId)
@@ -572,7 +571,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldUpdateNonEngagementRecommendationInDraftState() {
+  void shouldUpdateNonEngagementRecommendationInDraftState() {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
         .recommendationId(recommendationId)
@@ -591,7 +590,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldUpdateDeferRecommendationInDraftState() {
+  void shouldUpdateDeferRecommendationInDraftState() {
     final var deferralDate = LocalDate.now().plusDays(90);
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
@@ -616,7 +615,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldThrowExceptionWhenInvalidRecommendationIdProvidedForUpdate() {
+  void shouldThrowExceptionWhenInvalidRecommendationIdProvidedForUpdate() {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
         .recommendationId(recommendationId)
@@ -630,7 +629,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldAllwedSaveRecommendationWhenOneAlreadyInSubmittedAndRejectedState() {
+  void shouldAllwedSaveRecommendationWhenOneAlreadyInSubmittedAndRejectedState() {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
         .recommendationType(REVALIDATE.name())
@@ -651,7 +650,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldNotSaveRecommendationWhenOneAlreadyInDraft() throws JsonProcessingException {
+  void shouldNotSaveRecommendationWhenOneAlreadyInDraft() throws JsonProcessingException {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
         .recommendationType(REVALIDATE.name())
@@ -668,7 +667,7 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldNotSaveRecommendationWhenStatusIsSubmittedButStillUnderReview()
+  void shouldNotSaveRecommendationWhenStatusIsSubmittedButStillUnderReview()
       throws JsonProcessingException {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber1)
@@ -688,11 +687,13 @@ public class RecommendationServiceTest {
   }
 
   @Test
-  public void shouldReturnLatestRecommendations() throws ParseException {
+  void shouldReturnLatestRecommendations() throws ParseException {
     final var gmcId = faker.number().digits(7);
-    final var recommendation = buildRecommendation(gmcId, recommendationId, status, REVALIDATE, UNDER_REVIEW);
-    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcId)).thenReturn(
-        Optional.of(recommendation));
+    final var recommendation = buildRecommendation(gmcId, recommendationId, status, REVALIDATE,
+        UNDER_REVIEW);
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcId))
+        .thenReturn(
+            Optional.of(recommendation));
     final var recommendationResult = recommendationService.getLatestRecommendation(gmcId);
 
     assertThat(recommendationResult.getGmcNumber(), is(gmcId));

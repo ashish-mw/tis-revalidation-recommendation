@@ -29,7 +29,7 @@ import uk.nhs.hee.tis.gmc.client.generated.CheckRecommendationStatusResponse;
 import uk.nhs.hee.tis.gmc.client.generated.CheckRecommendationStatusResponseCT;
 
 @ExtendWith(MockitoExtension.class)
-public class GmcClientServiceTest {
+class GmcClientServiceTest {
 
   private final Faker faker = new Faker();
 
@@ -63,7 +63,7 @@ public class GmcClientServiceTest {
 
 
   @Test
-  public void shouldReturnSuccessForCheckStatusOfRecommendation() {
+  void shouldReturnSuccessForCheckStatusOfRecommendation() {
 
     when(webServiceTemplate
         .marshalSendAndReceive(any(String.class), any(CheckRecommendationStatus.class)
@@ -81,7 +81,7 @@ public class GmcClientServiceTest {
   }
 
   @Test
-  public void shouldReturnErrorForCheckStatusOfRecommendationWhenInvalidCredentials() {
+  void shouldReturnErrorForCheckStatusOfRecommendationWhenInvalidCredentials() {
 
     when(webServiceTemplate
         .marshalSendAndReceive(any(String.class), any(CheckRecommendationStatus.class)
@@ -97,7 +97,7 @@ public class GmcClientServiceTest {
   }
 
   @Test
-  public void shouldReturnErrorForCheckStatusOfRecommendationWhenInvalidGmcNumber() {
+  void shouldReturnErrorForCheckStatusOfRecommendationWhenInvalidGmcNumber() {
 
     when(webServiceTemplate
         .marshalSendAndReceive(any(String.class), any(CheckRecommendationStatus.class)
@@ -115,7 +115,7 @@ public class GmcClientServiceTest {
   }
 
   @Test
-  public void shouldReturnErrorForCheckStatusOfRecommendationWhenInternalError() {
+  void shouldReturnErrorForCheckStatusOfRecommendationWhenInternalError() {
 
     when(webServiceTemplate
         .marshalSendAndReceive(any(String.class), any(CheckRecommendationStatus.class)
@@ -132,7 +132,7 @@ public class GmcClientServiceTest {
   }
 
   @Test
-  public void shouldReturnErrorForCheckStatusOfRecommendationWhenInvalidRecommendationId() {
+  void shouldReturnErrorForCheckStatusOfRecommendationWhenInvalidRecommendationId() {
 
     when(webServiceTemplate
         .marshalSendAndReceive(any(String.class), any(CheckRecommendationStatus.class)
@@ -149,7 +149,7 @@ public class GmcClientServiceTest {
   }
 
   @Test
-  public void shouldReturnErrorForCheckStatusOfRecommendationWhenNoDBAccess() {
+  void shouldReturnErrorForCheckStatusOfRecommendationWhenNoDBAccess() {
 
     when(webServiceTemplate
         .marshalSendAndReceive(any(String.class), any(CheckRecommendationStatus.class)

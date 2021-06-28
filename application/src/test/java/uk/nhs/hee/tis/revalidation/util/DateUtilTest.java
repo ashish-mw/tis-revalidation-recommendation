@@ -14,10 +14,10 @@ import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDateTime;
 import org.junit.jupiter.api.Test;
 
 
-public class DateUtilTest {
+class DateUtilTest {
 
   @Test
-  public void shouldFormatDateTime() {
+  void shouldFormatDateTime() {
     final var dateToFormat = "2017-07-19 12:58:02";
     final var localDateTime = formatDateTime(dateToFormat);
     assertThat(localDateTime, is(notNullValue()));
@@ -27,7 +27,7 @@ public class DateUtilTest {
   }
 
   @Test
-  public void shouldFormatDateTimeWithoutTime() {
+  void shouldFormatDateTimeWithoutTime() {
     final var dateToFormat = "2017-07-19";
     final var localDateTime = formatDateTime(dateToFormat);
     assertThat(localDateTime, is(notNullValue()));
@@ -37,7 +37,7 @@ public class DateUtilTest {
   }
 
   @Test
-  public void shouldFormatDate() {
+  void shouldFormatDate() {
     final var dateToFormat = "2017-07-19";
     final var localDate = formatDate(dateToFormat);
     assertThat(localDate, is(notNullValue()));
@@ -47,21 +47,21 @@ public class DateUtilTest {
   }
 
   @Test
-  public void shouldReturnNullWhenDateTimeIsEmpty() {
+  void shouldReturnNullWhenDateTimeIsEmpty() {
     final String dateToFormat = null;
     final var localDateTime = formatDateTime(dateToFormat);
     assertNull(localDateTime);
   }
 
   @Test
-  public void shouldReturnNullWhenDateIsEmpty() {
+  void shouldReturnNullWhenDateIsEmpty() {
     final String dateToFormat = null;
     final var localDateTime = formatDate(dateToFormat);
     assertNull(localDateTime);
   }
 
   @Test
-  public void shouldFormatDateToGmcFormat() {
+  void shouldFormatDateToGmcFormat() {
     final var dateToFormat = "2017-07-19";
     final var localDateTime = formatDate(dateToFormat);
 
@@ -71,7 +71,7 @@ public class DateUtilTest {
   }
 
   @Test
-  public void shouldFormatGmcFormatStringDateToLocalDate() {
+  void shouldFormatGmcFormatStringDateToLocalDate() {
     final var dateToFormat = "04/07/2017";
     final var localDate = of(2017, 07, 04);
 
@@ -81,7 +81,7 @@ public class DateUtilTest {
   }
 
   @Test
-  public void shouldReturnNullWhenDateIsEmptyString() {
+  void shouldReturnNullWhenDateIsEmptyString() {
     final var dateToFormat = "";
     final var gmcDate = convertGmcDateToLocalDate(dateToFormat);
     assertNull(gmcDate);

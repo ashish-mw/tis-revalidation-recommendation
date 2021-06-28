@@ -51,7 +51,7 @@ import uk.nhs.hee.tis.revalidation.service.RecommendationService;
 @SpringBootTest(classes = RevalidationApplication.class)
 @TestPropertySource("classpath:application-test.yml")
 @ActiveProfiles("test")
-public class RecommendationIT extends BaseIT {
+class RecommendationIT extends BaseIT {
 
   @Autowired
   private RecommendationService recommendationService;
@@ -98,7 +98,7 @@ public class RecommendationIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnCoreDataForTrainee() throws Exception {
+  void shouldReturnCoreDataForTrainee() throws Exception {
     doctorsForDBRepository.saveAll(List.of(doc1));
 
     final var recommendation = recommendationService.getTraineeInfo(gmcRef1);
@@ -130,7 +130,7 @@ public class RecommendationIT extends BaseIT {
   }
 
   @Test
-  public void shouldGetTraineeListOfRecommendation() throws JsonProcessingException {
+  void shouldGetTraineeListOfRecommendation() throws JsonProcessingException {
     snapshotRepository.deleteAll();
     doctorsForDBRepository.saveAll(List.of(doc1));
     final var recordDTO1 = TraineeRecommendationRecordDto.builder()
@@ -156,7 +156,7 @@ public class RecommendationIT extends BaseIT {
   }
 
   @Test
-  public void shouldSaveRecommendationOfTypeRevalidate() {
+  void shouldSaveRecommendationOfTypeRevalidate() {
     doctorsForDBRepository.saveAll(List.of(doc1));
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcRef1)
@@ -174,7 +174,7 @@ public class RecommendationIT extends BaseIT {
   }
 
   @Test
-  public void shouldSaveRecommendationOfTypeNonEngagement() {
+  void shouldSaveRecommendationOfTypeNonEngagement() {
     doctorsForDBRepository.saveAll(List.of(doc2));
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcRef2)
@@ -192,7 +192,7 @@ public class RecommendationIT extends BaseIT {
   }
 
   @Test
-  public void shouldSaveRecommendationOfTypeDefer() {
+  void shouldSaveRecommendationOfTypeDefer() {
     doctorsForDBRepository.saveAll(List.of(doc2));
     final var deferralDate = subDate2.plusDays(70);
     final var recordDTO = TraineeRecommendationRecordDto.builder()
@@ -217,7 +217,7 @@ public class RecommendationIT extends BaseIT {
   }
 
   @Test
-  public void shouldSubmitRevalidateRecommendation() {
+  void shouldSubmitRevalidateRecommendation() {
     doctorsForDBRepository.saveAll(List.of(doc1));
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcRef1)
@@ -238,7 +238,7 @@ public class RecommendationIT extends BaseIT {
   }
 
   @Test
-  public void shouldSubmitDeferRecommendation() {
+  void shouldSubmitDeferRecommendation() {
     doctorsForDBRepository.saveAll(List.of(doc1));
     final var deferralReasonByCode = deferralReasonService.getDeferralReasonByCode("1");
     final var deferralSubReason = deferralReasonByCode.getDeferralSubReasons().get(0);
@@ -266,7 +266,7 @@ public class RecommendationIT extends BaseIT {
   }
 
   @Test
-  public void shouldUpdateRecommendationOfTypeRevalidate() {
+  void shouldUpdateRecommendationOfTypeRevalidate() {
     doctorsForDBRepository.saveAll(List.of(doc1));
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcRef1)
@@ -299,7 +299,7 @@ public class RecommendationIT extends BaseIT {
   }
 
   @Test
-  public void shouldNotAllowToCreateRecommendationWhenOneAlreadyInDraft() {
+  void shouldNotAllowToCreateRecommendationWhenOneAlreadyInDraft() {
     doctorsForDBRepository.saveAll(List.of(doc1));
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcRef1)
@@ -325,7 +325,7 @@ public class RecommendationIT extends BaseIT {
   }
 
   @Test
-  public void shouldNotAllowToCreateRecommendationWhenSubmitToGmcButStillUnderReview() {
+  void shouldNotAllowToCreateRecommendationWhenSubmitToGmcButStillUnderReview() {
     doctorsForDBRepository.saveAll(List.of(doc1));
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcRef1)

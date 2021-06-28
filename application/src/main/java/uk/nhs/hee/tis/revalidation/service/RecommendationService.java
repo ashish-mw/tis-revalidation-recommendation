@@ -184,13 +184,15 @@ public class RecommendationService {
     if (optionalRecommendation.isPresent()) {
       final var recommendation = optionalRecommendation.get();
 
-      return buildTraineeRecommendationRecordDto(recommendation.getGmcNumber(), recommendation.getGmcSubmissionDate(), recommendation);
+      return buildTraineeRecommendationRecordDto(recommendation.getGmcNumber(),
+          recommendation.getGmcSubmissionDate(), recommendation);
     }
     return new TraineeRecommendationRecordDto();
   }
 
   //get latest recommendations of a list of trainees
-  public Map<String, TraineeRecommendationRecordDto> getLatestRecommendations(final List<String> gmcIds) {
+  public Map<String, TraineeRecommendationRecordDto> getLatestRecommendations(
+      final List<String> gmcIds) {
     log.info("Mapping latest recommendation info for GmcIds: {}", gmcIds);
     return gmcIds.stream().collect(toMap(identity(), this::getLatestRecommendation));
   }
@@ -264,10 +266,7 @@ public class RecommendationService {
       if (r.getId().equals(recommendationId)) { //check if the request is for update
         return false;
       }
-      if (SUBMITTED_TO_GMC != r.getRecommendationStatus() || UNDER_REVIEW == r.getOutcome()) {
-        return true;
-      }
-      return false;
+      return SUBMITTED_TO_GMC != r.getRecommendationStatus() || UNDER_REVIEW == r.getOutcome();
     }).findFirst();
 
     if (recommendation.isPresent()) {
@@ -276,7 +275,8 @@ public class RecommendationService {
     }
   }
 
-  private TraineeRecommendationRecordDto buildTraineeRecommendationRecordDto(String gmcNumber, LocalDate submissionDate, Recommendation rec) {
+  private TraineeRecommendationRecordDto buildTraineeRecommendationRecordDto(String gmcNumber,
+      LocalDate submissionDate, Recommendation rec) {
     return TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcNumber)
         .recommendationId(rec.getId())

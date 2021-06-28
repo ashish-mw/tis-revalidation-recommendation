@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 @Builder
 class ApiError {
 
-    private HttpStatus status;
-    private String message;
-    private String debugMessage;
+  private HttpStatus status;
+  private String message;
+  private String debugMessage;
 }

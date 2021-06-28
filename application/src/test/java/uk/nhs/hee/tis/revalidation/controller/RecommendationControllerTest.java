@@ -35,7 +35,7 @@ import uk.nhs.hee.tis.revalidation.service.RecommendationService;
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(RecommendationController.class)
-public class RecommendationControllerTest {
+class RecommendationControllerTest {
 
   private static final String RECOMMENDATION_API_URL = "/api/recommendation";
   private static final String RECOMMENDATION_API_GMCID_PATH_VARIABLE = "{gmcId}";
@@ -58,7 +58,6 @@ public class RecommendationControllerTest {
   private String lastName = faker.name().lastName();
   private LocalDate submissionDate = LocalDate.now();
   private LocalDate dateAdded = LocalDate.now();
-  ;
   private UnderNotice underNotice = faker.options().option(UnderNotice.class);
   private String sanction = faker.lorem().characters(2);
   private RecommendationStatus status = faker.options().option(RecommendationStatus.class);
@@ -78,7 +77,7 @@ public class RecommendationControllerTest {
   private String admin = faker.name().fullName();
 
   @Test
-  public void shouldReturnTraineeRecommendation() throws Exception {
+  void shouldReturnTraineeRecommendation() throws Exception {
     final var recommendationDTO = prepareRecommendationDTO();
     when(service.getTraineeInfo(gmcId)).thenReturn(recommendationDTO);
     final var url = format("%s/%s", RECOMMENDATION_API_URL, RECOMMENDATION_API_GMCID_PATH_VARIABLE);
@@ -89,7 +88,7 @@ public class RecommendationControllerTest {
   }
 
   @Test
-  public void shouldSaveRevalidateRecommendation() throws Exception {
+  void shouldSaveRevalidateRecommendation() throws Exception {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcId)
         .recommendationType(REVALIDATE.name())
@@ -104,7 +103,7 @@ public class RecommendationControllerTest {
   }
 
   @Test
-  public void shouldSaveNonEngagementRecommendation() throws Exception {
+  void shouldSaveNonEngagementRecommendation() throws Exception {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcId)
         .recommendationType(NON_ENGAGEMENT.name())
@@ -119,7 +118,7 @@ public class RecommendationControllerTest {
   }
 
   @Test
-  public void shouldSaveDeferRecommendation() throws Exception {
+  void shouldSaveDeferRecommendation() throws Exception {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcId)
         .recommendationType(DEFER.name())
@@ -137,7 +136,7 @@ public class RecommendationControllerTest {
   }
 
   @Test
-  public void shouldThroughExceptionWhenGmcIdOrRecommendationTypeMissingInRecommendationRequest()
+  void shouldThroughExceptionWhenGmcIdOrRecommendationTypeMissingInRecommendationRequest()
       throws Exception {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber("")
@@ -156,7 +155,7 @@ public class RecommendationControllerTest {
   }
 
   @Test
-  public void shouldThroughExceptionWhenRecommendationIsDeferAndDateAndReasonAreMissingInRecommendationRequest()
+  void shouldThroughExceptionWhenRecommendationIsDeferAndDateAndReasonAreMissingInRecommendationRequest()
       throws Exception {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcId)
@@ -175,7 +174,7 @@ public class RecommendationControllerTest {
   }
 
   @Test
-  public void shouldThroughExceptionWhenRecommendationIsDeferAndDeferralDateIsInPast()
+  void shouldThroughExceptionWhenRecommendationIsDeferAndDeferralDateIsInPast()
       throws Exception {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcId)
@@ -196,7 +195,7 @@ public class RecommendationControllerTest {
   }
 
   @Test
-  public void shouldThroughExceptionWhenRecommendationIfDeferralReasonRequiredSubReasonAndNotProvided()
+  void shouldThroughExceptionWhenRecommendationIfDeferralReasonRequiredSubReasonAndNotProvided()
       throws Exception {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcId)
@@ -218,7 +217,7 @@ public class RecommendationControllerTest {
   }
 
   @Test
-  public void shouldSaveRecommendationWhenDeferralSubReasonIsNotRequired() throws Exception {
+  void shouldSaveRecommendationWhenDeferralSubReasonIsNotRequired() throws Exception {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcId)
         .recommendationType(DEFER.name())
@@ -236,7 +235,7 @@ public class RecommendationControllerTest {
   }
 
   @Test
-  public void shouldSubmitRecommendation() throws Exception {
+  void shouldSubmitRecommendation() throws Exception {
     final var url = format("%s/%s", RECOMMENDATION_API_URL,
         RECOMMENDATION_API_SUBMIT_PATH_VARIABLE);
     final var userProfileDto = RoUserProfileDto.builder().build();
@@ -248,7 +247,7 @@ public class RecommendationControllerTest {
   }
 
   @Test
-  public void shouldUpdateRevalidateRecommendation() throws Exception {
+  void shouldUpdateRevalidateRecommendation() throws Exception {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcId)
         .recommendationId(recommendationId)
@@ -264,7 +263,7 @@ public class RecommendationControllerTest {
   }
 
   @Test
-  public void shouldUpdateDeferRecommendation() throws Exception {
+  void shouldUpdateDeferRecommendation() throws Exception {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcId)
         .recommendationId(recommendationId)
@@ -283,7 +282,7 @@ public class RecommendationControllerTest {
   }
 
   @Test
-  public void shouldFailToUpdateRevalidateRecommendationWhenNoRecommendationId() throws Exception {
+  void shouldFailToUpdateRevalidateRecommendationWhenNoRecommendationId() throws Exception {
     final var recordDTO = TraineeRecommendationRecordDto.builder()
         .gmcNumber(gmcId)
         .recommendationType(REVALIDATE.name())
@@ -299,10 +298,12 @@ public class RecommendationControllerTest {
   }
 
   @Test
-  public void shouldReturnLatestTraineeRecommendations() throws Exception {
+  void shouldReturnLatestTraineeRecommendations() throws Exception {
     final var traineeRecommendationRecordDto = Map.of(gmcId, prepareRevalidationDTO());
-    when(service.getLatestRecommendations(List.of(gmcId))).thenReturn(traineeRecommendationRecordDto);
-    final var url = format("%s/%s", RECOMMENDATION_API_URL, RECOMMENDATION_API_LATEST_GMCIDS_PATH_VARIABLE);
+    when(service.getLatestRecommendations(List.of(gmcId)))
+        .thenReturn(traineeRecommendationRecordDto);
+    final var url = format("%s/%s", RECOMMENDATION_API_URL,
+        RECOMMENDATION_API_LATEST_GMCIDS_PATH_VARIABLE);
     this.mockMvc.perform(get(url, gmcId))
         .andExpect(status().isOk())
         .andExpect(content().json(mapper.writeValueAsString(traineeRecommendationRecordDto)));

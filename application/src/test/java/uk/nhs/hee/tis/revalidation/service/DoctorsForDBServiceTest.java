@@ -38,7 +38,7 @@ import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 
 @ExtendWith(MockitoExtension.class)
-public class DoctorsForDBServiceTest {
+class DoctorsForDBServiceTest {
 
   private final Faker faker = new Faker();
 
@@ -72,7 +72,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldReturnListOfAllDoctors() {
+  void shouldReturnListOfAllDoctors() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
@@ -91,7 +91,7 @@ public class DoctorsForDBServiceTest {
         .dbcs(dbcs)
         .build();
 
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of());
 
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
@@ -152,7 +152,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldReturnListOfDoctorsAttachedToASpecificDbc() {
+  void shouldReturnListOfDoctorsAttachedToASpecificDbc() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List.of(designatedBody1);
@@ -169,7 +169,7 @@ public class DoctorsForDBServiceTest {
         .dbcs(dbcs)
         .build();
 
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of());
 
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
@@ -189,7 +189,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldReturnListOfUnderNoticeDoctors() {
+  void shouldReturnListOfUnderNoticeDoctors() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
@@ -209,7 +209,7 @@ public class DoctorsForDBServiceTest {
         .searchQuery("")
         .dbcs(dbcs)
         .build();
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of());
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
     assertThat(allDoctors.getCountUnderNotice(), is(2L));
@@ -239,7 +239,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldReturnEmptyListOfDoctorsWhenNoRecordFound() {
+  void shouldReturnEmptyListOfDoctorsWhenNoRecordFound() {
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
         .of(designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5);
@@ -253,7 +253,7 @@ public class DoctorsForDBServiceTest {
         .searchQuery("")
         .dbcs(dbcs)
         .build();
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of());
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(0L));
     assertThat(allDoctors.getCountUnderNotice(), is(0L));
@@ -262,7 +262,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldReturnListOfAllDoctorsWhoMatchSearchQuery() {
+  void shouldReturnListOfAllDoctorsWhoMatchSearchQuery() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
@@ -281,7 +281,7 @@ public class DoctorsForDBServiceTest {
         .searchQuery("query")
         .dbcs(dbcs)
         .build();
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,List.of());
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, List.of());
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
     assertThat(allDoctors.getCountUnderNotice(), is(2L));
@@ -312,7 +312,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldNotFailIfGmcIdNull() {
+  void shouldNotFailIfGmcIdNull() {
 
     final Pageable pageableAndSortable = PageRequest.of(1, 20, by(DESC, "submissionDate"));
     List<String> dbcs = List
@@ -331,7 +331,7 @@ public class DoctorsForDBServiceTest {
         .searchQuery("query")
         .dbcs(dbcs)
         .build();
-    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO,null);
+    final var allDoctors = doctorsForDBService.getAllTraineeDoctorDetails(requestDTO, null);
     final var doctorsForDB = allDoctors.getTraineeInfo();
     assertThat(allDoctors.getCountTotal(), is(5L));
     assertThat(allDoctors.getCountUnderNotice(), is(2L));
@@ -362,7 +362,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldUpdateAdmin() {
+  void shouldUpdateAdmin() {
     final String newAdmin1 = faker.internet().emailAddress();
     final String newAdmin2 = faker.internet().emailAddress();
     final String newAdmin3 = faker.internet().emailAddress();
@@ -383,7 +383,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldUpdateDesignatedBodyCode() {
+  void shouldUpdateDesignatedBodyCode() {
     when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
     final var message = ConnectionMessageDto.builder().gmcId(gmcRef1).build();
     doctorsForDBService.removeDesignatedBodyCode(message);
@@ -392,7 +392,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldNotUpdateDesignatedBodyCodeWhenNoDoctorFound() {
+  void shouldNotUpdateDesignatedBodyCodeWhenNoDoctorFound() {
     when(repository.findById(gmcRef1)).thenReturn(Optional.empty());
     final var message = ConnectionMessageDto.builder().gmcId(gmcRef1).build();
     doctorsForDBService.removeDesignatedBodyCode(message);
@@ -401,7 +401,7 @@ public class DoctorsForDBServiceTest {
   }
 
   @Test
-  public void shouldGetDesignatedBodyCode() {
+  void shouldGetDesignatedBodyCode() {
     when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
     final var designatedBody = doctorsForDBService.getDesignatedBodyCode(gmcRef1);
     assertThat(designatedBody.getDesignatedBodyCode(), is(doc1.getDesignatedBodyCode()));
@@ -476,14 +476,14 @@ public class DoctorsForDBServiceTest {
     connectionStatus5 = "Yes";
 
     doc1 = new DoctorsForDB(gmcRef1, fname1, lname1, subDate1, addedDate1, un1, sanction1, status1,
-        now(), designatedBody1, admin1,null);
+        now(), designatedBody1, admin1, null);
     doc2 = new DoctorsForDB(gmcRef2, fname2, lname2, subDate2, addedDate2, un2, sanction2, status2,
-        now(), designatedBody2, admin2,null);
+        now(), designatedBody2, admin2, null);
     doc3 = new DoctorsForDB(gmcRef3, fname3, lname3, subDate3, addedDate3, un3, sanction3, status3,
-        now(), designatedBody3, admin3,null);
+        now(), designatedBody3, admin3, null);
     doc4 = new DoctorsForDB(gmcRef4, fname4, lname4, subDate4, addedDate4, un4, sanction4, status4,
-        now(), designatedBody4, admin4,null);
+        now(), designatedBody4, admin4, null);
     doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5,
-        now(), designatedBody5, admin5,null);
+        now(), designatedBody5, admin5, null);
   }
 }

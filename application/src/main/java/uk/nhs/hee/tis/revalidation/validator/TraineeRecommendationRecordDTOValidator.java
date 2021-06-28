@@ -2,7 +2,6 @@ package uk.nhs.hee.tis.revalidation.validator;
 
 import static java.time.LocalDate.now;
 
-import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
@@ -23,10 +22,10 @@ public class TraineeRecommendationRecordDTOValidator implements Validator {
 
     if (errors.getErrorCount() == 0) {
       final var recordDTO = (TraineeRecommendationRecordDto) target;
-      if (StringUtils.isEmpty(recordDTO.getGmcNumber())) {
+      if (recordDTO.getGmcNumber() == null || "".equals(recordDTO.getGmcNumber())) {
         errors.reject("GmcNumber", "Gmc Number can't be empty or null");
       }
-      if (StringUtils.isEmpty(recordDTO.getRecommendationType())) {
+      if (recordDTO.getRecommendationType() == null || "".equals(recordDTO.getRecommendationType())) {
         errors.reject("RecommendationType", "Recommendation type can't be empty or null");
       } else {
         final var recommendationType = RecommendationType
@@ -35,10 +34,10 @@ public class TraineeRecommendationRecordDTOValidator implements Validator {
           if (recordDTO.getDeferralDate() == null || recordDTO.getDeferralDate().isBefore(now())) {
             errors.reject("DeferralDate", "Deferral date can't be empty or in past");
           }
-          if (StringUtils.isEmpty(recordDTO.getDeferralReason())) {
+          if (recordDTO.getDeferralReason() == null || "".equals(recordDTO.getDeferralReason())) {
             errors.reject("DeferralReason", "Deferral Reason can't be empty or null");
           } else if (recordDTO.getDeferralReason().equalsIgnoreCase(INSUFFICIENT_EVIDENCE)
-              && StringUtils.isEmpty(recordDTO.getDeferralSubReason())) {
+              && (recordDTO.getDeferralSubReason() == null || "".equals(recordDTO.getDeferralSubReason()))) {
             errors.reject("DeferralSubReason", "Deferral Sub Reason can't be empty or null");
           }
         }

@@ -50,7 +50,7 @@ class DoctorsForDBServiceIT extends BaseIT {
 
   @DisplayName("Trainee doctors information should be sorted by submission date in desc order")
   @Test
-  public void shouldReturnDataSortBySubmissionDateInDescOrder() throws Exception {
+  void shouldReturnDataSortBySubmissionDateInDescOrder() throws Exception {
     subDate1 = now().minusDays(5);
     subDate2 = now().minusDays(2);
     subDate3 = now().minusDays(8);
@@ -568,7 +568,7 @@ class DoctorsForDBServiceIT extends BaseIT {
   }
 
   @Test
-  public void shouldKeepAdminForTraineeWhenNoChange() {
+  void shouldKeepAdminForTraineeWhenNoChange() {
     repository.saveAll(List.of(doc1, doc2));
     service.updateTraineeAdmin(List.of());
     var doctorsForDB = repository.findById(gmcRef1);
@@ -578,7 +578,7 @@ class DoctorsForDBServiceIT extends BaseIT {
   }
 
   @Test
-  public void shouldRetainAdminValue() {
+  void shouldRetainAdminValue() {
     final var adminEmail = faker.internet().emailAddress();
     final var doctorsForDbDto1 = DoctorsForDbDto.builder()
         .gmcReferenceNumber(gmcRef1)
@@ -609,7 +609,7 @@ class DoctorsForDBServiceIT extends BaseIT {
   }
 
   @Test
-  public void shouldReturnDataSortBySubmissionDateInDescOrderFilterByDesignatedBody()
+  void shouldReturnDataSortBySubmissionDateInDescOrderFilterByDesignatedBody()
       throws Exception {
     subDate1 = now().minusDays(5);
     subDate2 = now().minusDays(2);

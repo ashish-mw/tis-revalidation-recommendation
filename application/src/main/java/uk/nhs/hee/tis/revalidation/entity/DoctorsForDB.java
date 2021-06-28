@@ -49,7 +49,7 @@ public class DoctorsForDB {
   @Nullable
   Boolean syncEnd;
 
-  public final static DoctorsForDB convert(final DoctorsForDbDto doctorsForDBDTO) {
+  public static final  DoctorsForDB convert(final DoctorsForDbDto doctorsForDBDTO) {
     return DoctorsForDB.builder()
         .gmcReferenceNumber(doctorsForDBDTO.getGmcReferenceNumber())
         .doctorFirstName(doctorsForDBDTO.getDoctorFirstName())

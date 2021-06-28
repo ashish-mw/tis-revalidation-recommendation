@@ -40,10 +40,10 @@ public class GmcDoctorSyncController {
   }
 
   @GetMapping("/send-doctor")
-  public ResponseEntity startGmcSync() {
+  public ResponseEntity<String> startGmcSync() {
     //this endpoint is needed to start gmc sync manually
     gmcDoctorSyncService.receiveMessage("gmcSyncStart");
-    return ResponseEntity.ok().body("success");
+    return ResponseEntity.ok("success");
   }
 
 }

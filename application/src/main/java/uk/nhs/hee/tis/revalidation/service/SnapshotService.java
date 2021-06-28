@@ -2,7 +2,6 @@ package uk.nhs.hee.tis.revalidation.service;
 
 import static java.time.LocalDate.now;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.util.StringUtils.isEmpty;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDate;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDateTime;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.parseDate;
@@ -90,18 +89,18 @@ public class SnapshotService {
   }
 
   private String getDeferralReasonByCode(final String reasonCode) {
-    return isEmpty(reasonCode) ? null
+    return (reasonCode == null || "".equals(reasonCode)) ? null
         : deferralReasonService.getDeferralReasonByCode(reasonCode).getReason();
   }
 
   private String getDeferralSubReasonByCode(final String reasonCode, final String subCode) {
-    return isEmpty(reasonCode) && isEmpty(subCode) ? null :
+    return (reasonCode == null || "".equals(reasonCode)) && (subCode == null || "".equals(subCode)) ? null :
         deferralReasonService.getDeferralSubReasonByReasonCodeAndReasonSubCode(reasonCode, subCode)
             .getReason();
   }
 
   private String toUpperCase(final String code) {
-    return !isEmpty(code) ? code.toUpperCase() : code;
+    return !(code == null || "".equals(code)) ? code.toUpperCase() : code;
   }
 
 }

@@ -204,9 +204,9 @@ public class RecommendationService {
     log.info("Fetching snapshot record for GmcId: {}", gmcNumber);
 
     final var recommendations = recommendationRepository.findByGmcNumber(gmcNumber);
-    final var currentRecommendations = recommendations.stream().map(rec -> {
-      return buildTraineeRecommendationRecordDto(gmcNumber, doctorsForDB.getSubmissionDate(), rec);
-    }).collect(toList());
+    final var currentRecommendations = recommendations.stream().map(rec ->
+      buildTraineeRecommendationRecordDto(gmcNumber, doctorsForDB.getSubmissionDate(), rec)
+    ).collect(toList());
 
     final var snapshotRecommendations = snapshotService.getSnapshotRecommendations(doctorsForDB);
     currentRecommendations.addAll(snapshotRecommendations);

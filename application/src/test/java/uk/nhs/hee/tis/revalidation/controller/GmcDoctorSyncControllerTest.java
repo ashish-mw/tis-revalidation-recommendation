@@ -98,8 +98,7 @@ class GmcDoctorSyncControllerTest {
   @Test
   void shouldSendMessageToSqs() throws Exception {
     this.mockMvc.perform(get("/api/v1/sqs/send-doctor"))
-        .andExpect(status().isOk())
-        .andExpect(content().string("success"));
+        .andExpect(status().isOk());
 
     assertThat(allDoctors.size(), is(2));
     assertThat(allDoctors.get(0).getGmcReferenceNumber(), is("101"));

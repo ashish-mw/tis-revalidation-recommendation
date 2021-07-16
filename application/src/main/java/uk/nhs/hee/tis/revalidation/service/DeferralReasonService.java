@@ -37,9 +37,7 @@ public class DeferralReasonService {
   //get All deferral reasons
   public List<DeferralReasonDto> getAllDeferralReasons() {
     final var deferralReasons = deferralReasonRepository.findAll();
-    return deferralReasons.stream().map(dr -> {
-      return convertToDTO(dr);
-    }).collect(toList());
+    return deferralReasons.stream().map(dr -> convertToDTO(dr)).collect(toList());
   }
 
   //get deferral reason by code

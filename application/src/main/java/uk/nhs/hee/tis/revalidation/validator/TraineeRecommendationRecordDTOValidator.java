@@ -23,10 +23,10 @@ public class TraineeRecommendationRecordDTOValidator implements Validator {
 
     if (errors.getErrorCount() == 0) {
       final var recordDTO = (TraineeRecommendationRecordDto) target;
-      if (StringUtils.isEmpty(recordDTO.getGmcNumber())) {
+      if (!StringUtils.hasLength(recordDTO.getGmcNumber())) {
         errors.reject("GmcNumber", "Gmc Number can't be empty or null");
       }
-      if (StringUtils.isEmpty(recordDTO.getRecommendationType())) {
+      if (!StringUtils.hasLength(recordDTO.getRecommendationType())) {
         errors.reject("RecommendationType", "Recommendation type can't be empty or null");
       } else {
         final var recommendationType = RecommendationType
@@ -35,10 +35,10 @@ public class TraineeRecommendationRecordDTOValidator implements Validator {
           if (recordDTO.getDeferralDate() == null || recordDTO.getDeferralDate().isBefore(now())) {
             errors.reject("DeferralDate", "Deferral date can't be empty or in past");
           }
-          if (StringUtils.isEmpty(recordDTO.getDeferralReason())) {
+          if (!StringUtils.hasLength(recordDTO.getDeferralReason())) {
             errors.reject("DeferralReason", "Deferral Reason can't be empty or null");
           } else if (recordDTO.getDeferralReason().equalsIgnoreCase(INSUFFICIENT_EVIDENCE)
-              && StringUtils.isEmpty(recordDTO.getDeferralSubReason())) {
+              && !StringUtils.hasLength(recordDTO.getDeferralSubReason())) {
             errors.reject("DeferralSubReason", "Deferral Sub Reason can't be empty or null");
           }
         }

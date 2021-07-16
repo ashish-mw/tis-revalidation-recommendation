@@ -113,7 +113,7 @@ public class DoctorsForDBController {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Trainee's admin has been updated", response = ResponseEntity.class)})
   @PostMapping("/assign-admin")
-  public ResponseEntity updateAdmin(@RequestBody final TraineeAdminUpdateDto traineeAdmins) {
+  public ResponseEntity<Void> updateAdmin(@RequestBody final TraineeAdminUpdateDto traineeAdmins) {
 
     doctorsForDBService.updateTraineeAdmin(traineeAdmins.getTraineeAdmins());
     return ResponseEntity.ok().build();

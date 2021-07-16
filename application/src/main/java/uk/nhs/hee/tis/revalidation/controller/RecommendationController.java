@@ -64,8 +64,7 @@ public class RecommendationController {
       @PathVariable("gmcIds") final List<String> gmcIds) {
     log.info("Receive request to fetch recommendations for GmcIds: {}", gmcIds);
     final var recommendations = service.getLatestRecommendations(gmcIds);
-    return new ResponseEntity<Map<String, TraineeRecommendationRecordDto>>(recommendations,
-        HttpStatus.OK);
+    return new ResponseEntity<>(recommendations, HttpStatus.OK);
   }
 
   @ApiOperation(value = "Save new recommendation", notes = "It will allow user to save new recommendation", response = ResponseEntity.class)
@@ -94,7 +93,7 @@ public class RecommendationController {
       final BindingResult bindingResult) {
 
     log.info("recommendation: {}", traineeRecommendationDTO);
-    if (StringUtils.isEmpty(traineeRecommendationDTO.getRecommendationId())) {
+    if (!StringUtils.hasLength(traineeRecommendationDTO.getRecommendationId())) {
       return new ResponseEntity<>("Recommendation Id should not be empty", HttpStatus.BAD_REQUEST);
     }
 
@@ -110,7 +109,7 @@ public class RecommendationController {
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "New recommendation is submitted to gmc", response = ResponseEntity.class)})
   @PostMapping("/{gmcId}/submit/{recommendationId}")
-  public ResponseEntity submitRecommendation(@RequestBody RoUserProfileDto userProfileDto,
+  public ResponseEntity<Void> submitRecommendation(@RequestBody RoUserProfileDto userProfileDto,
       @PathVariable("gmcId") String gmcNumber,
       @PathVariable("recommendationId") String recommendationId) {
 
@@ -120,7 +119,7 @@ public class RecommendationController {
   }
 
 
-  private ResponseEntity buildErrorResponse(final BindingResult bindingResult) {
+  private ResponseEntity<List<String>> buildErrorResponse(final BindingResult bindingResult) {
     final var errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage())
         .collect(toList());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);

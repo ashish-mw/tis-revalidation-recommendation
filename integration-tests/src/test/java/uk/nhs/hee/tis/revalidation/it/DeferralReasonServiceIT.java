@@ -23,13 +23,13 @@ import uk.nhs.hee.tis.revalidation.service.DeferralReasonService;
 @SpringBootTest(classes = RevalidationApplication.class)
 @TestPropertySource("classpath:application-test.yml")
 @ActiveProfiles("test")
-public class DeferralReasonServiceIT {
+class DeferralReasonServiceIT {
 
   @Autowired
   private DeferralReasonService service;
 
   @Test
-  public void testGetDeferralReasonByCode() {
+  void testGetDeferralReasonByCode() {
     final var deferralReasonByCode = service.getDeferralReasonByCode("1");
     assertNotNull(deferralReasonByCode);
     assertThat(deferralReasonByCode.getCode(), is("1"));
@@ -39,7 +39,7 @@ public class DeferralReasonServiceIT {
   }
 
   @Test
-  public void testGetDeferralReasonByCodeHavingNoSubReason() {
+  void testGetDeferralReasonByCodeHavingNoSubReason() {
     final var deferralReasonByCode = service.getDeferralReasonByCode("2");
     assertNotNull(deferralReasonByCode);
     assertThat(deferralReasonByCode.getCode(), is("2"));
@@ -48,7 +48,7 @@ public class DeferralReasonServiceIT {
   }
 
   @Test
-  public void testGetDeferralReasonAndSubReasonByCode() {
+  void testGetDeferralReasonAndSubReasonByCode() {
     final var deferralReasonByCode = service
         .getDeferralSubReasonByReasonCodeAndReasonSubCode("1", "4");
     assertNotNull(deferralReasonByCode);
@@ -57,13 +57,13 @@ public class DeferralReasonServiceIT {
   }
 
   @Test
-  public void testGetAllDeferralReason() {
+  void testGetAllDeferralReason() {
     final var allDeferralReasons = service.getAllDeferralReasons();
     assertThat(allDeferralReasons, hasSize(2));
   }
 
   @Test
-  public void shouldThrowExceptionWhenDeferralCodeIsInvalid() {
+  void shouldThrowExceptionWhenDeferralCodeIsInvalid() {
     Assertions.assertThrows(RecommendationException.class, () -> {
       final var allDeferralReasons = service.getDeferralReasonByCode("6");
     });

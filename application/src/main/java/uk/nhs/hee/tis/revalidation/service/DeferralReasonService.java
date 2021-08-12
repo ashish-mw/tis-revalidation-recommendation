@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.revalidation.dto.DeferralReasonDto;
 import uk.nhs.hee.tis.revalidation.entity.DeferralReason;
+import uk.nhs.hee.tis.revalidation.entity.Status;
 import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DeferralReasonRepository;
 
@@ -37,6 +38,12 @@ public class DeferralReasonService {
   //get All deferral reasons
   public List<DeferralReasonDto> getAllDeferralReasons() {
     final var deferralReasons = deferralReasonRepository.findAll();
+    return deferralReasons.stream().map(dr -> convertToDTO(dr)).collect(toList());
+  }
+
+  //get All CURRENT deferral reasons
+  public List<DeferralReasonDto> getAllCurrentDeferralReasons() {
+    final var deferralReasons = deferralReasonRepository.findAllByStatus(Status.CURRENT);
     return deferralReasons.stream().map(dr -> convertToDTO(dr)).collect(toList());
   }
 

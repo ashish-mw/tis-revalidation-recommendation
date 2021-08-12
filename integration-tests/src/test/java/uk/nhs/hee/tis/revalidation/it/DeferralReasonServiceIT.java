@@ -58,7 +58,7 @@ class DeferralReasonServiceIT {
 
   @Test
   void testGetAllDeferralReason() {
-    final var allDeferralReasons = service.getAllDeferralReasons();
+    final var allDeferralReasons = service.getAllCurrentDeferralReasons();
     assertThat(allDeferralReasons, hasSize(2));
   }
 

@@ -190,7 +190,7 @@ class RecommendationServiceTest {
         .thenReturn(List.of(snapshot1, snapshot2));
     when(recommendationRepository.findByGmcNumber(gmcId)).thenReturn(List.of(
         buildRecommendation(gmcNumber1, recommendationId, status, REVALIDATE, UNDER_REVIEW)));
-    when(deferralReasonService.getAllDeferralReasons()).thenReturn(deferralReasons);
+    when(deferralReasonService.getAllCurrentDeferralReasons()).thenReturn(deferralReasons);
 
     when(snapshot1.getAdmin()).thenReturn(admin1);
     when(snapshot1.getGmcNumber()).thenReturn(gmcId);
@@ -276,7 +276,7 @@ class RecommendationServiceTest {
     when(recommendationRepository.findByGmcNumber(gmcId)).thenReturn(List.of(recommendation1));
     when(gmcClientService.checkRecommendationStatus(gmcNumber1,
         gmcRecommendationId2, recommendationId, designatedBodyCode)).thenReturn(APPROVED);
-    when(deferralReasonService.getAllDeferralReasons()).thenReturn(deferralReasons);
+    when(deferralReasonService.getAllCurrentDeferralReasons()).thenReturn(deferralReasons);
 
     when(snapshot1.getAdmin()).thenReturn(admin1);
     when(snapshot1.getGmcNumber()).thenReturn(gmcId);
@@ -337,7 +337,7 @@ class RecommendationServiceTest {
     when(recommendationRepository.findByGmcNumber(gmcId))
         .thenReturn(List.of(buildRecommendation(gmcId, newRecommendationId,
             SUBMITTED_TO_GMC, REVALIDATE, UNDER_REVIEW)));
-    when(deferralReasonService.getAllDeferralReasons()).thenReturn(deferralReasons);
+    when(deferralReasonService.getAllCurrentDeferralReasons()).thenReturn(deferralReasons);
 
     when(snapshot1.getAdmin()).thenReturn(admin1);
     when(snapshot1.getDeferralComment()).thenReturn(deferralComment1);

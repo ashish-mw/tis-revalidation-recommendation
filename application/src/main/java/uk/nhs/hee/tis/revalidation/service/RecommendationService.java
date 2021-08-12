@@ -30,6 +30,7 @@ import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.Recommendation;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationType;
+import uk.nhs.hee.tis.revalidation.entity.Status;
 import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
@@ -73,7 +74,7 @@ public class RecommendationService {
           .designatedBody(doctorsForDB.getDesignatedBodyCode())
           .gmcSubmissionDate(doctorsForDB.getSubmissionDate())
           .revalidations(getCurrentAndLegacyRecommendation(doctorsForDB))
-          .deferralReasons(deferralReasonService.getAllDeferralReasons()).build();
+          .deferralReasons(deferralReasonService.getAllCurrentDeferralReasons()).build();
     }
 
     return null;

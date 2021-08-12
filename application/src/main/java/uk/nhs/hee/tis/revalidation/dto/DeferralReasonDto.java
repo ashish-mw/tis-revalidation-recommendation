@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.nhs.hee.tis.revalidation.entity.Status;
 
 @Data
 @Builder
@@ -18,5 +19,7 @@ public class DeferralReasonDto {
 
   private String code;
   private String reason;
+  private String abbr;
   private List<DeferralReasonDto> subReasons;
+  private Status status;
 }

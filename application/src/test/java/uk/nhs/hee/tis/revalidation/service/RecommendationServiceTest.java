@@ -47,6 +47,7 @@ import uk.nhs.hee.tis.revalidation.entity.Recommendation;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationType;
+import uk.nhs.hee.tis.revalidation.entity.Status;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
@@ -169,8 +170,8 @@ class RecommendationServiceTest {
         .of(faker.lorem().sentence(3), faker.lorem().sentence(3), faker.lorem().sentence(7));
     recommendationId = faker.lorem().characters(10);
     newRecommendationId = faker.lorem().characters(10);
-    deferralReasons = List.of(new DeferralReasonDto("1", "evidence", List.of()),
-        new DeferralReasonDto("2", "ongoing", List.of()));
+    deferralReasons = List.of(new DeferralReasonDto("1", "evidence", "SICK_CARERS_LEAVE", List.of(), Status.CURRENT),
+        new DeferralReasonDto("2", "ongoing", "ONGOING_PROCESS",  List.of(), Status.INACTIVE));
 
     roFirstName = faker.name().firstName();
     roLastName = faker.name().lastName();

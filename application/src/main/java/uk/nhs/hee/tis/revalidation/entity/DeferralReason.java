@@ -20,7 +20,9 @@ public class DeferralReason {
   @Id
   private String code;
   private String reason;
+  private String abbr;
   private List<DeferralReason> deferralSubReasons;
+  private Status status;
 
   public DeferralReason getSubReasonByCode(final String subReason) {
     if (subReason != null) {

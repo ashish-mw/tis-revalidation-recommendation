@@ -155,8 +155,8 @@ class RecommendationServiceTest {
     deferralDate2 = LocalDate.of(2018, 03, 15);
     deferralResaon2 = "2";
     deferralSubResaon2 = null;
-    revalidatonType2 = faker.options().option(RecommendationType.class).name();
-    revalidationStatus2 = faker.options().option(RecommendationStatus.class).name();
+    revalidatonType2 = null;
+    revalidationStatus2 = null;
     gmcOutcome2 = APPROVED.getOutcome();
     gmcSubmissionDate2 = "2018-03-15 12:00:00";
     acutalSubmissionDate2 = "2018-03-15";

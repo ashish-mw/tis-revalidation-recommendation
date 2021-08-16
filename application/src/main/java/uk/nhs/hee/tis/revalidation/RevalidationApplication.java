@@ -2,6 +2,7 @@ package uk.nhs.hee.tis.revalidation;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 
+import com.github.cloudyrock.spring.v5.EnableMongock;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.SpringApplication;
@@ -12,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import uk.nhs.hee.tis.revalidation.validator.TraineeRecommendationRecordDTOValidator;
 
+@EnableMongock
 @SpringBootApplication
 public class RevalidationApplication {
 

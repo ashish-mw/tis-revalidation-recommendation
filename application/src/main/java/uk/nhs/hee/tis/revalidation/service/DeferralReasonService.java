@@ -3,7 +3,6 @@ package uk.nhs.hee.tis.revalidation.service;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
-import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,6 @@ import uk.nhs.hee.tis.revalidation.entity.Status;
 import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DeferralReasonRepository;
 
-//Its a temporary class to create a Deferral Reason table in Database. Will get rid of this once we have Reference DB access
 @Slf4j
 @Service
 public class DeferralReasonService {

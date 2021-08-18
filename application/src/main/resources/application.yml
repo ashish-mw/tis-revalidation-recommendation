@@ -83,3 +83,6 @@ cloud:
   aws:
     end-point:
       uri: ${SQS_SYNC_GMC_QUEUE:}
+
+mongock:
+  change-logs-scan-package: uk.nhs.hee.tis.revalidation.changelog

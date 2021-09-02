@@ -1,5 +1,6 @@
 package uk.nhs.hee.tis.revalidation.service;
 
+import static java.time.LocalDate.now;
 import static java.lang.String.format;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
@@ -30,7 +31,6 @@ import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.Recommendation;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationType;
-import uk.nhs.hee.tis.revalidation.entity.Status;
 import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
@@ -129,7 +129,8 @@ public class RecommendationService {
             submissionDate));
       }
     }
-
+    doctor.setLastUpdatedDate(now());
+    doctorsForDBRepository.save(doctor);
     return recommendationRepository.save(recommendation);
   }
 
@@ -258,7 +259,7 @@ public class RecommendationService {
     }
   }
 
-  //if recommendation for trainee is already in draft state, admin are not allowed to create a new one but allow to update
+  //if recommendation for trainee is already in draft state, admins are not allowed to create a new one but are allowed to update
   //if recommendation for trainee is Submitted to gmc but still in Under Review state, admin are not allowed to create a new one.
   private void isAllowedToCreateNewRecommendation(final String gmcNumber,
       final String recommendationId) {

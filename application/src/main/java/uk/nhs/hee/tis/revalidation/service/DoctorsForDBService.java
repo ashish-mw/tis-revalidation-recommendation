@@ -6,6 +6,9 @@ import static org.springframework.data.domain.PageRequest.of;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.domain.Sort.by;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.APPROVED;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.REJECTED;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.UNDER_REVIEW;
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.ON_HOLD;
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.YES;
 
@@ -23,9 +26,12 @@ import uk.nhs.hee.tis.revalidation.dto.DesignatedBodyDto;
 import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeAdminDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeInfoDto;
+import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 @Slf4j
@@ -36,8 +42,17 @@ public class DoctorsForDBService {
   @Value("${app.reval.pagination.pageSize}")
   private int pageSize;
 
-  @Autowired
   private DoctorsForDBRepository doctorsRepository;
+
+  private RecommendationService recommendationService;
+
+  public DoctorsForDBService(
+    DoctorsForDBRepository doctorsForDBRepository,
+    RecommendationService recommendationService
+  ) {
+    this.doctorsRepository = doctorsForDBRepository;
+    this.recommendationService = recommendationService;
+  }
 
   public TraineeSummaryDto getAllTraineeDoctorDetails(final TraineeRequestDto requestDTO,
       final List<String> hiddenGmcIds) {
@@ -59,6 +74,7 @@ public class DoctorsForDBService {
     final var doctorsForDB = DoctorsForDB.convert(gmcDoctor);
     final var doctor = doctorsRepository.findById(gmcDoctor.getGmcReferenceNumber());
     if (doctor.isPresent()) {
+      doctorsForDB.setDoctorStatus(getGmcOutcomeForTrainee(gmcDoctor.getGmcReferenceNumber()));
       doctorsForDB.setAdmin(doctor.get().getAdmin());
     }
     doctorsRepository.save(doctorsForDB);
@@ -151,5 +167,21 @@ public class DoctorsForDBService {
 
   private String getConnectionStatus(final String designatedBody) {
     return (designatedBody == null || designatedBody.equals("")) ? "No" : "Yes";
+  }
+
+  private RecommendationStatus getGmcOutcomeForTrainee(String gmcId) {
+    TraineeRecommendationRecordDto recommendation = this.recommendationService.getLatestRecommendation(gmcId);
+    String outcome = recommendation.getGmcOutcome();
+    if(outcome == null) return RecommendationStatus.NOT_STARTED;
+
+    if(outcome.equals(APPROVED.getOutcome())
+      || outcome.equals(REJECTED.getOutcome())
+    ) {
+      return RecommendationStatus.COMPLETED;
+    }
+    else if(outcome.equals(UNDER_REVIEW.getOutcome())) {
+      return RecommendationStatus.SUBMITTED_TO_GMC;
+    }
+    return RecommendationStatus.NOT_STARTED;
   }
 }

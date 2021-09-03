@@ -13,9 +13,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up JDK 11
+      - name: Set up JDK
         uses: actions/setup-java@v2.3.0
         with:
+          cache: maven
           distribution: adopt
           java-version: 11
 
@@ -59,9 +60,10 @@ jobs:
           name: app-jar
           path: build/reports
 
-      - name: Set up JDK 11
+      - name: Set up JDK
         uses: actions/setup-java@v2.3.0
         with:
+          cache: maven
           distribution: adopt
           java-version: 11
 

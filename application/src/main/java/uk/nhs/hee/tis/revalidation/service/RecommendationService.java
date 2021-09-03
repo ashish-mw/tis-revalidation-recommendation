@@ -168,6 +168,11 @@ public class RecommendationService {
         recommendation.setActualSubmissionDate(doctor.getSubmissionDate());
         recommendation.setGmcRevalidationId(tryRecommendationV2Result.getRecommendationID());
         recommendationRepository.save(recommendation);
+        doctor.setLastUpdatedDate(now());
+        doctor.setDoctorStatus(
+                getGmcOutcomeForTrainee(recordDTO.getGmcNumber())
+        );
+        doctorsForDBRepository.save(doctor);
         return true;
       } else {
         final var responseCode = fromCode(returnCode);

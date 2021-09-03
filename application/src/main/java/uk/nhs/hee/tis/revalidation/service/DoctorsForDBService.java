@@ -74,7 +74,9 @@ public class DoctorsForDBService {
     final var doctorsForDB = DoctorsForDB.convert(gmcDoctor);
     final var doctor = doctorsRepository.findById(gmcDoctor.getGmcReferenceNumber());
     if (doctor.isPresent()) {
-      doctorsForDB.setDoctorStatus(getGmcOutcomeForTrainee(gmcDoctor.getGmcReferenceNumber()));
+      doctorsForDB.setDoctorStatus(
+              recommendationService.getGmcOutcomeForTrainee(gmcDoctor.getGmcReferenceNumber())
+      );
       doctorsForDB.setAdmin(doctor.get().getAdmin());
     }
     doctorsRepository.save(doctorsForDB);
@@ -169,19 +171,5 @@ public class DoctorsForDBService {
     return (designatedBody == null || designatedBody.equals("")) ? "No" : "Yes";
   }
 
-  private RecommendationStatus getGmcOutcomeForTrainee(String gmcId) {
-    TraineeRecommendationRecordDto recommendation = this.recommendationService.getLatestRecommendation(gmcId);
-    String outcome = recommendation.getGmcOutcome();
-    if(outcome == null) return RecommendationStatus.NOT_STARTED;
 
-    if(outcome.equals(APPROVED.getOutcome())
-      || outcome.equals(REJECTED.getOutcome())
-    ) {
-      return RecommendationStatus.COMPLETED;
-    }
-    else if(outcome.equals(UNDER_REVIEW.getOutcome())) {
-      return RecommendationStatus.SUBMITTED_TO_GMC;
-    }
-    return RecommendationStatus.NOT_STARTED;
-  }
 }

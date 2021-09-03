@@ -30,6 +30,7 @@ import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.Recommendation;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationType;
 import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
@@ -130,6 +131,9 @@ public class RecommendationService {
       }
     }
     doctor.setLastUpdatedDate(now());
+    doctor.setDoctorStatus(
+            getGmcOutcomeForTrainee(recordDTO.getGmcNumber())
+    );
     doctorsForDBRepository.save(doctor);
     return recommendationRepository.save(recommendation);
   }
@@ -197,6 +201,22 @@ public class RecommendationService {
       final List<String> gmcIds) {
     log.info("Mapping latest recommendation info for GmcIds: {}", gmcIds);
     return gmcIds.stream().collect(toMap(identity(), this::getLatestRecommendation));
+  }
+
+  public RecommendationStatus getGmcOutcomeForTrainee(String gmcId) {
+    TraineeRecommendationRecordDto recommendation = getLatestRecommendation(gmcId);
+    String outcome = recommendation.getGmcOutcome();
+    if(outcome == null) return RecommendationStatus.NOT_STARTED;
+
+    if(outcome.equals(APPROVED.getOutcome())
+            || outcome.equals(REJECTED.getOutcome())
+    ) {
+      return RecommendationStatus.COMPLETED;
+    }
+    else if(outcome.equals(UNDER_REVIEW.getOutcome())) {
+      return RecommendationStatus.SUBMITTED_TO_GMC;
+    }
+    return RecommendationStatus.NOT_STARTED;
   }
 
   private List<TraineeRecommendationRecordDto> getCurrentAndLegacyRecommendation(

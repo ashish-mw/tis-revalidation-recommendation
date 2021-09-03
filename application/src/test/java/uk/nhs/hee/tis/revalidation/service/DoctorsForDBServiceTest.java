@@ -10,9 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.domain.Sort.by;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.APPROVED;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.REJECTED;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.UNDER_REVIEW;
+
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.ON_HOLD;
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.YES;
 
@@ -33,9 +31,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.nhs.hee.tis.revalidation.dto.ConnectionMessageDto;
-import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeAdminDto;
-import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
@@ -73,8 +69,6 @@ class DoctorsForDBServiceTest {
   private String designatedBody1, designatedBody2, designatedBody3, designatedBody4, designatedBody5;
   private String admin1, admin2, admin3, admin4, admin5;
   private String connectionStatus1, connectionStatus2, connectionStatus3, connectionStatus4, connectionStatus5;
-  private TraineeRecommendationRecordDto recommendation1, recommendation2, recommendation3, recommendation4, recommendation5;
-  private DoctorsForDbDto docDto1;
 
   @BeforeEach
   public void setup() {
@@ -418,65 +412,7 @@ class DoctorsForDBServiceTest {
     assertThat(designatedBody.getDesignatedBodyCode(), is(doc1.getDesignatedBodyCode()));
   }
 
-  @Test
-  void shouldMatchTisStatusCompletedToApproved() {
-    when(recommendationService.getLatestRecommendation(gmcRef1)).thenReturn(recommendation1);
-    when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
-    doctorsForDBService.updateTrainee(docDto1);
-    ArgumentCaptor<DoctorsForDB> argument = ArgumentCaptor.forClass(DoctorsForDB.class);
-    verify(repository, times(1)).save(argument.capture());
 
-    DoctorsForDB result = argument.getValue();
-    assertThat(result.getDoctorStatus(), is(RecommendationStatus.COMPLETED));
-  }
-
-  @Test
-  void shouldMatchTisStatusCompletedToRejected() {
-    when(recommendationService.getLatestRecommendation(gmcRef1)).thenReturn(recommendation2);
-    when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
-    doctorsForDBService.updateTrainee(docDto1);
-    ArgumentCaptor<DoctorsForDB> argument = ArgumentCaptor.forClass(DoctorsForDB.class);
-    verify(repository, times(1)).save(argument.capture());
-
-    DoctorsForDB result = argument.getValue();
-    assertThat(result.getDoctorStatus(), is(RecommendationStatus.COMPLETED));
-  }
-
-  @Test
-  void shouldMatchTisStatusUnderReviewToSubmittedToGmc() {
-    when(recommendationService.getLatestRecommendation(gmcRef1)).thenReturn(recommendation3);
-    when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
-    doctorsForDBService.updateTrainee(docDto1);
-    ArgumentCaptor<DoctorsForDB> argument = ArgumentCaptor.forClass(DoctorsForDB.class);
-    verify(repository, times(1)).save(argument.capture());
-
-    DoctorsForDB result = argument.getValue();
-    assertThat(result.getDoctorStatus(), is(RecommendationStatus.SUBMITTED_TO_GMC));
-  }
-
-  @Test
-  void shouldMatchTisStatusDefaultToNotStarted() {
-    when(recommendationService.getLatestRecommendation(gmcRef1)).thenReturn(recommendation4);
-    when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
-    doctorsForDBService.updateTrainee(docDto1);
-    ArgumentCaptor<DoctorsForDB> argument = ArgumentCaptor.forClass(DoctorsForDB.class);
-    verify(repository, times(1)).save(argument.capture());
-
-    DoctorsForDB result = argument.getValue();
-    assertThat(result.getDoctorStatus(), is(RecommendationStatus.NOT_STARTED));
-  }
-
-  @Test
-  void shouldMatchTisStatusDefaultToNotStartedIfNull() {
-    when(recommendationService.getLatestRecommendation(gmcRef1)).thenReturn(recommendation5);
-    when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
-    doctorsForDBService.updateTrainee(docDto1);
-    ArgumentCaptor<DoctorsForDB> argument = ArgumentCaptor.forClass(DoctorsForDB.class);
-    verify(repository, times(1)).save(argument.capture());
-
-    DoctorsForDB result = argument.getValue();
-    assertThat(result.getDoctorStatus(), is(RecommendationStatus.NOT_STARTED));
-  }
 
 
   private void setupData() {
@@ -557,30 +493,5 @@ class DoctorsForDBServiceTest {
     doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5,
         now(), designatedBody5, admin5, null);
 
-    docDto1 = new DoctorsForDbDto(
-            doc1.getGmcReferenceNumber(),
-            doc1.getDoctorFirstName(),
-            doc1.getDoctorLastName(),
-            null,
-            null,
-            doc1.getUnderNotice().toString(),
-            doc1.getSanction(),
-            doc1.getDesignatedBodyCode()
-    );
-
-    recommendation1 = new TraineeRecommendationRecordDto();
-    recommendation1.setGmcOutcome(APPROVED.getOutcome());
-
-    recommendation2 = new TraineeRecommendationRecordDto();
-    recommendation2.setGmcOutcome(REJECTED.getOutcome());
-
-    recommendation3 = new TraineeRecommendationRecordDto();
-    recommendation3.setGmcOutcome(UNDER_REVIEW.getOutcome());
-
-    recommendation4 = new TraineeRecommendationRecordDto();
-    recommendation4.setGmcOutcome("DRAFT");
-
-    recommendation5 = new TraineeRecommendationRecordDto();
-    recommendation5.setGmcOutcome(null);
   }
 }

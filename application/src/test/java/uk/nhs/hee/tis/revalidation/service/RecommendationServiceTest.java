@@ -29,16 +29,20 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationResponseCT;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationV2Response;
 import uk.nhs.hee.tis.revalidation.dto.DeferralReasonDto;
+import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 import uk.nhs.hee.tis.revalidation.dto.RoUserProfileDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.entity.DeferralReason;
@@ -125,6 +129,8 @@ class RecommendationServiceTest {
   private String roEmailAddress;
   private String roUserName;
 
+  private Recommendation recommendation1, recommendation2, recommendation3, recommendation4, recommendation5;
+  private DoctorsForDbDto docDto1;
 
   @BeforeEach
   public void setup() {
@@ -178,6 +184,18 @@ class RecommendationServiceTest {
     roUserName = faker.name().username();
     roEmailAddress = faker.internet().emailAddress();
     roPhoneNumber = faker.phoneNumber().phoneNumber();
+
+    recommendation1 = new Recommendation();
+    recommendation1.setOutcome(APPROVED);
+
+    recommendation2 = new Recommendation();
+    recommendation2.setOutcome(REJECTED);
+
+    recommendation3 = new Recommendation();
+    recommendation3.setOutcome(UNDER_REVIEW);
+
+    recommendation4 = new Recommendation();
+    recommendation4.setOutcome(null);
   }
 
   @Test
@@ -701,6 +719,38 @@ class RecommendationServiceTest {
     assertThat(recommendationResult.getGmcSubmissionDate(), is(submissionDate));
     assertThat(recommendationResult.getComments(), is(comments));
     assertThat(recommendationResult.getAdmin(), is(admin1));
+  }
+
+  @Test
+  void shouldMatchTisStatusCompletedToApproved() {
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber1))
+            .thenReturn(Optional.of(recommendation1));
+    RecommendationStatus result = recommendationService.getGmcOutcomeForTrainee(gmcNumber1);
+    assertThat(result, Matchers.is(RecommendationStatus.COMPLETED));
+  }
+
+  @Test
+  void shouldMatchTisStatusCompletedToRejected() {
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber1))
+            .thenReturn(Optional.of(recommendation2));
+    RecommendationStatus result = recommendationService.getGmcOutcomeForTrainee(gmcNumber1);
+    assertThat(result, Matchers.is(RecommendationStatus.COMPLETED));
+  }
+
+  @Test
+  void shouldMatchTisStatusUnderReviewToSubmittedToGmc() {
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber1))
+            .thenReturn(Optional.of(recommendation3));
+    RecommendationStatus result = recommendationService.getGmcOutcomeForTrainee(gmcNumber1);
+    assertThat(result, Matchers.is(SUBMITTED_TO_GMC));
+  }
+
+  @Test
+  void shouldMatchTisStatusDefaultToNotStartedIfNull() {
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber1))
+            .thenReturn(Optional.of(recommendation4));
+    RecommendationStatus result = recommendationService.getGmcOutcomeForTrainee(gmcNumber1);
+    assertThat(result, Matchers.is(NOT_STARTED));
   }
 
   private DoctorsForDB buildDoctorForDB(final String gmcId) {

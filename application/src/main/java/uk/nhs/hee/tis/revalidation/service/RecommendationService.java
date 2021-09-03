@@ -170,7 +170,7 @@ public class RecommendationService {
         recommendationRepository.save(recommendation);
         doctor.setLastUpdatedDate(now());
         doctor.setDoctorStatus(
-                getGmcOutcomeForTrainee(recordDTO.getGmcNumber())
+                getGmcOutcomeForTrainee(gmcNumber)
         );
         doctorsForDBRepository.save(doctor);
         return true;

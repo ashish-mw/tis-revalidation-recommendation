@@ -74,11 +74,11 @@ public class DoctorsForDBService {
     final var doctorsForDB = DoctorsForDB.convert(gmcDoctor);
     final var doctor = doctorsRepository.findById(gmcDoctor.getGmcReferenceNumber());
     if (doctor.isPresent()) {
-      doctorsForDB.setDoctorStatus(
-              recommendationService.getGmcOutcomeForTrainee(gmcDoctor.getGmcReferenceNumber())
-      );
       doctorsForDB.setAdmin(doctor.get().getAdmin());
     }
+    doctorsForDB.setDoctorStatus(
+            recommendationService.getGmcOutcomeForTrainee(gmcDoctor.getGmcReferenceNumber())
+    );
     doctorsRepository.save(doctorsForDB);
   }
 

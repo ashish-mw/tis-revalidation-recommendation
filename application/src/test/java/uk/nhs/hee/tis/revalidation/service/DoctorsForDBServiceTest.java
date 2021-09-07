@@ -31,6 +31,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.nhs.hee.tis.revalidation.dto.ConnectionMessageDto;
+import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeAdminDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
@@ -58,6 +59,7 @@ class DoctorsForDBServiceTest {
   private Page page;
 
   private DoctorsForDB doc1, doc2, doc3, doc4, doc5;
+  private DoctorsForDbDto docDto1;
   private String gmcRef1, gmcRef2, gmcRef3, gmcRef4, gmcRef5;
   private String fname1, fname2, fname3, fname4, fname5;
   private String lname1, lname2, lname3, lname4, lname5;
@@ -412,7 +414,12 @@ class DoctorsForDBServiceTest {
     assertThat(designatedBody.getDesignatedBodyCode(), is(doc1.getDesignatedBodyCode()));
   }
 
-
+  @Test
+  void shouldGetTisStatusForTraineeOnUpdate() {
+    when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
+    doctorsForDBService.updateTrainee(docDto1);
+    verify(recommendationService).getGmcOutcomeForTrainee(gmcRef1);
+  }
 
 
   private void setupData() {
@@ -492,6 +499,9 @@ class DoctorsForDBServiceTest {
         now(), designatedBody4, admin4, null);
     doc5 = new DoctorsForDB(gmcRef5, fname5, lname5, subDate5, addedDate5, un5, sanction5, status5,
         now(), designatedBody5, admin5, null);
+
+    docDto1 = new DoctorsForDbDto();
+    docDto1.setGmcReferenceNumber(gmcRef1);
 
   }
 }

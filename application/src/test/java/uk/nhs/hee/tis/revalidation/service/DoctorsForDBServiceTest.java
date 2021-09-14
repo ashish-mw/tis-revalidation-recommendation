@@ -43,7 +43,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -439,7 +438,7 @@ class DoctorsForDBServiceTest {
   void shouldGetTisStatusForTraineeOnUpdate() {
     when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
     doctorsForDBService.updateTrainee(docDto1);
-    verify(recommendationService).getGmcOutcomeForTrainee(gmcRef1);
+    verify(recommendationService).getRecommendationStatusForTrainee(gmcRef1);
   }
 
 

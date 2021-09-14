@@ -27,9 +27,6 @@ import static org.springframework.data.domain.PageRequest.of;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.domain.Sort.by;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.APPROVED;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.REJECTED;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.UNDER_REVIEW;
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.ON_HOLD;
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.YES;
 
@@ -37,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.IterableUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -51,7 +47,6 @@ import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRequestDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeSummaryDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
-import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
@@ -96,10 +91,13 @@ public class DoctorsForDBService {
     final var doctor = doctorsRepository.findById(gmcDoctor.getGmcReferenceNumber());
     if (doctor.isPresent()) {
       doctorsForDB.setAdmin(doctor.get().getAdmin());
+      doctorsForDB.setDoctorStatus(
+        recommendationService.getRecommendationStatusForTrainee(gmcDoctor.getGmcReferenceNumber())
+      );
     }
-    doctorsForDB.setDoctorStatus(
-            recommendationService.getGmcOutcomeForTrainee(gmcDoctor.getGmcReferenceNumber())
-    );
+    else {
+      doctorsForDB.setDoctorStatus(RecommendationStatus.NOT_STARTED);
+    }
     doctorsRepository.save(doctorsForDB);
   }
 

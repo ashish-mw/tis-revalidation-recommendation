@@ -23,7 +23,7 @@ package uk.nhs.hee.tis.revalidation.entity;
 
 public enum RecommendationGmcOutcome {
 
-  APPROVED("Approved"), REJECTED("Rejected"), UNDER_REVIEW("Under Review");
+  APPROVED("Approved"), REJECTED("Rejected"), UNDER_REVIEW("Under Review"), UNDER_NOTICE("Under Notice");
 
   private final String outcome;
 

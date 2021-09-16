@@ -151,13 +151,15 @@ public class RecommendationService {
             submissionDate));
       }
     }
-    doctor.setLastUpdatedDate(now());
-    doctor.setDoctorStatus(
-            getGmcOutcomeForTrainee(recordDTO.getGmcNumber())
-    );
+
     doctorsForDBRepository.save(doctor);
     recommendation.setActualSubmissionDate(now());
-    return recommendationRepository.save(recommendation);
+    Recommendation recommendationToSave = recommendationRepository.save(recommendation);
+    doctor.setLastUpdatedDate(now());
+    doctor.setDoctorStatus(
+            getRecommendationStatusForTrainee(recordDTO.getGmcNumber())
+    );
+    return recommendationToSave;
   }
 
   //update an existing recommendation
@@ -192,7 +194,7 @@ public class RecommendationService {
         recommendationRepository.save(recommendation);
         doctor.setLastUpdatedDate(now());
         doctor.setDoctorStatus(
-                getGmcOutcomeForTrainee(gmcNumber)
+                getRecommendationStatusForTrainee(gmcNumber)
         );
         doctorsForDBRepository.save(doctor);
         return true;
@@ -230,9 +232,10 @@ public class RecommendationService {
     return gmcIds.stream().collect(toMap(identity(), this::getLatestRecommendation));
   }
 
-  public RecommendationStatus getGmcOutcomeForTrainee(String gmcId) {
+  public RecommendationStatus getRecommendationStatusForTrainee(String gmcId) {
     TraineeRecommendationRecordDto recommendation = getLatestRecommendation(gmcId);
     String outcome = recommendation.getGmcOutcome();
+    //if no recommendations previously saved
     if(outcome == null) return RecommendationStatus.NOT_STARTED;
 
     if(outcome.equals(APPROVED.getOutcome())
@@ -243,7 +246,7 @@ public class RecommendationService {
     else if(outcome.equals(UNDER_REVIEW.getOutcome())) {
       return RecommendationStatus.SUBMITTED_TO_GMC;
     }
-    return RecommendationStatus.NOT_STARTED;
+    return RecommendationStatus.DRAFT;
   }
 
   private List<TraineeRecommendationRecordDto> getCurrentAndLegacyRecommendation(

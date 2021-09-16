@@ -31,9 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.domain.Sort.by;
-
-import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.ON_HOLD;
-import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.YES;
+import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.*;
 
 import com.github.javafaker.Faker;
 import java.time.LocalDate;
@@ -44,6 +42,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -75,12 +74,14 @@ class DoctorsForDBServiceTest {
   @Mock
   private RecommendationService recommendationService;
 
+  @Captor
+  ArgumentCaptor<DoctorsForDB> doctorCaptor;
 
   @Mock
   private Page page;
 
   private DoctorsForDB doc1, doc2, doc3, doc4, doc5;
-  private DoctorsForDbDto docDto1;
+  private DoctorsForDbDto docDto1, docDto2;
   private String gmcRef1, gmcRef2, gmcRef3, gmcRef4, gmcRef5;
   private String fname1, fname2, fname3, fname4, fname5;
   private String lname1, lname2, lname3, lname4, lname5;
@@ -436,10 +437,19 @@ class DoctorsForDBServiceTest {
   }
 
   @Test
-  void shouldGetTisStatusForTraineeOnUpdate() {
+  void shouldGetTisStatusForDoctorOnUpdate() {
     when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
     doctorsForDBService.updateTrainee(docDto1);
-    verify(recommendationService).getGmcOutcomeForTrainee(gmcRef1);
+    verify(recommendationService).getRecommendationStatusForTrainee(gmcRef1);
+  }
+
+  @Test
+  void shouldSetTisStatusToCompletedForDoctorOnUpdateIfNotUnderNotice() {
+
+    when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
+    doctorsForDBService.updateTrainee(docDto2);
+    verify(repository).save(doctorCaptor.capture());
+    assertThat(doctorCaptor.getValue().getDoctorStatus(), is(RecommendationStatus.COMPLETED));
   }
 
 
@@ -523,6 +533,11 @@ class DoctorsForDBServiceTest {
 
     docDto1 = new DoctorsForDbDto();
     docDto1.setGmcReferenceNumber(gmcRef1);
+    docDto1.setUnderNotice(YES.value());
+
+    docDto2 = new DoctorsForDbDto();
+    docDto2.setGmcReferenceNumber(gmcRef1);
+    docDto2.setUnderNotice(NO.value());
 
   }
 }

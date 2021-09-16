@@ -32,12 +32,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.INVALID_RECOMMENDATION;
 import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.SUCCESS;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.APPROVED;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.REJECTED;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.UNDER_REVIEW;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.NOT_STARTED;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.READY_TO_REVIEW;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.SUBMITTED_TO_GMC;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.*;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.*;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.DEFER;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.NON_ENGAGEMENT;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.REVALIDATE;
@@ -149,7 +145,8 @@ class RecommendationServiceTest {
   private String roEmailAddress;
   private String roUserName;
 
-  private Recommendation recommendation1, recommendation2, recommendation3, recommendation4, recommendation5;
+  private Recommendation recommendation1, recommendation2, recommendation3;
+  private Recommendation recommendation4;
   private DoctorsForDbDto docDto1;
 
   @BeforeEach
@@ -215,7 +212,6 @@ class RecommendationServiceTest {
     recommendation3.setOutcome(UNDER_REVIEW);
 
     recommendation4 = new Recommendation();
-    recommendation4.setOutcome(null);
   }
 
   @Test
@@ -746,7 +742,7 @@ class RecommendationServiceTest {
   void shouldMatchTisStatusCompletedToApproved() {
     when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber1))
             .thenReturn(Optional.of(recommendation1));
-    RecommendationStatus result = recommendationService.getGmcOutcomeForTrainee(gmcNumber1);
+    RecommendationStatus result = recommendationService.getRecommendationStatusForTrainee(gmcNumber1);
     assertThat(result, Matchers.is(RecommendationStatus.COMPLETED));
   }
 
@@ -754,7 +750,7 @@ class RecommendationServiceTest {
   void shouldMatchTisStatusCompletedToRejected() {
     when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber1))
             .thenReturn(Optional.of(recommendation2));
-    RecommendationStatus result = recommendationService.getGmcOutcomeForTrainee(gmcNumber1);
+    RecommendationStatus result = recommendationService.getRecommendationStatusForTrainee(gmcNumber1);
     assertThat(result, Matchers.is(RecommendationStatus.COMPLETED));
   }
 
@@ -762,7 +758,7 @@ class RecommendationServiceTest {
   void shouldMatchTisStatusUnderReviewToSubmittedToGmc() {
     when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber1))
             .thenReturn(Optional.of(recommendation3));
-    RecommendationStatus result = recommendationService.getGmcOutcomeForTrainee(gmcNumber1);
+    RecommendationStatus result = recommendationService.getRecommendationStatusForTrainee(gmcNumber1);
     assertThat(result, Matchers.is(SUBMITTED_TO_GMC));
   }
 
@@ -770,7 +766,7 @@ class RecommendationServiceTest {
   void shouldMatchTisStatusDefaultToNotStartedIfNull() {
     when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber1))
             .thenReturn(Optional.of(recommendation4));
-    RecommendationStatus result = recommendationService.getGmcOutcomeForTrainee(gmcNumber1);
+    RecommendationStatus result = recommendationService.getRecommendationStatusForTrainee(gmcNumber1);
     assertThat(result, Matchers.is(NOT_STARTED));
   }
 

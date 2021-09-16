@@ -151,13 +151,15 @@ public class RecommendationService {
             submissionDate));
       }
     }
+
+    doctorsForDBRepository.save(doctor);
+    recommendation.setActualSubmissionDate(now());
+    Recommendation recommendationToSave = recommendationRepository.save(recommendation);
     doctor.setLastUpdatedDate(now());
     doctor.setDoctorStatus(
             getRecommendationStatusForTrainee(recordDTO.getGmcNumber())
     );
-    doctorsForDBRepository.save(doctor);
-    recommendation.setActualSubmissionDate(now());
-    return recommendationRepository.save(recommendation);
+    return recommendationToSave;
   }
 
   //update an existing recommendation

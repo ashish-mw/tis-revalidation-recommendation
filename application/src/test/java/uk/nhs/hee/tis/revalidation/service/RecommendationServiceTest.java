@@ -146,7 +146,7 @@ class RecommendationServiceTest {
   private String roUserName;
 
   private Recommendation recommendation1, recommendation2, recommendation3;
-  private Recommendation recommendation4, recommendation5, recommendation6;
+  private Recommendation recommendation4;
   private DoctorsForDbDto docDto1;
 
   @BeforeEach
@@ -212,9 +212,6 @@ class RecommendationServiceTest {
     recommendation3.setOutcome(UNDER_REVIEW);
 
     recommendation4 = new Recommendation();
-
-    recommendation5 = new Recommendation();
-    recommendation5.setOutcome(UNDER_NOTICE);
   }
 
   @Test
@@ -771,14 +768,6 @@ class RecommendationServiceTest {
             .thenReturn(Optional.of(recommendation4));
     RecommendationStatus result = recommendationService.getRecommendationStatusForTrainee(gmcNumber1);
     assertThat(result, Matchers.is(NOT_STARTED));
-  }
-
-  @Test
-  void shouldMatchTisStatusDraftIfUnderNotice() {
-    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber1))
-            .thenReturn(Optional.of(recommendation5));
-    RecommendationStatus result = recommendationService.getRecommendationStatusForTrainee(gmcNumber1);
-    assertThat(result, Matchers.is(DRAFT));
   }
 
   private DoctorsForDB buildDoctorForDB(final String gmcId) {

@@ -29,6 +29,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.domain.Sort.by;
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.ON_HOLD;
 import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.YES;
+import static uk.nhs.hee.tis.revalidation.entity.UnderNotice.NO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,14 +90,14 @@ public class DoctorsForDBService {
   public void updateTrainee(final DoctorsForDbDto gmcDoctor) {
     final var doctorsForDB = DoctorsForDB.convert(gmcDoctor);
     final var doctor = doctorsRepository.findById(gmcDoctor.getGmcReferenceNumber());
-    if (doctor.isPresent()) {
-      doctorsForDB.setAdmin(doctor.get().getAdmin());
-      doctorsForDB.setDoctorStatus(
-        recommendationService.getRecommendationStatusForTrainee(gmcDoctor.getGmcReferenceNumber())
-      );
+    if (!doctor.isPresent() || gmcDoctor.getUnderNotice().equals(NO.value())) {
+      doctorsForDB.setDoctorStatus(RecommendationStatus.NOT_STARTED);
     }
     else {
-      doctorsForDB.setDoctorStatus(RecommendationStatus.NOT_STARTED);
+      doctorsForDB.setAdmin(doctor.get().getAdmin());
+        doctorsForDB.setDoctorStatus(
+          recommendationService.getRecommendationStatusForTrainee(gmcDoctor.getGmcReferenceNumber())
+        );
     }
     doctorsRepository.save(doctorsForDB);
   }

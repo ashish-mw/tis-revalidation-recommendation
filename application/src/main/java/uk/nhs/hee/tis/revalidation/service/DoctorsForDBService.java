@@ -90,14 +90,19 @@ public class DoctorsForDBService {
   public void updateTrainee(final DoctorsForDbDto gmcDoctor) {
     final var doctorsForDB = DoctorsForDB.convert(gmcDoctor);
     final var doctor = doctorsRepository.findById(gmcDoctor.getGmcReferenceNumber());
-    if (!doctor.isPresent() || gmcDoctor.getUnderNotice().equals(NO.value())) {
-      doctorsForDB.setDoctorStatus(RecommendationStatus.NOT_STARTED);
-    }
-    else {
+    if (doctor.isPresent() ) {
       doctorsForDB.setAdmin(doctor.get().getAdmin());
+      if(gmcDoctor.getUnderNotice().equals(NO.value())) {
+        doctorsForDB.setDoctorStatus(RecommendationStatus.COMPLETED);
+      }
+      else {
         doctorsForDB.setDoctorStatus(
           recommendationService.getRecommendationStatusForTrainee(gmcDoctor.getGmcReferenceNumber())
         );
+      }
+    }
+    else {
+      doctorsForDB.setDoctorStatus(RecommendationStatus.NOT_STARTED);
     }
     doctorsRepository.save(doctorsForDB);
   }

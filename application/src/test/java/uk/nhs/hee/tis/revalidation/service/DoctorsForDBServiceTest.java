@@ -444,12 +444,12 @@ class DoctorsForDBServiceTest {
   }
 
   @Test
-  void shouldSetTisStatusToNotStartedForDoctorOnUpdateIfNotUnderNotice() {
+  void shouldSetTisStatusToCompletedForDoctorOnUpdateIfNotUnderNotice() {
 
     when(repository.findById(gmcRef1)).thenReturn(Optional.of(doc1));
     doctorsForDBService.updateTrainee(docDto2);
     verify(repository).save(doctorCaptor.capture());
-    assertThat(doctorCaptor.getValue().getDoctorStatus(), is(RecommendationStatus.NOT_STARTED));
+    assertThat(doctorCaptor.getValue().getDoctorStatus(), is(RecommendationStatus.COMPLETED));
   }
 
 

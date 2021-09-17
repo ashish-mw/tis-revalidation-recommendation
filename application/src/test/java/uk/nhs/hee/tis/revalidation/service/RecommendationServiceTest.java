@@ -146,7 +146,7 @@ class RecommendationServiceTest {
   private String roUserName;
 
   private Recommendation recommendation1, recommendation2, recommendation3;
-  private Recommendation recommendation4;
+  private Recommendation recommendation4, recommendation5;
   private DoctorsForDbDto docDto1;
 
   @BeforeEach
@@ -203,15 +203,21 @@ class RecommendationServiceTest {
     roPhoneNumber = faker.phoneNumber().phoneNumber();
 
     recommendation1 = new Recommendation();
+    recommendation1.setRecommendationType(REVALIDATE);
     recommendation1.setOutcome(APPROVED);
 
     recommendation2 = new Recommendation();
+    recommendation2.setRecommendationType(REVALIDATE);
     recommendation2.setOutcome(REJECTED);
 
     recommendation3 = new Recommendation();
+    recommendation3.setRecommendationType(REVALIDATE);
     recommendation3.setOutcome(UNDER_REVIEW);
 
     recommendation4 = new Recommendation();
+    recommendation4.setRecommendationType(REVALIDATE);
+
+    recommendation5 = new Recommendation();
   }
 
   @Test
@@ -763,9 +769,17 @@ class RecommendationServiceTest {
   }
 
   @Test
-  void shouldMatchTisStatusDefaultToNotStartedIfNull() {
+  void shouldMatchTisStatusDraftToNonNullTypeAndNullOutcome() {
     when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber1))
             .thenReturn(Optional.of(recommendation4));
+    RecommendationStatus result = recommendationService.getRecommendationStatusForTrainee(gmcNumber1);
+    assertThat(result, Matchers.is(DRAFT));
+  }
+
+  @Test
+  void shouldMatchTisStatusToNotStartedIfTypeAndOutcomeNull() {
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber1))
+            .thenReturn(Optional.of(recommendation5));
     RecommendationStatus result = recommendationService.getRecommendationStatusForTrainee(gmcNumber1);
     assertThat(result, Matchers.is(NOT_STARTED));
   }

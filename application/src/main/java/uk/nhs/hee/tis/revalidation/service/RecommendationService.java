@@ -235,10 +235,15 @@ public class RecommendationService {
   public RecommendationStatus getRecommendationStatusForTrainee(String gmcId) {
     TraineeRecommendationRecordDto recommendation = getLatestRecommendation(gmcId);
     String outcome = recommendation.getGmcOutcome();
-    //if no recommendations previously saved
-    if(outcome == null) return RecommendationStatus.NOT_STARTED;
+    String type = recommendation.getRecommendationType();
 
-    if(outcome.equals(APPROVED.getOutcome())
+    if(outcome == null && type == null) {
+      return RecommendationStatus.NOT_STARTED;
+    }
+    else if(outcome == null) {
+      return RecommendationStatus.DRAFT;
+    }
+    else if(outcome.equals(APPROVED.getOutcome())
             || outcome.equals(REJECTED.getOutcome())
     ) {
       return RecommendationStatus.COMPLETED;
@@ -246,7 +251,9 @@ public class RecommendationService {
     else if(outcome.equals(UNDER_REVIEW.getOutcome())) {
       return RecommendationStatus.SUBMITTED_TO_GMC;
     }
-    return RecommendationStatus.DRAFT;
+    else {
+      return RecommendationStatus.DRAFT;
+    }
   }
 
   private List<TraineeRecommendationRecordDto> getCurrentAndLegacyRecommendation(

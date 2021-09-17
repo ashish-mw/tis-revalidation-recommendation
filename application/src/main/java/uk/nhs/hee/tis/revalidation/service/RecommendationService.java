@@ -235,8 +235,9 @@ public class RecommendationService {
   public RecommendationStatus getRecommendationStatusForTrainee(String gmcId) {
     TraineeRecommendationRecordDto recommendation = getLatestRecommendation(gmcId);
     String outcome = recommendation.getGmcOutcome();
+    String type = recommendation.getRecommendationType();
     //if no recommendations previously saved
-    if(outcome == null) return RecommendationStatus.NOT_STARTED;
+    if(outcome == null && type == null) return RecommendationStatus.NOT_STARTED;
 
     if(outcome.equals(APPROVED.getOutcome())
             || outcome.equals(REJECTED.getOutcome())

@@ -152,13 +152,13 @@ public class RecommendationService {
       }
     }
 
-    doctorsForDBRepository.save(doctor);
     recommendation.setActualSubmissionDate(now());
     Recommendation recommendationToSave = recommendationRepository.save(recommendation);
     doctor.setLastUpdatedDate(now());
     doctor.setDoctorStatus(
             getRecommendationStatusForTrainee(recordDTO.getGmcNumber())
     );
+    doctorsForDBRepository.save(doctor);
     return recommendationToSave;
   }
 

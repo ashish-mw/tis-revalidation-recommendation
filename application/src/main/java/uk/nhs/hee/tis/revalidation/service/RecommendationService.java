@@ -182,6 +182,11 @@ public class RecommendationService {
         userProfileDto);
     final var tryRecommendationV2Result = tryRecommendationV2Response
         .getTryRecommendationV2Result();
+    if(!userProfileDto.getDesignatedBodyCodes().contains(doctorsForDB.get().getDesignatedBodyCode())) {
+      throw new RecommendationException(
+        "Failed to submit recommendation: unauthorised designated body code"
+      );
+    }
     if (tryRecommendationV2Result != null) {
       log.info("Receive response for submit request for gmcId: {} with return code: {}",
           doctor.getGmcReferenceNumber(), tryRecommendationV2Result.getReturnCode());

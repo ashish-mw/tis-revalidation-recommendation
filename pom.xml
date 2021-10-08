@@ -41,7 +41,7 @@
         </sonar.java.checkstyle.reportPaths>
         <commons-collections4.version>4.4</commons-collections4.version>
         <spring-cloud-starter.version>2.3.2</spring-cloud-starter.version>
-        <mockito-inline.version>3.11.2</mockito-inline.version>
+        <mockito-inline.version>4.0.0</mockito-inline.version>
     </properties>
 
     <dependencyManagement>

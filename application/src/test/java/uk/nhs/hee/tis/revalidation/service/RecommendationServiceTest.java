@@ -79,7 +79,7 @@ class RecommendationServiceTest {
   private final Faker faker = new Faker();
 
   @InjectMocks
-  private RecommendationService recommendationService;
+  private RecommendationServiceImpl recommendationService;
 
   @Mock
   private RecommendationRepository recommendationRepository;

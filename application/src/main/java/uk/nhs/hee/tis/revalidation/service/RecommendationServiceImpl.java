@@ -104,59 +104,66 @@ public class RecommendationServiceImpl implements RecommendationService {
     isAllowedToCreateNewRecommendation(recordDTO.getGmcNumber(), recordDTO.getRecommendationId());
 
     final var doctorsForDB = doctorsForDBRepository.findById(recordDTO.getGmcNumber());
-    final var doctor = doctorsForDB.get();
-    final var submissionDate = doctor.getSubmissionDate();
+    if(doctorsForDB.isPresent()) {
+      final var doctor = doctorsForDB.get();
+      final var submissionDate = doctor.getSubmissionDate();
 
-    final var recommendationType = RecommendationType.valueOf(recordDTO.getRecommendationType());
-    Recommendation recommendation = null;
+      final var recommendationType = RecommendationType.valueOf(recordDTO.getRecommendationType());
+      Recommendation recommendation = null;
 
-    if (REVALIDATE.equals(recommendationType) || NON_ENGAGEMENT.equals(recommendationType)) {
-      recommendation = Recommendation.builder()
-              .id(recordDTO.getRecommendationId())
-              .gmcNumber(recordDTO.getGmcNumber())
-              .recommendationType(recommendationType)
-              .recommendationStatus(READY_TO_REVIEW)
-              .comments(recordDTO.getComments())
-              .gmcSubmissionDate(submissionDate)
-              .admin(recordDTO.getAdmin())
-              .build();
-    } else {
-      final var deferralDate = recordDTO.getDeferralDate();
-      final var validateDeferralDate = validateDeferralDate(deferralDate, submissionDate);
-      final var deferralReason = deferralReasonService
-              .getDeferralReasonByCode(recordDTO.getDeferralReason());
-      final var deferralSubReason = deferralReason
-              .getSubReasonByCode(recordDTO.getDeferralSubReason());
-      final var deferralSubReasonCode =
-              deferralSubReason != null ? deferralSubReason.getCode() : null;
-      if (validateDeferralDate) {
+      if (REVALIDATE.equals(recommendationType) || NON_ENGAGEMENT.equals(recommendationType)) {
         recommendation = Recommendation.builder()
                 .id(recordDTO.getRecommendationId())
                 .gmcNumber(recordDTO.getGmcNumber())
-                .comments(recordDTO.getComments())
                 .recommendationType(recommendationType)
                 .recommendationStatus(READY_TO_REVIEW)
-                .deferralDate(recordDTO.getDeferralDate())
-                .deferralReason(deferralReason.getCode())
-                .deferralSubReason(deferralSubReasonCode)
+                .comments(recordDTO.getComments())
                 .gmcSubmissionDate(submissionDate)
                 .admin(recordDTO.getAdmin())
                 .build();
       } else {
-        throw new RecommendationException(format(
-                "Deferral date is invalid, should be in between of 60 and 365 days of Gmc Submission Date: %s",
-                submissionDate));
+        final var deferralDate = recordDTO.getDeferralDate();
+        final var validateDeferralDate = validateDeferralDate(deferralDate, submissionDate);
+        final var deferralReason = deferralReasonService
+                .getDeferralReasonByCode(recordDTO.getDeferralReason());
+        final var deferralSubReason = deferralReason
+                .getSubReasonByCode(recordDTO.getDeferralSubReason());
+        final var deferralSubReasonCode =
+                deferralSubReason != null ? deferralSubReason.getCode() : null;
+        if (validateDeferralDate) {
+          recommendation = Recommendation.builder()
+                  .id(recordDTO.getRecommendationId())
+                  .gmcNumber(recordDTO.getGmcNumber())
+                  .comments(recordDTO.getComments())
+                  .recommendationType(recommendationType)
+                  .recommendationStatus(READY_TO_REVIEW)
+                  .deferralDate(recordDTO.getDeferralDate())
+                  .deferralReason(deferralReason.getCode())
+                  .deferralSubReason(deferralSubReasonCode)
+                  .gmcSubmissionDate(submissionDate)
+                  .admin(recordDTO.getAdmin())
+                  .build();
+        } else {
+          throw new RecommendationException(format(
+                  "Deferral date is invalid, should be in between of 60 and 365 days of Gmc Submission Date: %s",
+                  submissionDate));
+        }
       }
-    }
 
-    recommendation.setActualSubmissionDate(now());
-    Recommendation recommendationToSave = recommendationRepository.save(recommendation);
-    doctor.setLastUpdatedDate(now());
-    doctor.setDoctorStatus(
-            getRecommendationStatusForTrainee(recordDTO.getGmcNumber())
-    );
-    doctorsForDBRepository.save(doctor);
-    return recommendationToSave;
+      recommendation.setActualSubmissionDate(now());
+      Recommendation recommendationToSave = recommendationRepository.save(recommendation);
+      doctor.setLastUpdatedDate(now());
+      doctor.setDoctorStatus(
+              getRecommendationStatusForTrainee(recordDTO.getGmcNumber())
+      );
+      doctorsForDBRepository.save(doctor);
+      return recommendationToSave;
+    }
+    else {
+      throw new RecommendationException(format(
+        "Doctor %s does not exist!", recordDTO.getGmcNumber())
+      );
+    }
   }
 
   //update an existing recommendation
@@ -174,35 +181,42 @@ public class RecommendationServiceImpl implements RecommendationService {
     final var recommendation = recommendationRepository
             .findByIdAndGmcNumber(recommendationId, gmcNumber);
 
-    final var doctor = doctorsForDB.get();
-    final var tryRecommendationV2Response = gmcClientService.submitToGmc(doctor, recommendation,
-            userProfileDto);
-    final var tryRecommendationV2Result = tryRecommendationV2Response
-            .getTryRecommendationV2Result();
-    if (tryRecommendationV2Result != null) {
-      RecommendationServiceImpl.log.info("Receive response for submit request for gmcId: {} with return code: {}",
-              doctor.getGmcReferenceNumber(), tryRecommendationV2Result.getReturnCode());
-      final var returnCode = tryRecommendationV2Result.getReturnCode();
-      if (SUCCESS.getCode().equals(returnCode)) {
-        recommendation.setRecommendationStatus(SUBMITTED_TO_GMC);
-        recommendation.setOutcome(UNDER_REVIEW);
-        recommendation.setActualSubmissionDate(now());
-        recommendation.setGmcRevalidationId(tryRecommendationV2Result.getRecommendationID());
-        recommendationRepository.save(recommendation);
-        doctor.setLastUpdatedDate(now());
-        doctor.setDoctorStatus(
-                getRecommendationStatusForTrainee(gmcNumber)
-        );
-        doctorsForDBRepository.save(doctor);
-        return true;
-      } else {
-        final var responseCode = fromCode(returnCode);
-        RecommendationServiceImpl.log.error(
-                "Submission of recommendation to GMC is failed for GmcId: {} and RecommendationId: {}. Gmc response is: {}",
-                gmcNumber, recommendation.getId(), responseCode.getMessage());
-        throw new RecommendationException(
-                format("Fail to submit recommendation: %s", responseCode.getMessage()));
+    if(doctorsForDB.isPresent()) {
+      final var doctor = doctorsForDB.get();
+
+      final var tryRecommendationV2Response = gmcClientService.submitToGmc(doctor, recommendation,
+              userProfileDto);
+      final var tryRecommendationV2Result = tryRecommendationV2Response
+              .getTryRecommendationV2Result();
+      if (tryRecommendationV2Result != null) {
+        RecommendationServiceImpl.log.info("Receive response for submit request for gmcId: {} with return code: {}",
+                doctor.getGmcReferenceNumber(), tryRecommendationV2Result.getReturnCode());
+        final var returnCode = tryRecommendationV2Result.getReturnCode();
+        if (SUCCESS.getCode().equals(returnCode)) {
+          recommendation.setRecommendationStatus(SUBMITTED_TO_GMC);
+          recommendation.setOutcome(UNDER_REVIEW);
+          recommendation.setActualSubmissionDate(now());
+          recommendation.setGmcRevalidationId(tryRecommendationV2Result.getRecommendationID());
+          recommendationRepository.save(recommendation);
+          doctor.setLastUpdatedDate(now());
+          doctor.setDoctorStatus(
+                  getRecommendationStatusForTrainee(gmcNumber)
+          );
+          doctorsForDBRepository.save(doctor);
+          return true;
+        } else {
+          final var responseCode = fromCode(returnCode);
+          RecommendationServiceImpl.log.error(
+                  "Submission of recommendation to GMC is failed for GmcId: {} and RecommendationId: {}. Gmc response is: {}",
+                  gmcNumber, recommendation.getId(), responseCode.getMessage());
+          throw new RecommendationException(
+                  format("Fail to submit recommendation: %s", responseCode.getMessage()));
+        }
       }
+    } else {
+      throw new RecommendationException(format(
+              "Doctor %s does not exist!", gmcNumber)
+      );
     }
     return false;
   }

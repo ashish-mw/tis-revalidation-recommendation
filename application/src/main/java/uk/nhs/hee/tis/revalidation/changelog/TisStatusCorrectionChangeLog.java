@@ -40,7 +40,7 @@ import uk.nhs.hee.tis.revalidation.util.DateUtil;
 @Slf4j
 public class TisStatusCorrectionChangeLog {
 
-    @ChangeSet(order = "001", id = "insertCorrectTisStatuses", author = "")
+    @ChangeSet(order = "001", id = "insertCorrectTisStatuses", author = "", runAlways = true)
     public void correctTisStatuses(
             DoctorsForDBRepository doctorsForDBRepository,
             RecommendationService recommendationService

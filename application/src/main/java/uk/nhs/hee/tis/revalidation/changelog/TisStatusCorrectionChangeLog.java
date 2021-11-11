@@ -21,8 +21,6 @@
 
 package uk.nhs.hee.tis.revalidation.changelog;
 
-
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
 
@@ -30,7 +28,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.service.RecommendationService;
@@ -40,7 +37,7 @@ import uk.nhs.hee.tis.revalidation.util.DateUtil;
 @Slf4j
 public class TisStatusCorrectionChangeLog {
 
-    @ChangeSet(order = "001", id = "insertCorrectTisStatuses", author = "", runAlways = true)
+    @ChangeSet(order = "001", id = "insertCorrectTisStatuses", author = "")
     public void correctTisStatuses(
             DoctorsForDBRepository doctorsForDBRepository,
             RecommendationService recommendationService
@@ -48,7 +45,6 @@ public class TisStatusCorrectionChangeLog {
        DateUtil.convertDateInGmcFormat(LocalDate.now());
         List<DoctorsForDB> doctors = doctorsForDBRepository.findAll();
         doctors.forEach(doctor -> {
-            log.error(recommendationService.getRecommendationStatusForTrainee(doctor.getGmcReferenceNumber()).toString());
             doctor.setDoctorStatus(
                 recommendationService.getRecommendationStatusForTrainee(doctor.getGmcReferenceNumber())
             );

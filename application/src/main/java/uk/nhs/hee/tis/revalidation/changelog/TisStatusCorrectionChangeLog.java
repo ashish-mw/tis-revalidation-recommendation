@@ -33,7 +33,7 @@ import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.service.RecommendationService;
 import uk.nhs.hee.tis.revalidation.util.DateUtil;
 
-@ChangeLog
+@ChangeLog(order = "002")
 @Slf4j
 public class TisStatusCorrectionChangeLog {
 

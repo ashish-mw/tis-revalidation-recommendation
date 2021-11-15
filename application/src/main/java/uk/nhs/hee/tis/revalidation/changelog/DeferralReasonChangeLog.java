@@ -29,7 +29,7 @@ import java.util.Set;
 import uk.nhs.hee.tis.revalidation.entity.DeferralReason;
 import uk.nhs.hee.tis.revalidation.entity.Status;
 
-@ChangeLog
+@ChangeLog(order = "001")
 public class DeferralReasonChangeLog {
 
   @ChangeSet(order = "001", id = "insertInitialDeferralReason", author = "")

@@ -306,7 +306,7 @@ class RecommendationServiceTest {
   }
 
   @Test
-  void shouldUpdateSnapshotIfRecommendationStatusBecomeApprove() throws ParseException {
+  void shouldUpdateSnapshotAndDoctorIfRecommendationStatusBecomeApprove() {
     final var gmcId = faker.number().digits(7);
     final var doctorsForDB = buildDoctorForDB(gmcId);
     when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
@@ -317,6 +317,7 @@ class RecommendationServiceTest {
     when(gmcClientService.checkRecommendationStatus(gmcNumber1,
         gmcRecommendationId2, recommendationId, designatedBodyCode)).thenReturn(APPROVED);
     when(deferralReasonService.getAllCurrentDeferralReasons()).thenReturn(deferralReasons);
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcId))
 
     when(snapshot1.getAdmin()).thenReturn(admin1);
     when(snapshot1.getGmcNumber()).thenReturn(gmcId);
@@ -366,6 +367,7 @@ class RecommendationServiceTest {
 
     verify(recommendationRepository).save(recommendation1);
     verify(snapshotService).saveRecommendationToSnapshot(recommendation1);
+    verify(doctorsForDBRepository).save(doctorsForDB);
   }
 
   @Test

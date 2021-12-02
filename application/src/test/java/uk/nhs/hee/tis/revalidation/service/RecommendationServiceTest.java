@@ -318,6 +318,7 @@ class RecommendationServiceTest {
         gmcRecommendationId2, recommendationId, designatedBodyCode)).thenReturn(APPROVED);
     when(deferralReasonService.getAllCurrentDeferralReasons()).thenReturn(deferralReasons);
     when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcId))
+        .thenReturn(Optional.of(recommendation1));
 
     when(snapshot1.getAdmin()).thenReturn(admin1);
     when(snapshot1.getGmcNumber()).thenReturn(gmcId);
@@ -368,6 +369,7 @@ class RecommendationServiceTest {
     verify(recommendationRepository).save(recommendation1);
     verify(snapshotService).saveRecommendationToSnapshot(recommendation1);
     verify(doctorsForDBRepository).save(doctorsForDB);
+    assertThat(doctorsForDB.getDoctorStatus(), is(COMPLETED));
   }
 
   @Test

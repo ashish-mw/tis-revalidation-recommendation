@@ -146,7 +146,7 @@ class RecommendationServiceTest {
   private String roUserName;
 
   private Recommendation recommendation1, recommendation2, recommendation3;
-  private Recommendation recommendation4, recommendation5;
+  private Recommendation recommendation4, recommendation5, recommendation6;
   private DoctorsForDbDto docDto1;
 
   @BeforeEach
@@ -382,6 +382,8 @@ class RecommendationServiceTest {
         .thenReturn(List.of(buildRecommendation(gmcId, newRecommendationId,
             SUBMITTED_TO_GMC, REVALIDATE, UNDER_REVIEW)));
     when(deferralReasonService.getAllCurrentDeferralReasons()).thenReturn(deferralReasons);
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcId))
+            .thenReturn(Optional.of(recommendation3));
 
     when(snapshot1.getAdmin()).thenReturn(admin1);
     when(snapshot1.getDeferralComment()).thenReturn(deferralComment1);
@@ -424,6 +426,8 @@ class RecommendationServiceTest {
     assertThat(revalidationDTO.getActualSubmissionDate(), is(formatDate(acutalSubmissionDate1)));
     assertThat(revalidationDTO.getGmcRevalidationId(), is(gmcRecommendationId1));
     assertThat(revalidationDTO.getRecommendationId(), is(recommendationId));
+    verify(doctorsForDBRepository).save(doctorsForDB);
+    assertThat(doctorsForDB.getDoctorStatus(), is(SUBMITTED_TO_GMC));
   }
 
   @Test

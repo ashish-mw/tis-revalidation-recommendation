@@ -93,7 +93,8 @@ public class RecommendationServiceImpl implements RecommendationService {
               .designatedBody(doctorsForDB.getDesignatedBodyCode())
               .gmcSubmissionDate(doctorsForDB.getSubmissionDate())
               .revalidations(getCurrentAndLegacyRecommendation(doctorsForDB))
-              .deferralReasons(deferralReasonService.getAllCurrentDeferralReasons()).build();
+              .deferralReasons(deferralReasonService.getAllCurrentDeferralReasons())
+              .build();
     }
 
     return null;
@@ -271,8 +272,14 @@ public class RecommendationServiceImpl implements RecommendationService {
       final DoctorsForDB doctorsForDB) {
     final var gmcNumber = doctorsForDB.getGmcReferenceNumber();
     checkRecommendationStatus(gmcNumber, doctorsForDB.getDesignatedBodyCode());
-    log.info("Fetching snapshot record for GmcId: {}", gmcNumber);
 
+    final var newRecommendationStatus  = getRecommendationStatusForTrainee(gmcNumber);
+    if(!newRecommendationStatus.equals(doctorsForDB.getDoctorStatus())){
+      doctorsForDB.setDoctorStatus(newRecommendationStatus );
+      doctorsForDBRepository.save(doctorsForDB);
+    }
+
+    log.info("Fetching snapshot record for GmcId: {}", gmcNumber);
     final var recommendations = recommendationRepository.findByGmcNumber(gmcNumber);
     final var currentRecommendations = recommendations.stream().map(rec ->
       buildTraineeRecommendationRecordDto(gmcNumber, doctorsForDB.getSubmissionDate(), rec)

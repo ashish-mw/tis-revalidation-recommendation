@@ -272,11 +272,14 @@ public class RecommendationServiceImpl implements RecommendationService {
       final DoctorsForDB doctorsForDB) {
     final var gmcNumber = doctorsForDB.getGmcReferenceNumber();
     checkRecommendationStatus(gmcNumber, doctorsForDB.getDesignatedBodyCode());
+
+    final var newRecommendationStatus  = getRecommendationStatusForTrainee(gmcNumber);
+    if(!newRecommendationStatus.equals(doctorsForDB.getDoctorStatus())){
+      doctorsForDB.setDoctorStatus(newRecommendationStatus );
+      doctorsForDBRepository.save(doctorsForDB);
+    }
+
     log.info("Fetching snapshot record for GmcId: {}", gmcNumber);
-
-    doctorsForDB.setDoctorStatus(getRecommendationStatusForTrainee(gmcNumber));
-    doctorsForDBRepository.save(doctorsForDB);
-
     final var recommendations = recommendationRepository.findByGmcNumber(gmcNumber);
     final var currentRecommendations = recommendations.stream().map(rec ->
       buildTraineeRecommendationRecordDto(gmcNumber, doctorsForDB.getSubmissionDate(), rec)

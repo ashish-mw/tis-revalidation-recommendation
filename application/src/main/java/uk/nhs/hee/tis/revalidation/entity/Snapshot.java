@@ -27,6 +27,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * A point in time record of a trainee's Revalidation with the GMC.
+ * It contains a {@link SnapshotRevalidation} and Trainee identifiers
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -109,7 +110,7 @@ class RecommendationIT extends BaseIT {
   private Snapshot snapshot1, snapshot2;
   private SnapshotRevalidation snapshotRevalidation1, snapshotRevalidation2;
 
-  @BeforeEach
+  @BeforeAll
   public void setup() {
     doctorsForDBRepository.deleteAll();
     snapshotRepository.deleteAll();

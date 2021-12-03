@@ -502,8 +502,6 @@ class RecommendationServiceTest {
 
     when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
     when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
-    when(deferralReasonService.getDeferralReasonByCode(deferralReason1)).thenReturn(deferralReason);
-    when(deferralReason.getSubReasonByCode(deferralSubReason1)).thenReturn(deferralSubReason);
 
     assertThrows(RecommendationException.class,
         () -> recommendationService.saveRecommendation(recordDTO));
@@ -517,8 +515,6 @@ class RecommendationServiceTest {
 
     when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
     when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
-    when(deferralReasonService.getDeferralReasonByCode(deferralReason1)).thenReturn(deferralReason);
-    when(deferralReason.getSubReasonByCode(deferralSubReason1)).thenReturn(deferralSubReason);
 
     assertThrows(RecommendationException.class,
         () -> recommendationService.saveRecommendation(recordDTO));

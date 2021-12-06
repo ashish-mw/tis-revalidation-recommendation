@@ -27,7 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.nhs.hee.tis.revalidation.dto.ConnectionMessageDto;
 import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
+import uk.nhs.hee.tis.revalidation.dto.RecommendationStatusCheckDto;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
+import uk.nhs.hee.tis.revalidation.service.RecommendationTisStatusUpdateService;
 
 @Slf4j
 @Component
@@ -35,6 +37,9 @@ public class RabbitMessageListener {
 
   @Autowired
   private DoctorsForDBService doctorsForDBService;
+
+  @Autowired
+  private RecommendationTisStatusUpdateService recommendationTisStatusUpdateService;
 
   @RabbitListener(queues = "${app.rabbit.queue}")
   public void receivedMessage(final DoctorsForDbDto gmcDoctor) {
@@ -48,4 +53,10 @@ public class RabbitMessageListener {
     doctorsForDBService.removeDesignatedBodyCode(message);
   }
 
+  @RabbitListener(queues = "${app.rabbit.reval.queue.recommendationStatusCheck.updated}")
+  public void receiveMessageForRecommendationStatusUpdate(
+      final RecommendationStatusCheckDto recommendationStatusCheckDto) {
+    recommendationTisStatusUpdateService
+        .updateRecommendationAndTisStatus(recommendationStatusCheckDto);
+  }
 }

@@ -95,7 +95,6 @@ public class RabbitConfig {
         .with(recommendationGmcSyncStartKey);
   }
 
-
   @Bean
   public Binding binding(final Queue queue, final DirectExchange exchange) {
     return BindingBuilder.bind(queue).to(exchange).with(routingKey);

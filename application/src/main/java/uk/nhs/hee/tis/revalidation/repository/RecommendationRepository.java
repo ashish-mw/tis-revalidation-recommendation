@@ -30,6 +30,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import uk.nhs.hee.tis.revalidation.entity.Recommendation;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 
 @Repository
 public interface RecommendationRepository extends MongoRepository<Recommendation, String> {
@@ -46,4 +47,6 @@ public interface RecommendationRepository extends MongoRepository<Recommendation
 
   List<Recommendation> findAllByGmcNumberAndOutcomeNotIn(final String gmcNumber,
       final RecommendationGmcOutcome... outcome);
+
+  List<Recommendation> findAllByRecommendationStatus(final RecommendationStatus recommendationStatus);
 }

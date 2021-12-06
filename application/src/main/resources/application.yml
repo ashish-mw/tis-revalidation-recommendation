@@ -66,7 +66,9 @@ app:
     reval.exchange: ${REVAL_RABBIT_EXCHANGE:reval.exchange}
     reval.queue.recommendation.syncstart: ${REVAL_RABBIT_RECOMMENDATION_SYNC_START_QUEUE:reval.queue.recommendation.syncstart}
     reval.routingKey.recommendation.syncstart: ${REVAL_RABBIT_RECOMMENDATION_SYNCSTART_ROUTING_KEY:reval.recommendation.syncstart}
-
+    reval.exchange.recommendationstatuscheck: ${REVAL_RABBIT_EXCHANGE_RECOMMENDATION_STATUS_CHECK:reval.exchange.recommendationstatuscheck}
+    reval.queue.recommendationstatuscheck.requested.gmcclient: ${REVAL_RABBIT_RECOMMENDATION_STATUS_CHECK_REQUESTED_GMCCLIENT_QUEUE:reval.queue.recommendationstatuscheck.requested.gmcclient}
+    reval.routingKey.recommendationstatuscheck.requested: ${REVAL_RABBIT_RECOMMENDATION_STATUS_CHECK_REQUESTED_ROUTING_KEY:reval.recommendationstatuscheck.requested}
 
   gmc:
     url: ${GMC_CONNECT_URL:http://localhost:8090/GMCConnectMock2020/GMCWebServices}
@@ -74,6 +76,7 @@ app:
     gmcUsername: ${GMC_USER_NAME:guest}
     gmcPassword: ${GMC_PASSWORD:guest}
     designatedBodies: ${DESIGNATED_BODY_CODE:1-AIIDHJ,1-AIIDMQ,1-AIIDNQ,1-AIIDMY,1-AIIDQQ,1-AIIDWT,1-AIIDR8,1-AIIDSA,1-AIIDH1,1-AIIDWA,1-AIIDVS,1-AIIDWI,1-AIIDSI}
+    cronExpression: ${CRON_EXPRESSION:0 0 * * * *}
 
 sentry:
   dsn: ${SENTRY_DSN:}

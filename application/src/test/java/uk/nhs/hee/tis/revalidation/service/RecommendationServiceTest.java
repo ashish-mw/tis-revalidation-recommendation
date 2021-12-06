@@ -48,6 +48,7 @@ import static uk.nhs.hee.tis.revalidation.util.DateUtil.formatDateTime;
 
 import com.github.javafaker.Faker;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,6 +60,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationResponseCT;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationV2Response;
 import uk.nhs.hee.tis.revalidation.dto.DeferralReasonDto;
+import uk.nhs.hee.tis.revalidation.dto.RecommendationStatusCheckDto;
 import uk.nhs.hee.tis.revalidation.dto.RoUserProfileDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
 import uk.nhs.hee.tis.revalidation.entity.DeferralReason;
@@ -829,6 +831,38 @@ class RecommendationServiceTest {
     RecommendationStatus result = recommendationService
         .getRecommendationStatusForTrainee(gmcNumber1);
     assertThat(result, is(NOT_STARTED));
+  }
+
+  @Test
+  void shouldGetRecommendationStatusCheckDtos() {
+    final var gmcId = faker.number().digits(7);
+    final var doctorsForDB = buildDoctorForDB(gmcId, SUBMITTED_TO_GMC);
+    final var recommendation = buildRecommendation(gmcId, recommendationId, SUBMITTED_TO_GMC,
+        UNDER_REVIEW);
+
+    when(recommendationRepository.findAllByRecommendationStatus(RecommendationStatus.SUBMITTED_TO_GMC))
+        .thenReturn(Arrays.asList(recommendation));
+    when(doctorsForDBRepository.findById(recommendation.getGmcNumber())).thenReturn(Optional.of(doctorsForDB));
+    List<RecommendationStatusCheckDto> result = recommendationService.getRecommendationStatusCheckDtos();
+    assertThat(result.size(), is(1));
+    assertThat(result.get(0).getDesignatedBodyId(), is(designatedBodyCode));
+    assertThat(result.get(0).getGmcReferenceNumber(), is(gmcId));
+    assertThat(result.get(0).getGmcRecommendationId(), is(gmcRecommendationId2));
+    assertThat(result.get(0).getRecommendationId(), is(recommendationId));
+    assertThat(result.get(0).getOutcome(), is(nullValue()));
+  }
+
+  @Test
+  void shouldNotGetRecommendationStatusCheckDtosIfNoDoctorsForDbMatched() {
+    final var gmcId = faker.number().digits(7);
+    final var recommendation = buildRecommendation(gmcId, recommendationId, SUBMITTED_TO_GMC,
+        UNDER_REVIEW);
+
+    when(recommendationRepository.findAllByRecommendationStatus(RecommendationStatus.SUBMITTED_TO_GMC))
+        .thenReturn(Arrays.asList(recommendation));
+    when(doctorsForDBRepository.findById(recommendation.getGmcNumber())).thenReturn(Optional.empty());
+    List<RecommendationStatusCheckDto> result = recommendationService.getRecommendationStatusCheckDtos();
+    assertThat(result.size(), is(0));
   }
 
   private DoctorsForDB buildDoctorForDB(final String gmcId,

@@ -34,6 +34,7 @@ import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.READY_TO_R
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.SUBMITTED_TO_GMC;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,6 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.nhs.hee.tis.revalidation.dto.RecommendationStatusCheckDto;
 import uk.nhs.hee.tis.revalidation.dto.RoUserProfileDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
@@ -292,6 +294,30 @@ public class RecommendationServiceImpl implements RecommendationService {
     } else {
       return RecommendationStatus.DRAFT;
     }
+  }
+
+  /**
+   * Get recommendation status check dtos
+   *
+   * @return A list of submitted to gmc recommendation
+   */
+  public List<RecommendationStatusCheckDto> getRecommendationStatusCheckDtos() {
+    List<RecommendationStatusCheckDto> recommendationStatusCheckDtos = new ArrayList<>();
+    List<Recommendation> recommendations = recommendationRepository
+        .findAllByRecommendationStatus(RecommendationStatus.SUBMITTED_TO_GMC);
+    recommendations.forEach(rec -> {
+      final var doctorsForDB = doctorsForDBRepository.findById(rec.getGmcNumber());
+      if (doctorsForDB.isPresent()) {
+        final var recommendationStatusDto = RecommendationStatusCheckDto.builder()
+            .designatedBodyId(doctorsForDB.get().getDesignatedBodyCode())
+            .gmcReferenceNumber(rec.getGmcNumber())
+            .gmcRecommendationId(rec.getGmcRevalidationId())
+            .recommendationId(rec.getId())
+            .build();
+        recommendationStatusCheckDtos.add(recommendationStatusDto);
+      }
+    });
+    return recommendationStatusCheckDtos;
   }
 
   /**

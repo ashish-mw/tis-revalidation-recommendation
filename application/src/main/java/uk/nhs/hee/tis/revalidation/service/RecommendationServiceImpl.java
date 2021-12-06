@@ -21,27 +21,24 @@
 
 package uk.nhs.hee.tis.revalidation.service;
 
-import static java.time.LocalDate.now;
 import static java.lang.String.format;
+import static java.time.LocalDate.now;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.SUCCESS;
-import static uk.nhs.hee.tis.revalidation.entity.GmcResponseCode.fromCode;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.APPROVED;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.REJECTED;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.UNDER_REVIEW;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.READY_TO_REVIEW;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.SUBMITTED_TO_GMC;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.NON_ENGAGEMENT;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.REVALIDATE;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +46,12 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.nhs.hee.tis.revalidation.dto.RoUserProfileDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
-import uk.nhs.hee.tis.revalidation.entity.*;
+import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
+import uk.nhs.hee.tis.revalidation.entity.GmcResponseCode;
+import uk.nhs.hee.tis.revalidation.entity.Recommendation;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
+import uk.nhs.hee.tis.revalidation.entity.RecommendationType;
 import uk.nhs.hee.tis.revalidation.exception.RecommendationException;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
@@ -77,170 +79,202 @@ public class RecommendationServiceImpl implements RecommendationService {
   @Autowired
   private GmcClientService gmcClientService;
 
-  //get trainee information with current and legacy recommendations
+  /**
+   * Get trainee information with current and legacy recommendations
+   *
+   * @param gmcId - GMC Identifier/Number of the trainee requested
+   * @return A {@link TraineeRecommendationDto} if found, null otherwise
+   */
   public TraineeRecommendationDto getTraineeInfo(String gmcId) {
-    RecommendationServiceImpl.log.info("Fetching trainee info for GmcId: {}", gmcId);
+    log.info("Fetching trainee info for GmcId: {}", gmcId);
     final var optionalDoctorsForDB = doctorsForDBRepository.findById(gmcId);
 
     if (optionalDoctorsForDB.isPresent()) {
       final var doctorsForDB = optionalDoctorsForDB.get();
 
       return TraineeRecommendationDto.builder()
-              .fullName(
-                      String.format("%s %s", doctorsForDB.getDoctorFirstName(), doctorsForDB.getDoctorLastName()))
-              .gmcNumber(doctorsForDB.getGmcReferenceNumber())
-              .underNotice(doctorsForDB.getUnderNotice().value())
-              .designatedBody(doctorsForDB.getDesignatedBodyCode())
-              .gmcSubmissionDate(doctorsForDB.getSubmissionDate())
-              .revalidations(getCurrentAndLegacyRecommendation(doctorsForDB))
-              .deferralReasons(deferralReasonService.getAllCurrentDeferralReasons())
-              .build();
+          .fullName(String.format("%s %s",
+              doctorsForDB.getDoctorFirstName(), doctorsForDB.getDoctorLastName()))
+          .gmcNumber(doctorsForDB.getGmcReferenceNumber())
+          .underNotice(doctorsForDB.getUnderNotice().value())
+          .designatedBody(doctorsForDB.getDesignatedBodyCode())
+          .gmcSubmissionDate(doctorsForDB.getSubmissionDate())
+          .revalidations(getCurrentAndLegacyRecommendation(doctorsForDB))
+          .deferralReasons(deferralReasonService.getAllCurrentDeferralReasons())
+          .build();
     }
 
     return null;
   }
 
-  //save a new recommendation
+  /**
+   * Save a new recommendation
+   *
+   * @param recordDTO The recommendation to save
+   * @return The persisted Recommendation entity (rather than a DTO)
+   * @throws RecommendationException when the Doctor doesn't exist or the Deferral date is invalid
+   */
   public Recommendation saveRecommendation(TraineeRecommendationRecordDto recordDTO) {
-    isAllowedToCreateNewRecommendation(recordDTO.getGmcNumber(), recordDTO.getRecommendationId());
+    isSaveRecommendationPermitted(recordDTO.getGmcNumber(), recordDTO.getRecommendationId());
 
     final var doctorsForDB = doctorsForDBRepository.findById(recordDTO.getGmcNumber());
-    if(doctorsForDB.isPresent()) {
-      final var doctor = doctorsForDB.get();
-      final var submissionDate = doctor.getSubmissionDate();
+    if (doctorsForDB.isEmpty()) {
+      throw new RecommendationException(
+          format("Doctor %s does not exist!", recordDTO.getGmcNumber()));
+    }
+    final var doctor = doctorsForDB.get();
+    final var submissionDate = doctor.getSubmissionDate();
 
-      final var recommendationType = RecommendationType.valueOf(recordDTO.getRecommendationType());
-      Recommendation recommendation = null;
+    final var recommendationType = RecommendationType.valueOf(recordDTO.getRecommendationType());
+    Recommendation recommendation;
 
-      if (REVALIDATE.equals(recommendationType) || NON_ENGAGEMENT.equals(recommendationType)) {
+    switch (recommendationType) {
+      case REVALIDATE:
+      case NON_ENGAGEMENT:
         recommendation = Recommendation.builder()
-                .id(recordDTO.getRecommendationId())
-                .gmcNumber(recordDTO.getGmcNumber())
-                .recommendationType(recommendationType)
-                .recommendationStatus(READY_TO_REVIEW)
-                .comments(recordDTO.getComments())
-                .gmcSubmissionDate(submissionDate)
-                .admin(recordDTO.getAdmin())
-                .build();
-      } else {
+            .id(recordDTO.getRecommendationId())
+            .gmcNumber(recordDTO.getGmcNumber())
+            .recommendationType(recommendationType)
+            .recommendationStatus(READY_TO_REVIEW)
+            .comments(recordDTO.getComments())
+            .gmcSubmissionDate(submissionDate)
+            .admin(recordDTO.getAdmin())
+            .build();
+        break;
+      case DEFER:
+      default:
         final var deferralDate = recordDTO.getDeferralDate();
-        final var validateDeferralDate = validateDeferralDate(deferralDate, submissionDate);
-        final var deferralReason = deferralReasonService
-                .getDeferralReasonByCode(recordDTO.getDeferralReason());
-        final var deferralSubReason = deferralReason
-                .getSubReasonByCode(recordDTO.getDeferralSubReason());
-        final var deferralSubReasonCode =
-                deferralSubReason != null ? deferralSubReason.getCode() : null;
-        if (validateDeferralDate) {
+        if (isDeferralDateValid(deferralDate, submissionDate)) {
+          final var deferralReason =
+              deferralReasonService.getDeferralReasonByCode(recordDTO.getDeferralReason());
+          final var deferralSubReason =
+              deferralReason.getSubReasonByCode(recordDTO.getDeferralSubReason());
+          final var deferralSubReasonCode =
+              deferralSubReason != null ? deferralSubReason.getCode() : null;
+
           recommendation = Recommendation.builder()
-                  .id(recordDTO.getRecommendationId())
-                  .gmcNumber(recordDTO.getGmcNumber())
-                  .comments(recordDTO.getComments())
-                  .recommendationType(recommendationType)
-                  .recommendationStatus(READY_TO_REVIEW)
-                  .deferralDate(recordDTO.getDeferralDate())
-                  .deferralReason(deferralReason.getCode())
-                  .deferralSubReason(deferralSubReasonCode)
-                  .gmcSubmissionDate(submissionDate)
-                  .admin(recordDTO.getAdmin())
-                  .build();
+              .id(recordDTO.getRecommendationId())
+              .gmcNumber(recordDTO.getGmcNumber())
+              .comments(recordDTO.getComments())
+              .recommendationType(recommendationType)
+              .recommendationStatus(READY_TO_REVIEW)
+              .deferralDate(recordDTO.getDeferralDate())
+              .deferralReason(deferralReason.getCode())
+              .deferralSubReason(deferralSubReasonCode)
+              .gmcSubmissionDate(submissionDate)
+              .admin(recordDTO.getAdmin())
+              .build();
         } else {
           throw new RecommendationException(format(
-                  "Deferral date is invalid, should be in between of 60 and 365 days of Gmc Submission Date: %s",
-                  submissionDate));
+              "Deferral date is invalid, should be in between of 60 and 365 days of Gmc Submission Date: %s",
+              submissionDate));
         }
-      }
+        break;
+    }
 
-      recommendation.setActualSubmissionDate(now());
-      Recommendation recommendationToSave = recommendationRepository.save(recommendation);
-      doctor.setLastUpdatedDate(now());
-      doctor.setDoctorStatus(
-              getRecommendationStatusForTrainee(recordDTO.getGmcNumber())
-      );
-      doctorsForDBRepository.save(doctor);
-      return recommendationToSave;
-    }
-    else {
-      throw new RecommendationException(format(
-        "Doctor %s does not exist!", recordDTO.getGmcNumber())
-      );
-    }
+    recommendation.setActualSubmissionDate(now());
+    Recommendation savedRecommendation = recommendationRepository.save(recommendation);
+    doctor.setLastUpdatedDate(now());
+    doctor.setDoctorStatus(
+        getRecommendationStatusForTrainee(recordDTO.getGmcNumber())
+    );
+    doctorsForDBRepository.save(doctor);
+    return savedRecommendation;
   }
 
-  //update an existing recommendation
+  /**
+   * Update an existing recommendation
+   *
+   * @param recordDTO Modified TraineeRecommendationDto containing the Recommendation
+   * @return The updated Recommendation
+   * @throws RecommendationException when the Recommendation fails validation
+   */
   public Recommendation updateRecommendation(TraineeRecommendationRecordDto recordDTO) {
-    validationRecommendationId(recordDTO.getRecommendationId());
+    validateRecommendationExists(recordDTO.getRecommendationId());
     return saveRecommendation(recordDTO);
   }
 
-  //submit a recommendation to gmc
+  /**
+   * @param recommendationId The persistence id for the Recommendation to be submitted
+   * @param gmcNumber        The Doctor's GMC ID/Number
+   * @param userProfileDto   The details of the Responsible Officer to submit on behalf of.
+   * @return Flag indicating the Recommendation was submitted to the GMC service
+   * @throws RecommendationException when the Doctor is unknown to TIS or GMC submission fails
+   */
   public boolean submitRecommendation(String recommendationId, String gmcNumber,
-                                       RoUserProfileDto userProfileDto) {
-    RecommendationServiceImpl.log.info("submitting request to gmc for recommendation: {} and gmcNumber: {}", recommendationId,
-            gmcNumber);
+      RoUserProfileDto userProfileDto) {
+    log.info("submitting request to gmc for recommendation: {} and gmcNumber: {}", recommendationId,
+        gmcNumber);
     final var doctorsForDB = doctorsForDBRepository.findById(gmcNumber);
     final var recommendation = recommendationRepository
-            .findByIdAndGmcNumber(recommendationId, gmcNumber);
+        .findByIdAndGmcNumber(recommendationId, gmcNumber);
 
-    if(doctorsForDB.isPresent()) {
-      final var doctor = doctorsForDB.get();
+    if (doctorsForDB.isEmpty()) {
+      throw new RecommendationException(format("Doctor %s does not exist!", gmcNumber));
+    }
+    final var doctor = doctorsForDB.get();
 
-      final var tryRecommendationV2Response = gmcClientService.submitToGmc(doctor, recommendation,
-              userProfileDto);
-      final var tryRecommendationV2Result = tryRecommendationV2Response
-              .getTryRecommendationV2Result();
-      if (tryRecommendationV2Result != null) {
-        RecommendationServiceImpl.log.info("Receive response for submit request for gmcId: {} with return code: {}",
-                doctor.getGmcReferenceNumber(), tryRecommendationV2Result.getReturnCode());
-        final var returnCode = tryRecommendationV2Result.getReturnCode();
-        if (SUCCESS.getCode().equals(returnCode)) {
-          recommendation.setRecommendationStatus(SUBMITTED_TO_GMC);
-          recommendation.setOutcome(UNDER_REVIEW);
-          recommendation.setActualSubmissionDate(now());
-          recommendation.setGmcRevalidationId(tryRecommendationV2Result.getRecommendationID());
-          recommendationRepository.save(recommendation);
-          doctor.setLastUpdatedDate(now());
-          doctor.setDoctorStatus(
-                  getRecommendationStatusForTrainee(gmcNumber)
-          );
-          doctorsForDBRepository.save(doctor);
-          return true;
-        } else {
-          final var responseCode = fromCode(returnCode);
-          RecommendationServiceImpl.log.error(
-                  "Submission of recommendation to GMC is failed for GmcId: {} and RecommendationId: {}. Gmc response is: {}",
-                  gmcNumber, recommendation.getId(), responseCode.getMessage());
-          throw new RecommendationException(
-                  format("Fail to submit recommendation: %s", responseCode.getMessage()));
-        }
+    final var tryRecommendationV2Response = gmcClientService.submitToGmc(doctor, recommendation,
+        userProfileDto);
+    final var tryRecommendationResponseCT = tryRecommendationV2Response
+        .getTryRecommendationV2Result();
+    if (tryRecommendationResponseCT != null) {
+      log.info("Receive response for submit request for gmcId: {} with return code: {}",
+          doctor.getGmcReferenceNumber(), tryRecommendationResponseCT.getReturnCode());
+      final var returnCode = tryRecommendationResponseCT.getReturnCode();
+      if (SUCCESS.getCode().equals(returnCode)) {
+        recommendation.setRecommendationStatus(SUBMITTED_TO_GMC);
+        recommendation.setOutcome(UNDER_REVIEW);
+        recommendation.setActualSubmissionDate(now());
+        recommendation.setGmcRevalidationId(tryRecommendationResponseCT.getRecommendationID());
+        recommendationRepository.save(recommendation);
+        doctor.setLastUpdatedDate(now());
+        doctor.setDoctorStatus(getRecommendationStatusForTrainee(gmcNumber)
+        );
+        doctorsForDBRepository.save(doctor);
+        return true;
+      } else {
+        final var responseCode = GmcResponseCode.fromCode(returnCode);
+        log.error(
+            "Submission of recommendation to GMC failed for GmcId: {} and RecommendationId: {}. Gmc response is: {}",
+            gmcNumber, recommendation.getId(), responseCode.getMessage());
+        throw new RecommendationException(
+            format("Fail to submit recommendation: %s", responseCode.getMessage()));
       }
-    } else {
-      throw new RecommendationException(format(
-              "Doctor %s does not exist!", gmcNumber)
-      );
     }
     return false;
   }
 
-  //get latest recommendations of a trainee
+  /**
+   * Get latest recommendation of a trainee
+   *
+   * @param gmcId The GMC ID/Number of the Trainee to search for
+   * @return The last submitted Recommendation or empty
+   */
   public TraineeRecommendationRecordDto getLatestRecommendation(String gmcId) {
-    RecommendationServiceImpl.log.info("Fetching latest recommendation info for GmcId: {}", gmcId);
+    log.info("Fetching latest recommendation info for GmcId: {}", gmcId);
     Optional<Recommendation> optionalRecommendation = recommendationRepository
-            .findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcId);
+        .findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcId);
 
     if (optionalRecommendation.isPresent()) {
       final var recommendation = optionalRecommendation.get();
 
       return buildTraineeRecommendationRecordDto(recommendation.getGmcNumber(),
-              recommendation.getGmcSubmissionDate(), recommendation);
+          recommendation.getGmcSubmissionDate(), recommendation);
     }
     return new TraineeRecommendationRecordDto();
   }
 
-  //get latest recommendations of a list of trainees
+  /**
+   * Get latest recommendation for each of a list of trainees
+   *
+   * @param gmcIds The GMC IDs/Numbers of the Trainees to search for
+   * @return A mapping of input GMC Numbers to the last submitted Recommendation for each which may
+   * be empty
+   */
   public Map<String, TraineeRecommendationRecordDto> getLatestRecommendations(
-          List<String> gmcIds) {
-    RecommendationServiceImpl.log.info("Mapping latest recommendation info for GmcIds: {}", gmcIds);
+      List<String> gmcIds) {
+    log.info("Mapping latest recommendation info for GmcIds: {}", gmcIds);
     return gmcIds.stream().collect(toMap(identity(), this::getLatestRecommendation));
   }
 
@@ -249,40 +283,38 @@ public class RecommendationServiceImpl implements RecommendationService {
     String outcome = recommendation.getGmcOutcome();
     String type = recommendation.getRecommendationType();
 
-    if(outcome == null && type == null) {
+    if (outcome == null && type == null) {
       return RecommendationStatus.NOT_STARTED;
-    }
-    else if(outcome == null) {
-      return RecommendationStatus.DRAFT;
-    }
-    else if(outcome.equals(APPROVED.getOutcome())
-            || outcome.equals(REJECTED.getOutcome())
-    ) {
+    } else if (APPROVED.getOutcome().equals(outcome) || REJECTED.getOutcome().equals(outcome)) {
       return RecommendationStatus.COMPLETED;
-    }
-    else if(outcome.equals(UNDER_REVIEW.getOutcome())) {
+    } else if (UNDER_REVIEW.getOutcome().equals(outcome)) {
       return RecommendationStatus.SUBMITTED_TO_GMC;
-    }
-    else {
+    } else {
       return RecommendationStatus.DRAFT;
     }
   }
 
+  /**
+   * Get all Recommendations for a Doctor
+   *
+   * @param doctorsForDB The Doctor to search for
+   * @return A list of all Recommendations for the Doctor
+   */
   private List<TraineeRecommendationRecordDto> getCurrentAndLegacyRecommendation(
       final DoctorsForDB doctorsForDB) {
     final var gmcNumber = doctorsForDB.getGmcReferenceNumber();
     checkRecommendationStatus(gmcNumber, doctorsForDB.getDesignatedBodyCode());
 
-    final var newRecommendationStatus  = getRecommendationStatusForTrainee(gmcNumber);
-    if(!newRecommendationStatus.equals(doctorsForDB.getDoctorStatus())){
-      doctorsForDB.setDoctorStatus(newRecommendationStatus );
+    final var newRecommendationStatus = getRecommendationStatusForTrainee(gmcNumber);
+    if (!newRecommendationStatus.equals(doctorsForDB.getDoctorStatus())) {
+      doctorsForDB.setDoctorStatus(newRecommendationStatus);
       doctorsForDBRepository.save(doctorsForDB);
     }
 
     log.info("Fetching snapshot record for GmcId: {}", gmcNumber);
     final var recommendations = recommendationRepository.findByGmcNumber(gmcNumber);
     final var currentRecommendations = recommendations.stream().map(rec ->
-      buildTraineeRecommendationRecordDto(gmcNumber, doctorsForDB.getSubmissionDate(), rec)
+        buildTraineeRecommendationRecordDto(gmcNumber, doctorsForDB.getSubmissionDate(), rec)
     ).collect(toList());
 
     final var snapshotRecommendations = snapshotService.getSnapshotRecommendations(doctorsForDB);
@@ -290,7 +322,13 @@ public class RecommendationServiceImpl implements RecommendationService {
     return currentRecommendations;
   }
 
-  // And if GMC update status with Approved or Rejected, recommendation will be moved to snapshot.
+  /**
+   * Check all of the incomplete recommendations for a Doctor and if GMC update status with Approved
+   * or Rejected, recommendation will be moved to snapshot
+   *
+   * @param gmcNumber      The GMC ID/Number of the doctor to check recommendations for
+   * @param designatedBody The Body responsible for the recommendations/revalidation
+   */
   private void checkRecommendationStatus(final String gmcNumber, final String designatedBody) {
     log.info("Check status of Gmc outcome for under review recommendations of GmcNumber: {}",
         gmcNumber);
@@ -314,18 +352,30 @@ public class RecommendationServiceImpl implements RecommendationService {
     return Objects.nonNull(outcome) ? outcome.getOutcome() : null;
   }
 
-  //Deferral date should be atleast after 60 days from submission date and max up to 365 days from submission date
-  private boolean validateDeferralDate(final LocalDate deferralDate,
+  /**
+   * Validates deferral date, which should be at least after 60 days from submission date and less
+   * than 365 days from submission date
+   *
+   * @param deferralDate   The date that the revalidation is deferred until
+   * @param submissionDate The date that the Recommendation to Defer is submitted
+   * @return A flag indicating whether the deferral date is valid
+   */
+  private boolean isDeferralDateValid(final LocalDate deferralDate,
       final LocalDate submissionDate) {
     final var submissionDateWith60Days = submissionDate.plusDays(MIN_DAYS_FROM_SUBMISSION_DATE);
     final var submissionDateWith365Days = submissionDate.plusDays(MAX_DAYS_FROM_SUBMISSION_DATE);
 
-    return deferralDate.isAfter(submissionDateWith60Days) && deferralDate
-        .isBefore(submissionDateWith365Days);
+    return deferralDate.isAfter(submissionDateWith60Days)
+        && deferralDate.isBefore(submissionDateWith365Days);
   }
 
-  //before saving new recommendationId, check if the request is for update
-  private void validationRecommendationId(final String recommendationId) {
+  /**
+   * Check if the request exists. This is called before updating a recommendationId
+   *
+   * @param recommendationId The database ID of a recommendation
+   * @throws RecommendationException when no Recommendation is found
+   */
+  private void validateRecommendationExists(final String recommendationId) {
     log.info("Request for the update of existing recommendation: {}", recommendationId);
     final var existingRecommendation = recommendationRepository.findById(recommendationId);
     if (existingRecommendation.isEmpty()) {
@@ -334,22 +384,29 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
   }
 
-  //if recommendation for trainee is already in draft state, admins are not allowed to create a new one but are allowed to update
-  //if recommendation for trainee is Submitted to gmc but still in Under Review state, admin are not allowed to create a new one.
-  private void isAllowedToCreateNewRecommendation(final String gmcNumber,
+  /**
+   * Checks and returns whether a Doctor's recommendations are in a state that permits saving the
+   * Recommendation with the specified database identifier. The {@param recommendationId}
+   * <ol>
+   *   <li>If recommendation for trainee is already in draft state, admins are not allowed to
+   *   create a new one but are allowed to update</li>
+   *   <li>If recommendation for trainee is Submitted to gmc but still in Under Review state,
+   *   admin are not allowed to create a new one</li>
+   * </ol>
+   *
+   * @param gmcNumber        The GMC ID/Number of the Doctor to check against
+   * @param recommendationId The recommendation to check if we can save
+   * @throws RecommendationException where I'd expect this to return false
+   */
+  private void isSaveRecommendationPermitted(final String gmcNumber,
       final String recommendationId) {
-    final var recommendations = recommendationRepository.findByGmcNumber(gmcNumber);
-    final var recommendation = recommendations.stream().filter(r -> {
-      if (r.getId().equals(recommendationId)) { //check if the request is for update
-        return false;
-      }
-      return SUBMITTED_TO_GMC != r.getRecommendationStatus() || UNDER_REVIEW == r.getOutcome();
-    }).findFirst();
-
-    if (recommendation.isPresent()) {
+    final var inProgressFilter = new InProgressPredicate(recommendationId);
+    recommendationRepository.findByGmcNumber(gmcNumber).stream()
+        .filter(inProgressFilter)
+        .findFirst().ifPresent(r -> {
       throw new RecommendationException(
-          "Trainee already have an recommendation in draft state or waiting for approval from GMC.");
-    }
+          "Trainee already has a recommendation in draft or waiting for approval from GMC.");
+    });
   }
 
   private TraineeRecommendationRecordDto buildTraineeRecommendationRecordDto(String gmcNumber,
@@ -361,14 +418,37 @@ public class RecommendationServiceImpl implements RecommendationService {
         .deferralReason(rec.getDeferralReason())
         .deferralSubReason(rec.getDeferralSubReason())
         .gmcOutcome(getOutcome(rec.getOutcome()))
-        .recommendationStatus((rec.getRecommendationStatus() != null)
-            ? rec.getRecommendationStatus().name() : null)
-        .recommendationType((rec.getRecommendationType() != null)
-            ? rec.getRecommendationType().name() : null)
+        .recommendationStatus(
+            (rec.getRecommendationStatus() != null) ? rec.getRecommendationStatus().name() : null)
+        .recommendationType(
+            (rec.getRecommendationType() != null) ? rec.getRecommendationType().name() : null)
         .gmcSubmissionDate(submissionDate)
         .actualSubmissionDate(rec.getActualSubmissionDate())
         .admin(rec.getAdmin())
         .comments(rec.getComments())
         .build();
+  }
+
+  /**
+   * This predicate evaluates whether a recommendation is "In Progress".  This includes those with a
+   * `COMPLETED` status of {@link RecommendationStatus} and excludes a {@link Recommendation} with
+   * the id provided to the Predicate's constructor
+   */
+  public class InProgressPredicate implements Predicate<Recommendation> {
+
+    private final String recommendationId;
+
+    public InProgressPredicate(String recommendationId) {
+      this.recommendationId = recommendationId;
+    }
+
+    @Override
+    public boolean test(Recommendation r) {
+      if (r.getId().equals(recommendationId)) {
+        //check if the request is for update / exclude recommendation specified
+        return false;
+      }
+      return SUBMITTED_TO_GMC != r.getRecommendationStatus() || UNDER_REVIEW == r.getOutcome();
+    }
   }
 }

@@ -21,7 +21,6 @@
 
 package uk.nhs.hee.tis.revalidation.service;
 
-import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -222,8 +221,8 @@ class RecommendationServiceTest {
   @Test
   void shouldReturnRecommendationWithCurrentAndLegacyRecommendations() {
     final var gmcId = faker.number().digits(7);
-    final var doctorsForDB = buildDoctorForDB(gmcId);
-    when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
+    final var doctorsForDB = buildDoctorForDB(gmcId, RecommendationStatus.NOT_STARTED);
+    when(doctorsForDBRepository.findById(gmcId)).thenReturn(Optional.of(doctorsForDB));
     when(snapshotService.getSnapshotRecommendations(doctorsForDB))
         .thenReturn(List.of(snapshot1, snapshot2));
     when(recommendationRepository.findByGmcNumber(gmcId)).thenReturn(List.of(
@@ -306,8 +305,9 @@ class RecommendationServiceTest {
   @Test
   void shouldUpdateSnapshotAndDoctorIfRecommendationStatusBecomeApprove() {
     final var gmcId = faker.number().digits(7);
-    final var doctorsForDB = buildDoctorForDB(gmcId);
-    when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
+    final var doctorsForDB = buildDoctorForDB(gmcId, RecommendationStatus.NOT_STARTED);
+    when(doctorsForDBRepository.findById(gmcId)).thenReturn(Optional.of(doctorsForDB));
+
     when(snapshotService.getSnapshotRecommendations(doctorsForDB)).thenReturn(List.of(snapshot1));
     final var recommendation1 = buildRecommendation(gmcNumber1, recommendationId, SUBMITTED_TO_GMC,
         APPROVED);
@@ -371,10 +371,37 @@ class RecommendationServiceTest {
   }
 
   @Test
+  void shouldNotUpdateSnapshotOrDoctorIfRecommendationStatusIsUnchanged() {
+    final var gmcId = faker.number().digits(7);
+    final var doctorsForDB = buildDoctorForDB(gmcId, SUBMITTED_TO_GMC);
+    when(doctorsForDBRepository.findById(gmcId)).thenReturn(Optional.of(doctorsForDB));
+    final var recommendation1 = buildRecommendation(gmcNumber1, recommendationId, SUBMITTED_TO_GMC,
+        UNDER_REVIEW);
+    when(recommendationRepository.findByGmcNumber(gmcId)).thenReturn(List.of(recommendation1));
+    when(gmcClientService.checkRecommendationStatus(gmcNumber1,
+        gmcRecommendationId2, recommendationId, designatedBodyCode)).thenReturn(UNDER_REVIEW);
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcId))
+        .thenReturn(Optional.of(recommendation1));
+    when(snapshotService.getSnapshotRecommendations(doctorsForDB)).thenReturn(List.of());
+
+    final var traineeRecommendationDto = recommendationService.getTraineeInfo(gmcId);
+    assertThat(traineeRecommendationDto.getRevalidations(), hasSize(1));
+    var revalidationDTO = traineeRecommendationDto.getRevalidations().get(0);
+    assertThat(revalidationDTO.getGmcOutcome(), is(UNDER_REVIEW.getOutcome()));
+    assertThat(revalidationDTO.getAdmin(), is(admin1));
+    assertThat(revalidationDTO.getRecommendationType(), is(REVALIDATE.name()));
+    assertThat(revalidationDTO.getRecommendationStatus(), is(SUBMITTED_TO_GMC.name()));
+    assertThat(revalidationDTO.getGmcSubmissionDate(), is(submissionDate));
+    assertThat(revalidationDTO.getActualSubmissionDate(), is(actualSubmissionDate));
+    assertThat(revalidationDTO.getRecommendationId(), is(recommendationId));
+    assertThat(revalidationDTO.getComments(), is(comments));
+  }
+
+  @Test
   void shouldReturnCurrentRecommendationWhichAreSubmittedToGMC() {
     final var gmcId = faker.number().digits(7);
-    final var doctorsForDB = buildDoctorForDB(gmcId);
-    when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
+    final var doctorsForDB = buildDoctorForDB(gmcId, RecommendationStatus.NOT_STARTED);
+    when(doctorsForDBRepository.findById(gmcId)).thenReturn(Optional.of(doctorsForDB));
     when(snapshotService.getSnapshotRecommendations(doctorsForDB)).thenReturn(List.of(snapshot1));
     when(recommendationRepository.findByGmcNumber(gmcId))
         .thenReturn(List.of(buildRecommendation(gmcId, newRecommendationId,
@@ -427,8 +454,8 @@ class RecommendationServiceTest {
   @Test
   void shouldReturnRecommendationDtoWithoutTisInformation() {
     final var gmcId = faker.number().digits(8);
-    final var doctorsForDB = buildDoctorForDB(gmcId);
-    when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
+    final var doctorsForDB = buildDoctorForDB(gmcId, RecommendationStatus.NOT_STARTED);
+    when(doctorsForDBRepository.findById(gmcId)).thenReturn(Optional.of(doctorsForDB));
     final var recommendation = recommendationService.getTraineeInfo(gmcId);
     assertThat(recommendation.getGmcNumber(), is(gmcId));
     assertThat(recommendation.getFullName(), is(getFullName(firstName, lastName)));
@@ -436,6 +463,14 @@ class RecommendationServiceTest {
     assertThat(recommendation.getProgrammeMembershipType(), is(nullValue()));
     assertThat(recommendation.getCurrentGrade(), is(nullValue()));
     assertThat(recommendation.getRevalidations(), hasSize(0));
+  }
+
+  @Test
+  void shouldReturnNullWhenUnknownVGmc() {
+    final var gmcId = faker.number().digits(7);
+    final var doctorsForDB = buildDoctorForDB(gmcId, RecommendationStatus.NOT_STARTED);
+    when(doctorsForDBRepository.findById(gmcId)).thenReturn(Optional.empty());
+    assertThat(recommendationService.getTraineeInfo(gmcId), is(nullValue()));
   }
 
   @Test
@@ -503,8 +538,11 @@ class RecommendationServiceTest {
     when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
     when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
 
-    assertThrows(RecommendationException.class,
+    RecommendationException ex = assertThrows(RecommendationException.class,
         () -> recommendationService.saveRecommendation(recordDTO));
+    assertThat(ex.getMessage(), is(String.format(
+        "Deferral date is invalid, should be in between of 60 and 365 days of Gmc Submission Date: %s",
+        submissionDate)));
   }
 
   @Test
@@ -516,8 +554,23 @@ class RecommendationServiceTest {
     when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
     when(doctorsForDB.getSubmissionDate()).thenReturn(submissionDate);
 
-    assertThrows(RecommendationException.class,
+    RecommendationException ex = assertThrows(RecommendationException.class,
         () -> recommendationService.saveRecommendation(recordDTO));
+    assertThat(ex.getMessage(), is(String.format(
+        "Deferral date is invalid, should be in between of 60 and 365 days of Gmc Submission Date: %s",
+        submissionDate)));
+  }
+
+  @Test
+  void shouldThrowExceptionWhenGmcNumberIsUnknown() {
+    final var deferralDate = submissionDate.plusDays(61);
+    final var recordDTO = buildTraineeRecommendationRecordDto(null, DEFER.name(), deferralDate,
+        deferralReason1, deferralSubReason1, null);
+    when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.empty());
+
+    RecommendationException ex = assertThrows(RecommendationException.class,
+        () -> recommendationService.saveRecommendation(recordDTO));
+    assertThat(ex.getMessage(), is(String.format("Doctor %s does not exist!", gmcNumber1)));
   }
 
   @Test
@@ -535,6 +588,16 @@ class RecommendationServiceTest {
   }
 
   @Test
+  void shouldThrowExceptionWhenSubmittingWithUnknownGmcNumber() {
+    when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.empty());
+    RoUserProfileDto roUserProfileDto = buildRoUserProfileDto(gmcNumber1);
+    RecommendationException ex = assertThrows(RecommendationException.class,
+        () -> recommendationService
+            .submitRecommendation(recommendationId, gmcNumber1, roUserProfileDto));
+    assertThat(ex.getMessage(), is(String.format("Doctor %s does not exist!", gmcNumber1)));
+  }
+
+  @Test
   void shouldNotUpdateRecommendationWhenSubmitFail() {
     final var recommendation = buildRecommendation(gmcNumber1, recommendationId, status,
         UNDER_REVIEW);
@@ -547,6 +610,23 @@ class RecommendationServiceTest {
 
     assertThrows(RecommendationException.class, () -> recommendationService
         .submitRecommendation(recommendationId, gmcNumber1, userProfileDto));
+    verify(recommendationRepository, times(0)).save(recommendation);
+  }
+
+  @Test
+  void shouldNotUpdateRecommendationWhenSubmitResponseIsNull() {
+    final var recommendation = buildRecommendation(gmcNumber1, recommendationId, status,
+        UNDER_REVIEW);
+    final var userProfileDto = buildRoUserProfileDto(gmcNumber1);
+    when(doctorsForDBRepository.findById(gmcNumber1)).thenReturn(Optional.of(doctorsForDB));
+    when(recommendationRepository.findByIdAndGmcNumber(recommendationId, gmcNumber1))
+        .thenReturn(recommendation);
+    when(gmcClientService.submitToGmc(doctorsForDB, recommendation, userProfileDto))
+        .thenReturn(new TryRecommendationV2Response());
+
+    boolean actual = recommendationService
+        .submitRecommendation(recommendationId, gmcNumber1, userProfileDto);
+    assertThat(actual, is(false));
     verify(recommendationRepository, times(0)).save(recommendation);
   }
 
@@ -679,6 +759,34 @@ class RecommendationServiceTest {
   }
 
   @Test
+  void shouldReturnLatestRecommendationsList() {
+    final var gmcNumber2 = faker.number().digits(7);
+    final var gmcNumberX = faker.number().digits(7);
+    final var recommendation = buildRecommendation(gmcNumber1, recommendationId, status,
+        UNDER_REVIEW);
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber1))
+        .thenReturn(Optional.of(recommendation));
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumberX))
+        .thenReturn(Optional.empty());
+    when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber2))
+        .thenReturn(Optional.of(recommendation2));
+    final var actualRecommendationMap = recommendationService
+        .getLatestRecommendations(List.of(gmcNumber1, gmcNumberX, gmcNumber2));
+
+    assertThat(actualRecommendationMap.size(), is(3));
+
+    var traineeRecommendationRecordDto = actualRecommendationMap.get(gmcNumber1);
+    assertThat(traineeRecommendationRecordDto.getGmcNumber(), is(gmcNumber1));
+    assertThat(traineeRecommendationRecordDto.getGmcSubmissionDate(), is(submissionDate));
+    assertThat(traineeRecommendationRecordDto.getActualSubmissionDate(), is(actualSubmissionDate));
+    assertThat(traineeRecommendationRecordDto.getComments(), is(comments));
+    assertThat(traineeRecommendationRecordDto.getAdmin(), is(admin1));
+
+    traineeRecommendationRecordDto = actualRecommendationMap.get(gmcNumberX);
+    assertThat(traineeRecommendationRecordDto.getGmcNumber(), is(nullValue()));
+  }
+
+  @Test
   void shouldMatchTisStatusCompletedToApproved() {
     when(recommendationRepository.findFirstByGmcNumberOrderByActualSubmissionDateDesc(gmcNumber1))
         .thenReturn(Optional.of(recommendation1));
@@ -723,12 +831,13 @@ class RecommendationServiceTest {
     assertThat(result, is(NOT_STARTED));
   }
 
-  private DoctorsForDB buildDoctorForDB(final String gmcId) {
+  private DoctorsForDB buildDoctorForDB(final String gmcId,
+      RecommendationStatus doctorRecommendationStatus) {
     return DoctorsForDB.builder()
         .gmcReferenceNumber(gmcId)
         .doctorFirstName(firstName)
         .doctorLastName(lastName)
-        .doctorStatus(status)
+        .doctorStatus(doctorRecommendationStatus)
         .submissionDate(submissionDate)
         .dateAdded(dateAdded)
         .underNotice(underNotice)

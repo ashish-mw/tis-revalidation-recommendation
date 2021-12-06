@@ -216,17 +216,17 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     final var tryRecommendationV2Response = gmcClientService.submitToGmc(doctor, recommendation,
         userProfileDto);
-    final var tryRecommendationV2Result = tryRecommendationV2Response
+    final var tryRecommendationResponseCT = tryRecommendationV2Response
         .getTryRecommendationV2Result();
-    if (tryRecommendationV2Result != null) {
+    if (tryRecommendationResponseCT != null) {
       log.info("Receive response for submit request for gmcId: {} with return code: {}",
-          doctor.getGmcReferenceNumber(), tryRecommendationV2Result.getReturnCode());
-      final var returnCode = tryRecommendationV2Result.getReturnCode();
+          doctor.getGmcReferenceNumber(), tryRecommendationResponseCT.getReturnCode());
+      final var returnCode = tryRecommendationResponseCT.getReturnCode();
       if (SUCCESS.getCode().equals(returnCode)) {
         recommendation.setRecommendationStatus(SUBMITTED_TO_GMC);
         recommendation.setOutcome(UNDER_REVIEW);
         recommendation.setActualSubmissionDate(now());
-        recommendation.setGmcRevalidationId(tryRecommendationV2Result.getRecommendationID());
+        recommendation.setGmcRevalidationId(tryRecommendationResponseCT.getRecommendationID());
         recommendationRepository.save(recommendation);
         doctor.setLastUpdatedDate(now());
         doctor.setDoctorStatus(getRecommendationStatusForTrainee(gmcNumber)

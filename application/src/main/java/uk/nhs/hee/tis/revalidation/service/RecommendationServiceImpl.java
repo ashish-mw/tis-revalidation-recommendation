@@ -303,9 +303,8 @@ public class RecommendationServiceImpl implements RecommendationService {
    */
   public List<RecommendationStatusCheckDto> getRecommendationStatusCheckDtos() {
     List<RecommendationStatusCheckDto> recommendationStatusCheckDtos = new ArrayList<>();
-    List<Recommendation> recommendations = recommendationRepository
-        .findAllByRecommendationStatus(RecommendationStatus.SUBMITTED_TO_GMC);
-    recommendations.forEach(rec -> {
+    recommendationRepository
+        .findAllByRecommendationStatus(RecommendationStatus.SUBMITTED_TO_GMC).forEach(rec -> {
       final var doctorsForDB = doctorsForDBRepository.findById(rec.getGmcNumber());
       if (doctorsForDB.isPresent()) {
         final var recommendationStatusDto = RecommendationStatusCheckDto.builder()

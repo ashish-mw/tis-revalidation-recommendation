@@ -103,7 +103,7 @@ class GmcClientServiceTest {
     ReflectionTestUtils.setField(gmcClientService, "gmcConnectUrl", url);
     ReflectionTestUtils.setField(gmcClientService, "gmcUserName", username);
     ReflectionTestUtils.setField(gmcClientService, "gmcPassword", password);
-    ReflectionTestUtils.setField(gmcClientService, "revalExchangeRecommendationStatus", exchange);
+    ReflectionTestUtils.setField(gmcClientService, "revalExchange", exchange);
     ReflectionTestUtils.setField(gmcClientService, "revalRoutingKeyRecommendationStatus", routingKey);
 
     recommendationStatus1 =

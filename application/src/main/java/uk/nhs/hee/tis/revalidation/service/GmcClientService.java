@@ -68,8 +68,8 @@ public class GmcClientService {
   @Value("${app.gmc.soapActionBase}")
   private String gmcSoapBaseAction;
 
-  @Value("${app.rabbit.reval.exchange.recommendationstatuscheck}")
-  private String revalExchangeRecommendationStatus;
+  @Value("${app.rabbit.reval.exchange}")
+  private String revalExchange;
 
   @Value("${app.rabbit.reval.routingKey.recommendationstatuscheck.requested}")
   private String revalRoutingKeyRecommendationStatus;
@@ -96,13 +96,12 @@ public class GmcClientService {
   /**
    * Cron job to send RecommendationStatusDtos to Rabbit queue for GMC recommendation status check.
    */
-  @Scheduled(cron = "${app.gmc.cronExpression}")
+  @Scheduled(cron = "${app.gmc.recommendationstatuscheck.cronExpression}")
   public void sendRecommendationStatusRequestToRabbit() {
     log.info("Start cron job: sendRecommendationStatusRequestToRabbit()");
-    List<RecommendationStatusCheckDto> recommendations = recommendationService.getRecommendationStatusCheckDtos();
-    recommendations.forEach(recommendation -> {
+    recommendationService.getRecommendationStatusCheckDtos().forEach(recommendation -> {
       rabbitTemplate.convertAndSend(
-          revalExchangeRecommendationStatus,
+          revalExchange,
           revalRoutingKeyRecommendationStatus,
           recommendation
       );

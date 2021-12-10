@@ -21,6 +21,7 @@
 
 package uk.nhs.hee.tis.revalidation.service;
 
+import uk.nhs.hee.tis.revalidation.dto.RecommendationStatusCheckDto;
 import uk.nhs.hee.tis.revalidation.dto.RoUserProfileDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationDto;
 import uk.nhs.hee.tis.revalidation.dto.TraineeRecommendationRecordDto;
@@ -52,4 +53,7 @@ public interface RecommendationService {
             List<String> gmcIds);
 
     RecommendationStatus getRecommendationStatusForTrainee(String gmcId);
+
+    // get a list of recommendation status Dto
+    List<RecommendationStatusCheckDto> getRecommendationStatusCheckDtos();
 }

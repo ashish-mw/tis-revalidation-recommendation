@@ -27,9 +27,12 @@ import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.UNDER_
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.DEFER;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.convertDateInGmcFormat;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.soap.client.core.SoapActionCallback;
@@ -39,6 +42,7 @@ import uk.nhs.hee.tis.gmc.client.generated.CheckRecommendationStatusResponse;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationV2;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationV2Request;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationV2Response;
+import uk.nhs.hee.tis.revalidation.dto.RecommendationStatusCheckDto;
 import uk.nhs.hee.tis.revalidation.dto.RoUserProfileDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.Recommendation;
@@ -52,9 +56,6 @@ public class GmcClientService {
   private static final String TRY_RECOMMENDATION_V2 = "TryRecommendationV2";
   private static final String CHECK_RECOMMENDATION_STATUS = "CheckRecommendationStatus";
 
-  @Autowired
-  private WebServiceTemplate webServiceTemplate;
-
   @Value("${app.gmc.url}")
   private String gmcConnectUrl;
 
@@ -66,6 +67,46 @@ public class GmcClientService {
 
   @Value("${app.gmc.soapActionBase}")
   private String gmcSoapBaseAction;
+
+  @Value("${app.rabbit.reval.exchange}")
+  private String revalExchange;
+
+  @Value("${app.rabbit.reval.routingKey.recommendationstatuscheck.requested}")
+  private String revalRoutingKeyRecommendationStatus;
+
+  private WebServiceTemplate webServiceTemplate;
+
+  private RecommendationService recommendationService;
+
+  private RabbitTemplate rabbitTemplate;
+
+  /**
+   * Constructor of GmcClientService.
+   */
+  public GmcClientService(
+      WebServiceTemplate webServiceTemplate,
+      RecommendationService recommendationService,
+      RabbitTemplate rabbitTemplate
+  ) {
+    this.webServiceTemplate = webServiceTemplate;
+    this.recommendationService = recommendationService;
+    this.rabbitTemplate = rabbitTemplate;
+  }
+
+  /**
+   * Cron job to send RecommendationStatusDtos to Rabbit queue for GMC recommendation status check.
+   */
+  @Scheduled(cron = "${app.gmc.recommendationstatuscheck.cronExpression}")
+  public void sendRecommendationStatusRequestToRabbit() {
+    log.info("Start cron job: sendRecommendationStatusRequestToRabbit()");
+    recommendationService.getRecommendationStatusCheckDtos().forEach(recommendation -> {
+      rabbitTemplate.convertAndSend(
+          revalExchange,
+          revalRoutingKeyRecommendationStatus,
+          recommendation
+      );
+    });
+  }
 
   public RecommendationGmcOutcome checkRecommendationStatus(final String gmcNumber,
       final String gmcRecommendationId,

@@ -26,6 +26,7 @@ import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.REJECT
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.COMPLETED;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ import uk.nhs.hee.tis.revalidation.entity.Recommendation;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
+import uk.nhs.hee.tis.revalidation.repository.SnapshotRepository;
 
 @Slf4j
 @Service
@@ -45,6 +47,8 @@ public class RecommendationTisStatusUpdateService {
   @Autowired
   private DoctorsForDBRepository doctorsForDBRepository;
   @Autowired
+  private SnapshotRepository snapshotRepository;
+  @Autowired
   private RecommendationService recommendationService;
   @Autowired
   private SnapshotService snapshotService;
@@ -53,7 +57,7 @@ public class RecommendationTisStatusUpdateService {
       final RecommendationStatusCheckDto recommendationStatusCheckDto) {
     RecommendationGmcOutcome outcome = recommendationStatusCheckDto.getOutcome();
     setRecommendationStatusAndUpdateRepositories(recommendationStatusCheckDto.getRecommendationId(),
-        outcome);
+        outcome, recommendationStatusCheckDto.getGmcRecommendationId());
 
     String gmcReferenceNumber = recommendationStatusCheckDto.getGmcReferenceNumber();
     Optional<DoctorsForDB> optionalDoctorsForDB = doctorsForDBRepository
@@ -72,7 +76,7 @@ public class RecommendationTisStatusUpdateService {
   //if gmc outcome is approved/rejected, update the relevant recommendation to approved/rejected,
   //tis status to complete and also update the snapshot repository
   private void setRecommendationStatusAndUpdateRepositories(final String recommendationId,
-      final RecommendationGmcOutcome recommendationGmcOutcome) {
+      final RecommendationGmcOutcome recommendationGmcOutcome, final String gmcRecommendationId) {
 
     final var optionalRecommendation = recommendationRepository.findById(recommendationId);
 
@@ -82,8 +86,33 @@ public class RecommendationTisStatusUpdateService {
         recommendation.setOutcome(recommendationGmcOutcome);
         recommendation.setRecommendationStatus(COMPLETED);
         recommendationRepository.save(recommendation);
-        snapshotService.saveRecommendationToSnapshot(recommendation);
+
+        // Find the snapshot from snapshot repository and check the gmcRecommendationId.
+        // If it exists then don't save snapshot else save it
+        if (!doesSnapshotRecommendationExist(recommendation.getGmcNumber(),
+            gmcRecommendationId)) {
+          recommendation.setGmcRevalidationId(gmcRecommendationId);
+          snapshotService.saveRecommendationToSnapshot(recommendation);
+        }
       }
     }
+  }
+
+  private boolean doesSnapshotRecommendationExist(String gmcReferenceNumber,
+      String gmcRecommendationId) {
+    AtomicBoolean doesSnapshotRecommendationExist = new AtomicBoolean(false);
+    final var snapshots = snapshotRepository.findByGmcNumber(gmcReferenceNumber);
+    if (snapshots.size() == 0) {
+      return false;
+    } else {
+      snapshots.forEach(snapshot -> {
+        boolean var = false;
+        if (snapshot.getRevalidation().getGmcRecommendationId() != null && snapshot
+            .getRevalidation().getGmcRecommendationId().equals(gmcRecommendationId)) {
+          doesSnapshotRecommendationExist.set(true);
+        }
+      });
+    }
+    return doesSnapshotRecommendationExist.get();
   }
 }

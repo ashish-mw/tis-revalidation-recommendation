@@ -27,10 +27,8 @@ import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.UNDER_
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.DEFER;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.convertDateInGmcFormat;
 
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -42,7 +40,6 @@ import uk.nhs.hee.tis.gmc.client.generated.CheckRecommendationStatusResponse;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationV2;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationV2Request;
 import uk.nhs.hee.tis.gmc.client.generated.TryRecommendationV2Response;
-import uk.nhs.hee.tis.revalidation.dto.RecommendationStatusCheckDto;
 import uk.nhs.hee.tis.revalidation.dto.RoUserProfileDto;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.Recommendation;
@@ -99,13 +96,9 @@ public class GmcClientService {
   @Scheduled(cron = "${app.gmc.recommendationstatuscheck.cronExpression}")
   public void sendRecommendationStatusRequestToRabbit() {
     log.info("Start cron job: sendRecommendationStatusRequestToRabbit()");
-    recommendationService.getRecommendationStatusCheckDtos().forEach(recommendation -> {
-      rabbitTemplate.convertAndSend(
-          revalExchange,
-          revalRoutingKeyRecommendationStatus,
-          recommendation
-      );
-    });
+    recommendationService.getRecommendationStatusCheckDtos().forEach(
+        recommendation -> rabbitTemplate
+            .convertAndSend(revalExchange, revalRoutingKeyRecommendationStatus, recommendation));
   }
 
   public RecommendationGmcOutcome checkRecommendationStatus(final String gmcNumber,
@@ -134,7 +127,8 @@ public class GmcClientService {
         final var responseCode = fromCode(gmcReturnCode);
         log.error(
             "Gmc recommendation check status request is failed for GmcId: {} and recommendationId: {}. Reason: {}."
-                + " Recommendation will stay in Under Review state", gmcNumber, recommendationId, responseCode);
+                + " Recommendation will stay in Under Review state", gmcNumber, recommendationId,
+            responseCode);
       }
     } catch (Exception e) {
       log.error("Failed to check status with GMC", e);

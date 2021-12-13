@@ -22,23 +22,23 @@
 package uk.nhs.hee.tis.revalidation.messages;
 
 import static java.time.LocalDate.now;
-import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.APPROVED;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.UNDER_REVIEW;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.COMPLETED;
-import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.REVALIDATE;
+import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.SUBMITTED_TO_GMC;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.parseDate;
 
 import com.github.javafaker.Faker;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -83,8 +83,7 @@ class RecommendationStatusCheckUpdatedMessageHandlerTest {
   private SnapshotService snapshotService;
 
   private String recommendationId;
-  private RecommendationGmcOutcome recommendationGmcOutcome;
-  private RecommendationGmcOutcome recommendationGmcOutcome_rejected;
+  private String gmcRecommendationId;
   private String firstName;
   private String lastName;
   private LocalDate submissionDate;
@@ -95,19 +94,15 @@ class RecommendationStatusCheckUpdatedMessageHandlerTest {
   private String designatedBodyCode;
   private RecommendationStatus status;
   private String admin1;
-  private Snapshot snapshot;
   private Recommendation recommendation;
   private String gmcId;
-  private String gmcRecommendationId;
 
   @BeforeEach
   public void setup() {
     recommendationId = faker.lorem().characters(10);
-    recommendationGmcOutcome = RecommendationGmcOutcome.APPROVED;
-    recommendationGmcOutcome_rejected = RecommendationGmcOutcome.REJECTED;
     firstName = faker.name().firstName();
     lastName = faker.name().lastName();
-    status = COMPLETED;
+    status = SUBMITTED_TO_GMC;
     submissionDate = LocalDate.now();
     actualSubmissionDate = LocalDate.now();
     dateAdded = LocalDate.now();
@@ -116,31 +111,26 @@ class RecommendationStatusCheckUpdatedMessageHandlerTest {
     designatedBodyCode = faker.lorem().characters(7);
     admin1 = faker.internet().emailAddress();
     gmcId = faker.number().digits(7);
-    recommendation = buildRecommendation(gmcId, recommendationId, status, REVALIDATE,
-        recommendationGmcOutcome);
-    snapshot = buildSnapshot(gmcId);
+    recommendation = buildRecommendation(gmcId, recommendationId, status, APPROVED);
+    Snapshot snapshot = buildSnapshot(gmcId);
     gmcRecommendationId = faker.lorem().characters(7);
   }
 
-  @Test
-  void shouldUpdateRecommendationAndTisStatus() throws Exception {
+  @ParameterizedTest(name = "GMC Outcome: {0} should Update Recommendation, Snapshot and Doctor")
+  @EnumSource(value = RecommendationGmcOutcome.class, names = {"APPROVED", "REJECTED"})
+  void shouldUpdateRecommendationAndSnapshotAndTisStatus(RecommendationGmcOutcome newOutcome) {
 
-    final var recommendationStatusCheckDto = RecommendationStatusCheckDto.builder()
-        .gmcReferenceNumber(gmcId)
-        .recommendationId(recommendationId)
-        .outcome(recommendationGmcOutcome)
-        .build();
+    final RecommendationStatusCheckDto recommendationStatusCheckDto =
+        buildRecommendationStatusCheckDto(newOutcome);
 
     final var doctorsForDB = buildDoctorForDB(gmcId);
-    when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
+    when(doctorsForDBRepository.findById(gmcId)).thenReturn(Optional.of(doctorsForDB));
 
     when(recommendationRepository.findById(recommendationId))
-        .thenReturn(Optional.of(buildRecommendation(gmcId, recommendationId, status, REVALIDATE,
+        .thenReturn(Optional.of(buildRecommendation(gmcId, recommendationId, status,
             UNDER_REVIEW)));
 
-    when(recommendationService.getRecommendationStatusForTrainee(gmcId)).thenReturn(status);
-
-    snapshotRepository.save(snapshot);
+    when(recommendationService.getRecommendationStatusForTrainee(gmcId)).thenReturn(COMPLETED);
 
     recommendationStatusCheckUpdatedMessageHandler
         .updateRecommendationAndTisStatus(recommendationStatusCheckDto);
@@ -149,48 +139,23 @@ class RecommendationStatusCheckUpdatedMessageHandlerTest {
     assertThat(doctorCaptor.getValue().getDoctorStatus(), is(COMPLETED));
 
     verify(recommendationRepository).save(recommendationCaptor.capture());
-    assertThat(recommendationCaptor.getValue().getRecommendationStatus(),
-        is(COMPLETED));
-    assertThat(recommendationCaptor.getValue().getOutcome(), is(RecommendationGmcOutcome.APPROVED));
+    assertThat(recommendationCaptor.getValue().getRecommendationStatus(), is(COMPLETED));
+    assertThat(recommendationCaptor.getValue().getOutcome(), is(newOutcome));
 
-    verify(snapshotRepository).save(any());
+    verify(snapshotService).saveRecommendationToSnapshot(recommendationCaptor.capture());
+    final var actualSnapshotRecommendation = recommendationCaptor.getValue();
+    assertThat(actualSnapshotRecommendation.getId(), is(recommendationId));
+    assertThat(actualSnapshotRecommendation.getRecommendationStatus(), is(COMPLETED));
 
   }
 
-  @Test
-  void shouldUpdateRecommendationAndTisStatus_WhenRecommendationGmcOutcomeIsRejected()
-      throws Exception {
-
-    final var recommendationStatusCheckDto = RecommendationStatusCheckDto.builder()
+  private RecommendationStatusCheckDto buildRecommendationStatusCheckDto(
+      RecommendationGmcOutcome outcome) {
+    return RecommendationStatusCheckDto.builder()
         .gmcReferenceNumber(gmcId)
         .recommendationId(recommendationId)
-        .outcome(recommendationGmcOutcome_rejected)
+        .outcome(outcome)
         .build();
-
-    final var doctorsForDB = buildDoctorForDB(gmcId);
-    when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
-
-    when(recommendationRepository.findById(recommendationId))
-        .thenReturn(Optional.of(buildRecommendation(gmcId, recommendationId, status, REVALIDATE,
-            UNDER_REVIEW)));
-
-    when(recommendationService.getRecommendationStatusForTrainee(gmcId)).thenReturn(status);
-
-    snapshotRepository.save(snapshot);
-
-    recommendationStatusCheckUpdatedMessageHandler
-        .updateRecommendationAndTisStatus(recommendationStatusCheckDto);
-
-    verify(doctorsForDBRepository).save(doctorCaptor.capture());
-    assertThat(doctorCaptor.getValue().getDoctorStatus(), is(COMPLETED));
-
-    verify(recommendationRepository).save(recommendationCaptor.capture());
-    assertThat(recommendationCaptor.getValue().getRecommendationStatus(),
-        is(COMPLETED));
-    assertThat(recommendationCaptor.getValue().getOutcome(), is(RecommendationGmcOutcome.REJECTED));
-
-    verify(snapshotRepository).save(any());
-
   }
 
   private DoctorsForDB buildDoctorForDB(final String gmcId) {
@@ -210,13 +175,13 @@ class RecommendationStatusCheckUpdatedMessageHandlerTest {
   }
 
   private Recommendation buildRecommendation(final String gmcId, final String recommendationId,
-      final RecommendationStatus status, final RecommendationType recommendationType,
+      final RecommendationStatus status,
       final RecommendationGmcOutcome outcome) {
     return Recommendation.builder()
         .id(recommendationId)
         .gmcNumber(gmcId)
         .recommendationStatus(status)
-        .recommendationType(recommendationType)
+        .recommendationType(RecommendationType.REVALIDATE)
         .admin(admin1)
         .gmcSubmissionDate(submissionDate)
         .actualSubmissionDate(actualSubmissionDate)

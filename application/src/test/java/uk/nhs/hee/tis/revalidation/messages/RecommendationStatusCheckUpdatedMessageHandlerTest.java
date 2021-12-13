@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.revalidation.service;
+package uk.nhs.hee.tis.revalidation.messages;
 
 import static java.time.LocalDate.now;
 import static java.util.Optional.of;
@@ -56,9 +56,11 @@ import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
 import uk.nhs.hee.tis.revalidation.repository.SnapshotRepository;
+import uk.nhs.hee.tis.revalidation.service.RecommendationService;
+import uk.nhs.hee.tis.revalidation.service.SnapshotService;
 
 @ExtendWith(MockitoExtension.class)
-class RecommendationTisStatusUpdateServiceTest {
+class RecommendationStatusCheckUpdatedMessageHandlerTest {
 
   private final Faker faker = new Faker();
   @Captor
@@ -68,7 +70,7 @@ class RecommendationTisStatusUpdateServiceTest {
   @Captor
   ArgumentCaptor<Snapshot> snapshotCaptor;
   @InjectMocks
-  private RecommendationTisStatusUpdateService recommendationTisStatusUpdateService;
+  private RecommendationStatusCheckUpdatedMessageHandler recommendationStatusCheckUpdatedMessageHandler;
   @Mock
   private RecommendationRepository recommendationRepository;
   @Mock
@@ -82,6 +84,7 @@ class RecommendationTisStatusUpdateServiceTest {
 
   private String recommendationId;
   private RecommendationGmcOutcome recommendationGmcOutcome;
+  private RecommendationGmcOutcome recommendationGmcOutcome_rejected;
   private String firstName;
   private String lastName;
   private LocalDate submissionDate;
@@ -95,11 +98,13 @@ class RecommendationTisStatusUpdateServiceTest {
   private Snapshot snapshot;
   private Recommendation recommendation;
   private String gmcId;
+  private String gmcRecommendationId;
 
   @BeforeEach
   public void setup() {
     recommendationId = faker.lorem().characters(10);
     recommendationGmcOutcome = RecommendationGmcOutcome.APPROVED;
+    recommendationGmcOutcome_rejected = RecommendationGmcOutcome.REJECTED;
     firstName = faker.name().firstName();
     lastName = faker.name().lastName();
     status = COMPLETED;
@@ -114,6 +119,7 @@ class RecommendationTisStatusUpdateServiceTest {
     recommendation = buildRecommendation(gmcId, recommendationId, status, REVALIDATE,
         recommendationGmcOutcome);
     snapshot = buildSnapshot(gmcId);
+    gmcRecommendationId = faker.lorem().characters(7);
   }
 
   @Test
@@ -136,7 +142,7 @@ class RecommendationTisStatusUpdateServiceTest {
 
     snapshotRepository.save(snapshot);
 
-    recommendationTisStatusUpdateService
+    recommendationStatusCheckUpdatedMessageHandler
         .updateRecommendationAndTisStatus(recommendationStatusCheckDto);
 
     verify(doctorsForDBRepository).save(doctorCaptor.capture());
@@ -146,6 +152,42 @@ class RecommendationTisStatusUpdateServiceTest {
     assertThat(recommendationCaptor.getValue().getRecommendationStatus(),
         is(COMPLETED));
     assertThat(recommendationCaptor.getValue().getOutcome(), is(RecommendationGmcOutcome.APPROVED));
+
+    verify(snapshotRepository).save(any());
+
+  }
+
+  @Test
+  void shouldUpdateRecommendationAndTisStatus_WhenRecommendationGmcOutcomeIsRejected()
+      throws Exception {
+
+    final var recommendationStatusCheckDto = RecommendationStatusCheckDto.builder()
+        .gmcReferenceNumber(gmcId)
+        .recommendationId(recommendationId)
+        .outcome(recommendationGmcOutcome_rejected)
+        .build();
+
+    final var doctorsForDB = buildDoctorForDB(gmcId);
+    when(doctorsForDBRepository.findById(gmcId)).thenReturn(of(doctorsForDB));
+
+    when(recommendationRepository.findById(recommendationId))
+        .thenReturn(Optional.of(buildRecommendation(gmcId, recommendationId, status, REVALIDATE,
+            UNDER_REVIEW)));
+
+    when(recommendationService.getRecommendationStatusForTrainee(gmcId)).thenReturn(status);
+
+    snapshotRepository.save(snapshot);
+
+    recommendationStatusCheckUpdatedMessageHandler
+        .updateRecommendationAndTisStatus(recommendationStatusCheckDto);
+
+    verify(doctorsForDBRepository).save(doctorCaptor.capture());
+    assertThat(doctorCaptor.getValue().getDoctorStatus(), is(COMPLETED));
+
+    verify(recommendationRepository).save(recommendationCaptor.capture());
+    assertThat(recommendationCaptor.getValue().getRecommendationStatus(),
+        is(COMPLETED));
+    assertThat(recommendationCaptor.getValue().getOutcome(), is(RecommendationGmcOutcome.REJECTED));
 
     verify(snapshotRepository).save(any());
 

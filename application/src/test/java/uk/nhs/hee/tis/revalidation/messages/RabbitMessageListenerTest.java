@@ -35,7 +35,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.nhs.hee.tis.revalidation.dto.RecommendationStatusCheckDto;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
-import uk.nhs.hee.tis.revalidation.service.RecommendationTisStatusUpdateService;
 
 @ExtendWith(MockitoExtension.class)
 public class RabbitMessageListenerTest {
@@ -46,7 +45,7 @@ public class RabbitMessageListenerTest {
   RabbitMessageListener rabbitMessageListener;
 
   @Mock
-  RecommendationTisStatusUpdateService recommendationTisStatusUpdateService;
+  RecommendationStatusCheckUpdatedMessageHandler recommendationStatusCheckUpdatedMessageHandler;
 
   @Captor
   ArgumentCaptor<RecommendationStatusCheckDto> recommendationStatusCheckDtoCaptor;
@@ -69,7 +68,7 @@ public class RabbitMessageListenerTest {
   @Test
   public void shouldHandleRecommendationStatusCheckMessages() {
     rabbitMessageListener.receiveMessageForRecommendationStatusUpdate(recommendationStatusCheckDto);
-    verify(recommendationTisStatusUpdateService)
+    verify(recommendationStatusCheckUpdatedMessageHandler)
         .updateRecommendationAndTisStatus(recommendationStatusCheckDtoCaptor.capture());
 
     assertThat(recommendationStatusCheckDtoCaptor.getValue().getGmcReferenceNumber(), is(gmcNumber));

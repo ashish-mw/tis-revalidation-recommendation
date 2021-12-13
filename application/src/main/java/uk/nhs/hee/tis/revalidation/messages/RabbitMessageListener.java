@@ -29,7 +29,6 @@ import uk.nhs.hee.tis.revalidation.dto.ConnectionMessageDto;
 import uk.nhs.hee.tis.revalidation.dto.DoctorsForDbDto;
 import uk.nhs.hee.tis.revalidation.dto.RecommendationStatusCheckDto;
 import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
-import uk.nhs.hee.tis.revalidation.service.RecommendationTisStatusUpdateService;
 
 @Slf4j
 @Component
@@ -39,7 +38,7 @@ public class RabbitMessageListener {
   private DoctorsForDBService doctorsForDBService;
 
   @Autowired
-  private RecommendationTisStatusUpdateService recommendationTisStatusUpdateService;
+  private RecommendationStatusCheckUpdatedMessageHandler recommendationStatusCheckUpdatedMessageHandler;
 
   @RabbitListener(queues = "${app.rabbit.queue}")
   public void receivedMessage(final DoctorsForDbDto gmcDoctor) {
@@ -56,7 +55,7 @@ public class RabbitMessageListener {
   @RabbitListener(queues = "${app.rabbit.reval.queue.recommendationStatusCheck.updated}")
   public void receiveMessageForRecommendationStatusUpdate(
       final RecommendationStatusCheckDto recommendationStatusCheckDto) {
-    recommendationTisStatusUpdateService
+    recommendationStatusCheckUpdatedMessageHandler
         .updateRecommendationAndTisStatus(recommendationStatusCheckDto);
   }
 }

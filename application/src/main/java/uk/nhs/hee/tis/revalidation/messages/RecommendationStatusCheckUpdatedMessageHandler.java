@@ -19,14 +19,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.revalidation.service;
+package uk.nhs.hee.tis.revalidation.messages;
 
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.APPROVED;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.REJECTED;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationStatus.COMPLETED;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,10 +36,12 @@ import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 import uk.nhs.hee.tis.revalidation.repository.RecommendationRepository;
 import uk.nhs.hee.tis.revalidation.repository.SnapshotRepository;
+import uk.nhs.hee.tis.revalidation.service.RecommendationService;
+import uk.nhs.hee.tis.revalidation.service.SnapshotService;
 
 @Slf4j
 @Service
-public class RecommendationTisStatusUpdateService {
+public class RecommendationStatusCheckUpdatedMessageHandler {
 
   @Autowired
   private RecommendationRepository recommendationRepository;
@@ -100,19 +101,12 @@ public class RecommendationTisStatusUpdateService {
 
   private boolean doesSnapshotRecommendationExist(String gmcReferenceNumber,
       String gmcRecommendationId) {
-    AtomicBoolean doesSnapshotRecommendationExist = new AtomicBoolean(false);
     final var snapshots = snapshotRepository.findByGmcNumber(gmcReferenceNumber);
-    if (snapshots.size() == 0) {
+    if (snapshots.isEmpty()) {
       return false;
-    } else {
-      snapshots.forEach(snapshot -> {
-        boolean var = false;
-        if (snapshot.getRevalidation().getGmcRecommendationId() != null && snapshot
-            .getRevalidation().getGmcRecommendationId().equals(gmcRecommendationId)) {
-          doesSnapshotRecommendationExist.set(true);
-        }
-      });
     }
-    return doesSnapshotRecommendationExist.get();
+    return snapshots.stream()
+        .filter(s -> gmcRecommendationId.equals(s.getRevalidation().getGmcRecommendationId()))
+        .findAny().isPresent();
   }
 }

@@ -67,7 +67,6 @@ app:
     reval.queue.recommendation.syncstart: ${REVAL_RABBIT_RECOMMENDATION_SYNC_START_QUEUE:reval.queue.recommendation.syncstart}
     reval.routingKey.recommendation.syncstart: ${REVAL_RABBIT_RECOMMENDATION_SYNCSTART_ROUTING_KEY:reval.recommendation.syncstart}
     reval.queue.recommendationStatusCheck.updated: ${REVAL_RABBIT_RECOMMENDATION_STATUS_CHECK_UPDATED_QUEUE:reval.queue.recommendationstatuscheck.updated.recommendation}
-    reval.routingKey.recommendationStatusCheck.updated: ${REVAL_RABBIT_RECOMMENDATION_STATUS_CHECK_UPDATED_ROUTING_KEY:reval.recommendationstatuscheck.updated}
     reval.routingKey.recommendationstatuscheck.requested: ${REVAL_RABBIT_RECOMMENDATION_STATUS_CHECK_REQUESTED_ROUTING_KEY:reval.recommendationstatuscheck.requested}
 
   gmc:

@@ -24,6 +24,7 @@ package uk.nhs.hee.tis.revalidation.messages;
 import static java.time.LocalDate.now;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome.APPROVED;
@@ -147,6 +148,20 @@ class RecommendationStatusCheckUpdatedMessageHandlerTest {
     assertThat(actualSnapshotRecommendation.getId(), is(recommendationId));
     assertThat(actualSnapshotRecommendation.getRecommendationStatus(), is(COMPLETED));
 
+  }
+
+  @ParameterizedTest(name = "GMC Outcome: {0} should Check Recommendation Repository contains empty recommendation")
+  @EnumSource(value = RecommendationGmcOutcome.class, names = {"APPROVED", "REJECTED"})
+  void shouldCheckRecommendationRepositoryContainsEmptyRecommendation(
+      RecommendationGmcOutcome newOutcome) {
+    final RecommendationStatusCheckDto recommendationStatusCheckDto =
+        buildRecommendationStatusCheckDto(newOutcome);
+    when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.empty());
+
+    recommendationStatusCheckUpdatedMessageHandler
+        .updateRecommendationAndTisStatus(recommendationStatusCheckDto);
+
+    verify(recommendationRepository, times(0)).save(recommendation);
   }
 
   private RecommendationStatusCheckDto buildRecommendationStatusCheckDto(

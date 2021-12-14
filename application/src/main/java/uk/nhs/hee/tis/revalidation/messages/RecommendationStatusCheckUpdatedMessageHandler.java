@@ -54,6 +54,13 @@ public class RecommendationStatusCheckUpdatedMessageHandler {
   @Autowired
   private SnapshotService snapshotService;
 
+  /**
+   * Finds a recommendation and if gmc outcome is approved/rejected, update the
+   * recommendation to approved/rejected, snapshot and doctor tis/recommendation
+   * status to completed
+   *
+   * @param recommendationStatusCheckDto for finding the doctor's recommendation
+   */
   public void updateRecommendationAndTisStatus(
       final RecommendationStatusCheckDto recommendationStatusCheckDto) {
     RecommendationGmcOutcome outcome = recommendationStatusCheckDto.getOutcome();

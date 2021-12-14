@@ -37,7 +37,7 @@ import uk.nhs.hee.tis.revalidation.dto.RecommendationStatusCheckDto;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationGmcOutcome;
 
 @ExtendWith(MockitoExtension.class)
-public class RabbitMessageListenerTest {
+class RabbitMessageListenerTest {
 
   private final Faker faker = new Faker();
 
@@ -66,7 +66,7 @@ public class RabbitMessageListenerTest {
           .build();
 
   @Test
-  public void shouldHandleRecommendationStatusCheckMessages() {
+  void shouldHandleRecommendationStatusCheckMessages() {
     rabbitMessageListener.receiveMessageForRecommendationStatusUpdate(recommendationStatusCheckDto);
     verify(recommendationStatusCheckUpdatedMessageHandler)
         .updateRecommendationAndTisStatus(recommendationStatusCheckDtoCaptor.capture());

@@ -96,6 +96,7 @@ class RecommendationStatusCheckUpdatedMessageHandlerTest {
   private RecommendationStatus status;
   private String admin1;
   private Recommendation recommendation;
+  private DoctorsForDB doctorsForDB;
   private String gmcId;
 
   @BeforeEach
@@ -115,6 +116,7 @@ class RecommendationStatusCheckUpdatedMessageHandlerTest {
     recommendation = buildRecommendation(gmcId, recommendationId, status, APPROVED);
     Snapshot snapshot = buildSnapshot(gmcId);
     gmcRecommendationId = faker.lorem().characters(7);
+    doctorsForDB = buildDoctorForDB(gmcId);
   }
 
   @ParameterizedTest(name = "GMC Outcome: {0} should Update Recommendation, Snapshot and Doctor")
@@ -150,18 +152,20 @@ class RecommendationStatusCheckUpdatedMessageHandlerTest {
 
   }
 
-  @ParameterizedTest(name = "GMC Outcome: {0} should Check Recommendation Repository contains empty recommendation")
+  @ParameterizedTest(name = "GMC Outcome: {0} should Check Recommendation and DoctorsForDb Repository contains empty recommendation")
   @EnumSource(value = RecommendationGmcOutcome.class, names = {"APPROVED", "REJECTED"})
-  void shouldCheckRecommendationRepositoryContainsEmptyRecommendation(
+  void shouldCheckRecommendationRepositoryAndDoctorsForDbRepositoryContainEmptyValues(
       RecommendationGmcOutcome newOutcome) {
     final RecommendationStatusCheckDto recommendationStatusCheckDto =
         buildRecommendationStatusCheckDto(newOutcome);
     when(recommendationRepository.findById(recommendationId)).thenReturn(Optional.empty());
+    when(doctorsForDBRepository.findById(gmcId)).thenReturn(Optional.empty());
 
     recommendationStatusCheckUpdatedMessageHandler
         .updateRecommendationAndTisStatus(recommendationStatusCheckDto);
 
     verify(recommendationRepository, times(0)).save(recommendation);
+    verify(doctorsForDBRepository, times(0)).save(doctorsForDB);
   }
 
   private RecommendationStatusCheckDto buildRecommendationStatusCheckDto(

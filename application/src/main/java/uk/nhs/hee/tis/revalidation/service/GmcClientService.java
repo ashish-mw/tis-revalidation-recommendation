@@ -28,6 +28,7 @@ import static uk.nhs.hee.tis.revalidation.entity.RecommendationType.DEFER;
 import static uk.nhs.hee.tis.revalidation.util.DateUtil.convertDateInGmcFormat;
 
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -94,6 +95,7 @@ public class GmcClientService {
    * Cron job to send RecommendationStatusDtos to Rabbit queue for GMC recommendation status check.
    */
   @Scheduled(cron = "${app.gmc.recommendationstatuscheck.cronExpression}")
+  @SchedulerLock(name = "RecommendationStatusCheckJob")
   public void sendRecommendationStatusRequestToRabbit() {
     log.info("Start cron job: sendRecommendationStatusRequestToRabbit()");
     recommendationService.getRecommendationStatusCheckDtos().forEach(

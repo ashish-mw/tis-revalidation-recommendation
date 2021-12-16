@@ -19,31 +19,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.revalidation.controller;
+package uk.nhs.hee.tis.revalidation.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.hee.tis.revalidation.service.GmcDoctorConnectionSyncService;
+import static org.mockito.Mockito.verify;
 
-@Slf4j
-@RestController
-@RequestMapping("/api/v1/sqs")
-public class GmcDoctorSyncController {
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.nhs.hee.tis.revalidation.messages.publisher.GmcDoctorsForDbSyncStartPublisher;
 
-  private final GmcDoctorConnectionSyncService gmcDoctorConnectionSyncService;
+@ExtendWith(MockitoExtension.class)
+public class GmcDoctorNightlySyncServiceTest {
 
-  public GmcDoctorSyncController(final GmcDoctorConnectionSyncService gmcDoctorConnectionSyncService) {
-    this.gmcDoctorConnectionSyncService = gmcDoctorConnectionSyncService;
+  @InjectMocks
+  GmcDoctorNightlySyncService gmcDoctorNightlySyncService;
+
+  @Mock
+  DoctorsForDBService doctorsForDBService;
+
+  @Mock
+  GmcDoctorsForDbSyncStartPublisher gmcDoctorsForDbSyncStartPublisher;
+
+
+  @Test
+  public void shouldHideAllDoctors() {
+    gmcDoctorNightlySyncService.startNightlyGmcDoctorSync();
+    verify(doctorsForDBService).hideAllDoctors();
   }
 
-  @GetMapping("/send-doctor")
-  public ResponseEntity<Void> startGmcSync() {
-    //this endpoint is needed to start gmc sync manually
-    gmcDoctorConnectionSyncService.receiveMessage("gmcSyncStart");
-    return ResponseEntity.ok().build();
+  @Test
+  public void shouldPublishMessageToStartSync() {
+    gmcDoctorNightlySyncService.startNightlyGmcDoctorSync();
+    verify(gmcDoctorsForDbSyncStartPublisher).publishNightlySyncStartMessage();
   }
 
 }

@@ -146,6 +146,14 @@ public class DoctorsForDBService {
         .totalResults(traineeInfoDtos.size()).traineeInfo(traineeInfoDtos).build();
   }
 
+  public void hideAllDoctors() {
+    List<DoctorsForDB> doctors = doctorsRepository.findAll();
+    doctors.stream().forEach(doctor -> {
+      doctor.setDesignatedBodyCode("last-"+doctor.getDesignatedBodyCode());
+      doctorsRepository.save(doctor);
+    });
+  }
+
   private TraineeInfoDto convert(final DoctorsForDB doctorsForDB) {
     final var traineeInfoDTOBuilder = TraineeInfoDto.builder()
         .gmcReferenceNumber(doctorsForDB.getGmcReferenceNumber())

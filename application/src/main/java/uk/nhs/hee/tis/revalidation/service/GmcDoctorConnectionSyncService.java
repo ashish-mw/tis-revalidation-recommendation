@@ -32,7 +32,7 @@ import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 @Slf4j
 @Service
-public class GmcDoctorSyncService {
+public class GmcDoctorConnectionSyncService {
 
   private final QueueMessagingTemplate queueMessagingTemplate;
   private final DoctorsForDBRepository doctorsForDBRepository;
@@ -41,7 +41,7 @@ public class GmcDoctorSyncService {
   @Value("${cloud.aws.end-point.uri}")
   private String sqsEndPoint;
 
-  public GmcDoctorSyncService(QueueMessagingTemplate queueMessagingTemplate,
+  public GmcDoctorConnectionSyncService(QueueMessagingTemplate queueMessagingTemplate,
       DoctorsForDBRepository doctorsForDBRepository) {
     this.queueMessagingTemplate = queueMessagingTemplate;
     this.doctorsForDBRepository = doctorsForDBRepository;

@@ -19,31 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.revalidation.controller;
+package uk.nhs.hee.tis.revalidation.messages.publisher;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.hee.tis.revalidation.service.GmcDoctorConnectionSyncService;
+public interface MessagePublisher<T> {
 
-@Slf4j
-@RestController
-@RequestMapping("/api/v1/sqs")
-public class GmcDoctorSyncController {
-
-  private final GmcDoctorConnectionSyncService gmcDoctorConnectionSyncService;
-
-  public GmcDoctorSyncController(final GmcDoctorConnectionSyncService gmcDoctorConnectionSyncService) {
-    this.gmcDoctorConnectionSyncService = gmcDoctorConnectionSyncService;
-  }
-
-  @GetMapping("/send-doctor")
-  public ResponseEntity<Void> startGmcSync() {
-    //this endpoint is needed to start gmc sync manually
-    gmcDoctorConnectionSyncService.receiveMessage("gmcSyncStart");
-    return ResponseEntity.ok().build();
-  }
-
+  void publishToBroker(T message);
 }
+

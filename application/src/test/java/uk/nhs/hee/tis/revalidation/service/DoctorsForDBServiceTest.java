@@ -452,6 +452,14 @@ class DoctorsForDBServiceTest {
     assertThat(doctorCaptor.getValue().getDoctorStatus(), is(RecommendationStatus.COMPLETED));
   }
 
+  @Test
+  void shouldHideAllDoctorsByModifyingDBC() {
+    when(repository.findAll()).thenReturn(List.of(doc1));
+    doctorsForDBService.hideAllDoctors();
+    verify(repository).save(doctorCaptor.capture());
+    assertThat(doctorCaptor.getValue().getDesignatedBodyCode(), is("last-"+designatedBody1));
+  }
+
 
   private void setupData() {
     gmcRef1 = faker.number().digits(8);

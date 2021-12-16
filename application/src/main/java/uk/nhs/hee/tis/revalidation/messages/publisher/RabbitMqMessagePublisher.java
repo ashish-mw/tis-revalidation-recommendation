@@ -19,31 +19,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.revalidation.controller;
+package uk.nhs.hee.tis.revalidation.messages.publisher;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.hee.tis.revalidation.service.GmcDoctorConnectionSyncService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-@Slf4j
-@RestController
-@RequestMapping("/api/v1/sqs")
-public class GmcDoctorSyncController {
+@Component
+public class RabbitMqMessagePublisher<T> implements MessagePublisher<T> {
 
-  private final GmcDoctorConnectionSyncService gmcDoctorConnectionSyncService;
+  @Value("${app.rabbit.reval.exchange}")
+  private String exchange;
 
-  public GmcDoctorSyncController(final GmcDoctorConnectionSyncService gmcDoctorConnectionSyncService) {
-    this.gmcDoctorConnectionSyncService = gmcDoctorConnectionSyncService;
+  @Value("${app.rabbit.reval.routingKey.gmcsync.syncStarted}")
+  private String routingKey;
+
+  @Autowired
+  private RabbitTemplate rabbitTemplate;
+
+  /**
+   * Publishes message to injected broker interface
+   *
+   * @param message contains message payload
+   */
+  public void publishToBroker(T message) {
+    rabbitTemplate.convertAndSend(exchange, routingKey, message);
   }
-
-  @GetMapping("/send-doctor")
-  public ResponseEntity<Void> startGmcSync() {
-    //this endpoint is needed to start gmc sync manually
-    gmcDoctorConnectionSyncService.receiveMessage("gmcSyncStart");
-    return ResponseEntity.ok().build();
-  }
-
 }

@@ -24,7 +24,6 @@ package uk.nhs.hee.tis.revalidation.controller;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
@@ -42,7 +41,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.nhs.hee.tis.revalidation.entity.DoctorsForDB;
 import uk.nhs.hee.tis.revalidation.entity.RecommendationStatus;
 import uk.nhs.hee.tis.revalidation.entity.UnderNotice;
-import uk.nhs.hee.tis.revalidation.service.GmcDoctorSyncService;
+import uk.nhs.hee.tis.revalidation.service.GmcDoctorConnectionSyncService;
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(GmcDoctorSyncController.class)
@@ -53,7 +52,7 @@ class GmcDoctorSyncControllerTest {
   private MockMvc mockMvc;
 
   @MockBean
-  private GmcDoctorSyncService gmcDoctorSyncService;
+  private GmcDoctorConnectionSyncService gmcDoctorConnectionSyncService;
 
   @InjectMocks
   private GmcDoctorSyncController gmcDoctorSyncController;

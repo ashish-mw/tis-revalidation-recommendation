@@ -19,31 +19,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.revalidation.controller;
+package uk.nhs.hee.tis.revalidation.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import uk.nhs.hee.tis.revalidation.service.GmcDoctorConnectionSyncService;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.verify;
 
-@Slf4j
-@RestController
-@RequestMapping("/api/v1/sqs")
-public class GmcDoctorSyncController {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-  private final GmcDoctorConnectionSyncService gmcDoctorConnectionSyncService;
+@ExtendWith(MockitoExtension.class)
+class GmcDoctorConnectionSyncServiceTest {
 
-  public GmcDoctorSyncController(final GmcDoctorConnectionSyncService gmcDoctorConnectionSyncService) {
-    this.gmcDoctorConnectionSyncService = gmcDoctorConnectionSyncService;
+  @Captor
+  ArgumentCaptor<String> syncStartMessage;
+  @Mock
+  private GmcDoctorConnectionSyncService gmcDoctorConnectionSyncService;
+
+  @BeforeEach
+  void setUp() {
   }
 
-  @GetMapping("/send-doctor")
-  public ResponseEntity<Void> startGmcSync() {
-    //this endpoint is needed to start gmc sync manually
+  @Test
+  void testReceiveMessageArgument() {
     gmcDoctorConnectionSyncService.receiveMessage("gmcSyncStart");
-    return ResponseEntity.ok().build();
-  }
 
+    verify(gmcDoctorConnectionSyncService).receiveMessage(syncStartMessage.capture());
+    assertThat(syncStartMessage.getValue(), is("gmcSyncStart"));
+  }
 }

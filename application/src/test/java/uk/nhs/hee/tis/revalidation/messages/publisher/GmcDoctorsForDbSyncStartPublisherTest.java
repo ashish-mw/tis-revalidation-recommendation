@@ -19,37 +19,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.nhs.hee.tis.revalidation.service;
+package uk.nhs.hee.tis.revalidation.messages.publisher;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.verify;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 @ExtendWith(MockitoExtension.class)
-class GmcDoctorSyncServiceTest {
+public class GmcDoctorsForDbSyncStartPublisherTest {
+
+  @InjectMocks
+  GmcDoctorsForDbSyncStartPublisher gmcDoctorsForDbSyncStartPublisher;
+
+  @Mock
+  MessagePublisher<String> messagePublisher;
 
   @Captor
-  ArgumentCaptor<String> syncStartMessage;
-  @Mock
-  private GmcDoctorSyncService gmcDoctorSyncService;
-
-  @BeforeEach
-  void setUp() {
-  }
+  ArgumentCaptor<String> messageCaptor;
 
   @Test
-  void testReceiveMessageArgument() {
-    gmcDoctorSyncService.receiveMessage("gmcSyncStart");
+  public void shouldPublishStartSyncMessage() {
 
-    verify(gmcDoctorSyncService).receiveMessage(syncStartMessage.capture());
-    assertThat(syncStartMessage.getValue(), is("gmcSyncStart"));
+    final String startMessage = "start";
+    ReflectionTestUtils.setField(
+        gmcDoctorsForDbSyncStartPublisher, "startMessage", startMessage
+    );
+
+    gmcDoctorsForDbSyncStartPublisher.publishNightlySyncStartMessage();
+
+    verify(messagePublisher).publishToBroker(
+        messageCaptor.capture()
+    );
+
+    assertThat(messageCaptor.getValue(), is(startMessage));
+
   }
+
+
 }

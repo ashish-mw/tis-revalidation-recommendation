@@ -37,7 +37,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class RabbitMqMessagePublisherTest {
+class RabbitMqMessagePublisherTest {
 
   private final Faker faker = new Faker();
 
@@ -64,7 +64,7 @@ public class RabbitMqMessagePublisherTest {
   private String recommendationStatusCheckDto = "start";
 
   @Test
-  public void shouldPublishToRabbitMq() {
+  void shouldPublishToRabbitMq() {
 
     String routingKeyName = "routingKeyName";
     String exchangeName = "exchangeName";

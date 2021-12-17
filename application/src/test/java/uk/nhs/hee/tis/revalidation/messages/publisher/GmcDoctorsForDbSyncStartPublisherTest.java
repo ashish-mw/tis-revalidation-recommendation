@@ -35,7 +35,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class GmcDoctorsForDbSyncStartPublisherTest {
+class GmcDoctorsForDbSyncStartPublisherTest {
 
   @InjectMocks
   GmcDoctorsForDbSyncStartPublisher gmcDoctorsForDbSyncStartPublisher;
@@ -47,7 +47,7 @@ public class GmcDoctorsForDbSyncStartPublisherTest {
   ArgumentCaptor<String> messageCaptor;
 
   @Test
-  public void shouldPublishStartSyncMessage() {
+  void shouldPublishStartSyncMessage() {
 
     final String startMessage = "start";
     ReflectionTestUtils.setField(

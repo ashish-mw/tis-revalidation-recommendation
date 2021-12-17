@@ -1,9 +1,9 @@
 package uk.nhs.hee.tis.revalidation.service;
 
-import org.springframework.stereotype.Component;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.revalidation.messages.publisher.GmcDoctorsForDbSyncStartPublisher;
-import uk.nhs.hee.tis.revalidation.service.DoctorsForDBService;
 
 @Service
 public class GmcDoctorNightlySyncService {
@@ -20,6 +20,8 @@ public class GmcDoctorNightlySyncService {
     this.doctorsForDBService = doctorsForDBService;
   }
 
+  @Scheduled(cron="${app.gmc.nightlySyncStart.cronExpression}")
+  @SchedulerLock(name = "GmcNightlySyncJob")
   public void startNightlyGmcDoctorSync() {
     this.doctorsForDBService.hideAllDoctors();
     this.gmcDoctorsForDbSyncStartPublisher.publishNightlySyncStartMessage();

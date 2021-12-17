@@ -31,7 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.nhs.hee.tis.revalidation.messages.publisher.GmcDoctorsForDbSyncStartPublisher;
 
 @ExtendWith(MockitoExtension.class)
-public class GmcDoctorNightlySyncServiceTest {
+class GmcDoctorNightlySyncServiceTest {
 
   @InjectMocks
   GmcDoctorNightlySyncService gmcDoctorNightlySyncService;
@@ -44,13 +44,13 @@ public class GmcDoctorNightlySyncServiceTest {
 
 
   @Test
-  public void shouldHideAllDoctors() {
+  void shouldHideAllDoctors() {
     gmcDoctorNightlySyncService.startNightlyGmcDoctorSync();
     verify(doctorsForDBService).hideAllDoctors();
   }
 
   @Test
-  public void shouldPublishMessageToStartSync() {
+  void shouldPublishMessageToStartSync() {
     gmcDoctorNightlySyncService.startNightlyGmcDoctorSync();
     verify(gmcDoctorsForDbSyncStartPublisher).publishNightlySyncStartMessage();
   }

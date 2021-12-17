@@ -7,9 +7,9 @@ public class GmcDoctorsForDbSyncStartPublisher {
 
   private String startMessage = "${app.gmc.nightlySyncStartMessage}";
 
-  private MessagePublisher messagePublisher;
+  private MessagePublisher<String> messagePublisher;
 
-  public GmcDoctorsForDbSyncStartPublisher(MessagePublisher messagePublisher) {
+  public GmcDoctorsForDbSyncStartPublisher(MessagePublisher<String> messagePublisher) {
     this.messagePublisher = messagePublisher;
   }
 

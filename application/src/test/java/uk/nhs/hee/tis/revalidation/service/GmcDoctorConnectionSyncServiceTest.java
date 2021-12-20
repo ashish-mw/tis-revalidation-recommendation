@@ -62,6 +62,13 @@ class GmcDoctorConnectionSyncServiceTest {
   }
 
   @Test
+  void shouldNotRetireveDoctorsIfNullMessageSupplied() {
+    gmcDoctorConnectionSyncService.receiveMessage(null);
+
+    verify(doctorsForDBRepository, never()).findAll();
+  }
+
+  @Test
   void shouldNotRetireveDoctorsIfIncorrectMessageSupplied() {
     gmcDoctorConnectionSyncService.receiveMessage("anyString");
 

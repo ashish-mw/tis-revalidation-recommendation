@@ -4,6 +4,7 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import uk.nhs.hee.tis.revalidation.messages.publisher.GmcDoctorsForDbSyncStartPublisher;
+import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
 
 @Service
 public class GmcDoctorNightlySyncService {

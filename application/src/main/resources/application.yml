@@ -69,6 +69,7 @@ app:
     reval.queue.recommendationStatusCheck.updated: ${REVAL_RABBIT_RECOMMENDATION_STATUS_CHECK_UPDATED_QUEUE:reval.queue.recommendationstatuscheck.updated.recommendation}
     reval.routingKey.recommendationstatuscheck.requested: ${REVAL_RABBIT_RECOMMENDATION_STATUS_CHECK_REQUESTED_ROUTING_KEY:reval.recommendationstatuscheck.requested}
     reval.queue.gmcsync.requested.gmcclient: ${REVAL_RABBIT_GMCSYNC_REQUESTED_GMCCLIENT_QUEUE:reval.queue.gmcsync.requested.gmcclient}
+    reval.routingKey.gmcsync.requested.gmcclient: ${REVAL_RABBIT_GMCSYNC_REQUESTED_GMCCLIENT_ROUTING_KEY:reval.gmcsync.requested}
 
   gmc:
     url: ${GMC_CONNECT_URL:http://localhost:8090/GMCConnectMock2020/GMCWebServices}

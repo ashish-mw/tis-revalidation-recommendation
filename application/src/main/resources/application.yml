@@ -78,8 +78,8 @@ app:
     gmcPassword: ${GMC_PASSWORD:guest}
     designatedBodies: ${DESIGNATED_BODY_CODE:1-AIIDHJ,1-AIIDMQ,1-AIIDNQ,1-AIIDMY,1-AIIDQQ,1-AIIDWT,1-AIIDR8,1-AIIDSA,1-AIIDH1,1-AIIDWA,1-AIIDVS,1-AIIDWI,1-AIIDSI}
     recommendationstatuscheck.cronExpression: ${REC_STATUS_CHECK_CRON:0 0 * * * *}
-    nightlySyncStart.cronExpression: ${REC_STATUS_CHECK_CRON:0 0 * * * *}
-    nightlySyncStartMessage: ${NIGHTLY_SYNC_START_MESSAGE:start}
+    nightlySyncStart.cronExpression: ${REC_NIGHTLY_SYNC_CRON:0 0 * * * *}
+    nightlySyncStartMessage: ${REC_NIGHTLY_SYNC_START_MESSAGE:start}
 
   scheduling:
     lock:

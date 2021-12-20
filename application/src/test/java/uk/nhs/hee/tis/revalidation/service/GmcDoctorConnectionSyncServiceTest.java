@@ -23,33 +23,48 @@ package uk.nhs.hee.tis.revalidation.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import io.awspring.cloud.messaging.core.QueueMessagingTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.nhs.hee.tis.revalidation.repository.DoctorsForDBRepository;
+
 
 @ExtendWith(MockitoExtension.class)
 class GmcDoctorConnectionSyncServiceTest {
 
   @Captor
   ArgumentCaptor<String> syncStartMessage;
-  @Mock
+  @InjectMocks
   private GmcDoctorConnectionSyncService gmcDoctorConnectionSyncService;
+  @Mock
+  private QueueMessagingTemplate queueMessagingTemplate;
+  @Mock
+  private DoctorsForDBRepository doctorsForDBRepository;
 
   @BeforeEach
   void setUp() {
   }
 
   @Test
-  void testReceiveMessageArgument() {
+  void shouldRetrieveAllDoctors() {
     gmcDoctorConnectionSyncService.receiveMessage("gmcSyncStart");
 
-    verify(gmcDoctorConnectionSyncService).receiveMessage(syncStartMessage.capture());
-    assertThat(syncStartMessage.getValue(), is("gmcSyncStart"));
+    verify(doctorsForDBRepository).findAll();
+  }
+
+  @Test
+  void shouldNotRetireveDoctorsIfIncorrectMessageSupplied() {
+    gmcDoctorConnectionSyncService.receiveMessage("anyString");
+
+    verify(doctorsForDBRepository, never()).findAll();
   }
 }

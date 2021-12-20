@@ -59,6 +59,8 @@ public class DoctorsForDBService {
   @Value("${app.reval.pagination.pageSize}")
   private int pageSize;
 
+  private String hiddenPrefix = "last-";
+
   private DoctorsForDBRepository doctorsRepository;
 
   private RecommendationService recommendationService;
@@ -149,7 +151,9 @@ public class DoctorsForDBService {
   public void hideAllDoctors() {
     List<DoctorsForDB> doctors = doctorsRepository.findAll();
     doctors.stream().forEach(doctor -> {
-      doctor.setDesignatedBodyCode("last-"+doctor.getDesignatedBodyCode());
+      doctor.setDesignatedBodyCode(
+          getHiddenDesignatedBodyCode(doctor.getDesignatedBodyCode())
+      );
       doctorsRepository.save(doctor);
     });
   }
@@ -202,6 +206,14 @@ public class DoctorsForDBService {
 
   private String getConnectionStatus(final String designatedBody) {
     return (designatedBody == null || designatedBody.equals("")) ? "No" : "Yes";
+  }
+
+  private String getHiddenDesignatedBodyCode(String dbCode) {
+    if(!dbCode.startsWith(hiddenPrefix)){
+      return hiddenPrefix + dbCode;
+    } else {
+      return dbCode;
+    }
   }
 
 

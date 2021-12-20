@@ -460,6 +460,17 @@ class DoctorsForDBServiceTest {
     assertThat(doctorCaptor.getValue().getDesignatedBodyCode(), is("last-"+designatedBody1));
   }
 
+  @Test
+  void shouldNotAddHiddenPrefixToDoctorIfAlreadyHidden() {
+    final var dbCode = doc1.getDesignatedBodyCode();
+    doc1.setDesignatedBodyCode("last-" + dbCode);
+
+    when(repository.findAll()).thenReturn(List.of(doc1));
+    doctorsForDBService.hideAllDoctors();
+    verify(repository).save(doctorCaptor.capture());
+    assertThat(doctorCaptor.getValue().getDesignatedBodyCode(), is("last-"+designatedBody1));
+  }
+
 
   private void setupData() {
     gmcRef1 = faker.number().digits(8);

@@ -32,7 +32,7 @@ public class RabbitMqMessagePublisher<T> implements MessagePublisher<T> {
   @Value("${app.rabbit.reval.exchange}")
   private String exchange;
 
-  @Value("${reval.routingKey.gmcsync.requested.gmcclient}")
+  @Value("${app.rabbit.reval.routingKey.gmcsync.requested.gmcclient}")
   private String routingKey;
 
   @Autowired

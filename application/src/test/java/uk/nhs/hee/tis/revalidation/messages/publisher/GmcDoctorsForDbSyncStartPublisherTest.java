@@ -50,9 +50,6 @@ class GmcDoctorsForDbSyncStartPublisherTest {
   void shouldPublishStartSyncMessage() {
 
     final String startMessage = "start";
-    ReflectionTestUtils.setField(
-        gmcDoctorsForDbSyncStartPublisher, "startMessage", startMessage
-    );
 
     gmcDoctorsForDbSyncStartPublisher.publishNightlySyncStartMessage();
 

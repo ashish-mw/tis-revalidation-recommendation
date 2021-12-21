@@ -209,7 +209,7 @@ public class DoctorsForDBService {
   }
 
   private String getHiddenDesignatedBodyCode(String dbCode) {
-    if(!dbCode.startsWith(hiddenPrefix)){
+    if(dbCode != null && !dbCode.startsWith(hiddenPrefix)){
       return hiddenPrefix + dbCode;
     } else {
       return dbCode;

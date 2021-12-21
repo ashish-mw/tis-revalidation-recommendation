@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GmcDoctorsForDbSyncStartPublisher {
 
-  private String startMessage = "${app.gmc.nightlySyncStartMessage}";
+  private String startMessage = "start";
 
   private MessagePublisher<String> messagePublisher;
 
